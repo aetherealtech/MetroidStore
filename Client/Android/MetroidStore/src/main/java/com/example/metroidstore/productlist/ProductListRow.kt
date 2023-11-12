@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -14,13 +15,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
-import coil.compose.AsyncImage
+import com.example.metroidstore.model.ImageSource
 import com.example.metroidstore.model.Product
 import com.example.metroidstore.model.Rating
+import com.example.metroidstore.widgets.AsyncImage
 import com.example.metroidstore.widgets.PriceView
 import com.example.metroidstore.widgets.StarRatingView
 import kotlinx.collections.immutable.ImmutableList
-import okhttp3.HttpUrl
 import java.math.BigDecimal
 
 @Composable
@@ -33,22 +34,10 @@ fun ProductListRow(
         modifier = Modifier.height(128.dp)
     ) {
         AsyncImage(
-            model = HttpUrl.Builder()
-                .scheme("https")
-                .host("html.com")
-                .addPathSegment("wp-content")
-                .addPathSegment("uploads")
-                .addPathSegment("flamingo.jpg")
-                .build(),
             modifier = Modifier
                 .aspectRatio(1.0f)
                 .fillMaxHeight(),
-            onSuccess = {
-                println("SUCCESS")
-            },
-            onError = { error ->
-                println("ERROR: $error")
-            },
+            source = viewModel.image,
             contentDescription = "Product Image"
         )
         Column(
@@ -76,6 +65,7 @@ fun ProductListRow(
 class ProductRowViewModel(
     product: Product
 ): ViewModel() {
+    val image: ImageSource
     val name: String
     val type: String
     val game: String
@@ -83,6 +73,7 @@ class ProductRowViewModel(
     val price: BigDecimal
 
     init {
+        image = product.image
         name = product.name
         type = product.type
         game = product.game
