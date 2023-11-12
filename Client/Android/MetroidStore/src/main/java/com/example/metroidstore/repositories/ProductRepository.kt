@@ -2,7 +2,7 @@ package com.example.metroidstore.repositories
 
 import com.example.metroidstore.model.Product
 import com.example.metroidstore.datasources.ProductDataSource
-import com.example.metroidstore.datasources.ProductDataSourceFake
+import com.example.metroidstore.fakedatasources.ProductDataSourceFake
 import kotlinx.collections.immutable.ImmutableList
 
 class ProductRepository(

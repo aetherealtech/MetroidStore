@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.metroidstore.datasources.ProductDataSourceFake
+import com.example.metroidstore.fakedatasources.ProductDataSourceFake
 import com.example.metroidstore.repositories.ProductRepository
 import com.example.metroidstore.ui.theme.MetroidStoreTheme
 import kotlinx.coroutines.flow.MutableStateFlow

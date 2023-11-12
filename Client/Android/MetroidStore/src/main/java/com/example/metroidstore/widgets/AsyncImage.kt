@@ -31,11 +31,17 @@ fun AsyncImage(
     val currentLoadedImage by loadedImage
 
     currentLoadedImage?.let { image ->
-        Image(
-            bitmap = image,
-            contentDescription = contentDescription,
-            modifier = modifier
-        )
+        Box(
+            modifier = modifier,
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                bitmap = image,
+                contentDescription = contentDescription,
+                modifier = Modifier
+                    .fillMaxSize(0.75f)
+            )
+        }
     } ?: run {
         Box(
             modifier = modifier,

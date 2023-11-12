@@ -1,7 +1,6 @@
 package com.example.metroidstore.model
 
 import kotlinx.collections.immutable.ImmutableList
-import java.math.BigDecimal
 
 data class Product(
     val image: ImageSource,
@@ -9,5 +8,5 @@ data class Product(
     val type: String,
     val game: String,
     val ratings: ImmutableList<Rating>,
-    val price: BigDecimal
+    val price: Price
 )

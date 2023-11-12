@@ -12,7 +12,7 @@ enum class Rating(val value: Int) {
 val List<Rating>.rating: Float
     get() {
         val sum = map { rating -> rating.value }
-            .reduce { lhs, rhs -> lhs + rhs }
+            .fold(0) { lhs, rhs -> lhs + rhs }
 
         return sum.toFloat() / size
     }

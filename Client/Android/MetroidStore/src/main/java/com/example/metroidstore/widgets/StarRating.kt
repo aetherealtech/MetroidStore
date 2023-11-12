@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
 import com.example.metroidstore.model.Rating
 import com.example.metroidstore.model.rating
 import java.text.DecimalFormat
@@ -29,7 +30,7 @@ operator fun Color.div(other: Float): Color {
 
 @Composable
 fun StarRatingView(
-    ratings: List<Rating>
+    viewModel: StarRatingViewModel
 ) {
     @Composable
     fun Star(filled: Boolean) {
@@ -41,24 +42,50 @@ fun StarRatingView(
         )
     }
 
-    val format = DecimalFormat("0.0")
-    val rating = ratings.rating
-
     Row(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = format.format(rating),
+            text = viewModel.displayedRating,
             fontSize = 12.sp,
             fontWeight = FontWeight.Light
         )
         (1..5).forEach { index ->
-            Star(filled = rating >= index)
+            Star(filled = viewModel.rating >= index)
         }
         Text(
-            text = "(${ratings.size})",
+            text = viewModel.count,
             fontSize = 10.sp
         )
+    }
+}
+
+class StarRatingViewModel private constructor(
+    ratings: List<Rating>
+): ViewModel() {
+    companion object {
+        fun create(
+            ratings: List<Rating>
+        ): StarRatingViewModel? {
+            if(ratings.isEmpty())
+                return null
+
+            return StarRatingViewModel(ratings)
+        }
+    }
+
+    private val format = DecimalFormat("0.0")
+
+    val rating: Int
+    val displayedRating: String
+    val count: String
+
+    init {
+        val rating = ratings.rating
+
+        this.rating = rating.toInt()
+        this.displayedRating = format.format(rating)
+        this.count = "(${ratings.size})"
     }
 }
