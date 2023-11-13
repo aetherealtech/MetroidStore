@@ -1,6 +1,7 @@
 package com.example.metroidstore.productlist
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -24,52 +25,58 @@ import com.example.metroidstore.widgets.StarRatingView
 import com.example.metroidstore.widgets.StarRatingViewModel
 
 @Composable
-fun ProductListRow(
+fun ProductRowView(
+    modifier: Modifier = Modifier,
     viewModel: ProductRowViewModel
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier.height(128.dp)
+    Box(
+        modifier = modifier
     ) {
-        AsyncImage(
-            modifier = Modifier
-                .aspectRatio(1.0f)
-                .fillMaxHeight(),
-            source = viewModel.image,
-            contentDescription = "Product Image"
-        )
-        Column(
-            verticalArrangement = Arrangement.Top,
-            modifier = Modifier.fillMaxHeight()
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = modifier.height(128.dp)
         ) {
-            @Composable
-            fun Description(text: String) {
+            AsyncImage(
+                modifier = Modifier
+                    .aspectRatio(1.0f)
+                    .fillMaxHeight(),
+                source = viewModel.image,
+                contentDescription = "Product Image"
+            )
+            Column(
+                verticalArrangement = Arrangement.Top,
+                modifier = Modifier.fillMaxHeight()
+            ) {
+                @Composable
+                fun Description(text: String) {
+                    Text(
+                        text = text,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+
                 Text(
-                    text = text,
+                    text = viewModel.name,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.Medium
                 )
+                Description(text = viewModel.type)
+                Description(text = viewModel.game)
+                if (viewModel.ratings != null) {
+                    StarRatingView(viewModel = viewModel.ratings)
+                }
+                PriceView(viewModel = viewModel.price)
             }
-
-            Text(
-                text = viewModel.name,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Medium
-            )
-            Description(text = viewModel.type)
-            Description(text = viewModel.game)
-            if(viewModel.ratings != null) {
-                StarRatingView(viewModel = viewModel.ratings)
-            }
-            PriceView(viewModel = viewModel.price)
         }
+        Divider()
     }
-    Divider()
 }
 
 class ProductRowViewModel(
     product: Product
 ): ViewModel() {
+    val id: Product.ID
     val image: ImageSource
     val name: String
     val type: String
@@ -78,6 +85,7 @@ class ProductRowViewModel(
     val price: PriceViewModel
 
     init {
+        id = product.id
         image = product.image
         name = product.name
         type = product.type

@@ -3,6 +3,7 @@ package com.example.metroidstore.embeddedbackend
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.defaultForFileExtension
 import io.ktor.server.application.*
 import io.ktor.server.response.*
@@ -29,6 +30,15 @@ class EmbeddedServer(
                 get("/products") {
                     val products = database.products()
                     call.respondText(Json.encodeToString(products))
+                }
+
+                get("/products/{productId}") {
+                    val product = database.product(call.parameters["productId"]!!.toInt())
+                    if(product != null) {
+                        call.respondText(Json.encodeToString(product))
+                    } else {
+                        call.respond(HttpStatusCode.NotFound)
+                    }
                 }
 
                 get("/images/{imageId}") {

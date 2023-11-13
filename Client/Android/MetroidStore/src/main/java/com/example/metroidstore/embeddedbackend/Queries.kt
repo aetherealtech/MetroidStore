@@ -1,5 +1,6 @@
 package com.example.metroidstore.embeddedbackend
 
+import android.content.res.Resources.NotFoundException
 import android.database.sqlite.SQLiteDatabase
 import kotlinx.collections.immutable.toImmutableList
 
@@ -37,6 +38,7 @@ fun SQLiteDatabase.products(): List<Product> {
 
             results.add(
                 Product(
+                    id = productId,
                     image = "images/${cursor.getInt(1)}",
                     name = cursor.getString(2),
                     type = cursor.getString(3),
@@ -48,6 +50,39 @@ fun SQLiteDatabase.products(): List<Product> {
         }
 
         return@use results.toImmutableList()
+    }
+}
+
+fun SQLiteDatabase.product(id: Int): Product? {
+    val ratings = rawQuery(
+        "SELECT rating FROM ProductReviews WHERE productId = ?",
+        arrayOf("$id")
+    ).use { cursor ->
+        val results = mutableListOf<Int>()
+
+        while(cursor.moveToNext()) {
+            results.add(cursor.getInt(0))
+        }
+
+        return@use results
+    }
+
+    return rawQuery(
+        "SELECT Images.id, Products.name, Products.type, Products.game, Products.price FROM Products LEFT JOIN ProductImages ON ProductImages.productId = Products.id JOIN Images ON Images.id = ProductImages.imageId WHERE Products.id = ? AND ProductImages.isPrimary = 1",
+        arrayOf("$id")
+    ).use { cursor ->
+        if(!cursor.moveToNext())
+            return@use null
+
+        return@use Product(
+            id = id,
+            image = "images/${cursor.getInt(0)}",
+            name = cursor.getString(1),
+            type = cursor.getString(2),
+            game = cursor.getString(3),
+            ratings = ratings,
+            priceCents = cursor.getInt(4)
+        )
     }
 }
 

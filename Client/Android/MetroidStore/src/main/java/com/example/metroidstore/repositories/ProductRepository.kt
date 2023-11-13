@@ -6,9 +6,13 @@ import com.example.metroidstore.fakedatasources.ProductDataSourceFake
 import kotlinx.collections.immutable.ImmutableList
 
 class ProductRepository(
-    private val dataSource: ProductDataSource = ProductDataSourceFake()
+    private val dataSource: ProductDataSource
 ) {
     suspend fun getProducts(): ImmutableList<Product> {
         return dataSource.getProducts()
+    }
+
+    suspend fun getProductDetails(id: Product.ID): Product {
+        return dataSource.getProductDetails(id)
     }
 }

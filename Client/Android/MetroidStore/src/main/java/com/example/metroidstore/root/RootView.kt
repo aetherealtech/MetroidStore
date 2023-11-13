@@ -1,11 +1,15 @@
 package com.example.metroidstore.root
 
+import android.os.Bundle
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -15,13 +19,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.CreationExtras
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.metroidstore.datasources.DataSource
+import com.example.metroidstore.model.Product
+import com.example.metroidstore.productdetail.ProductDetailView
+import com.example.metroidstore.productdetail.ProductDetailViewModel
 import com.example.metroidstore.productlist.ProductListView
 import com.example.metroidstore.productlist.ProductListViewModel
 import com.example.metroidstore.repositories.ProductRepository
@@ -30,24 +43,69 @@ import com.example.metroidstore.settings.SettingsViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
+fun Bundle.getProductID(key: String): Product.ID {
+    return Product.ID(getInt(key))
+}
+
+fun Bundle.putProductID(key: String, value: Product.ID) {
+    putInt(key, value.value)
+}
+
+val NavType.Companion.ProductIDType: NavType<Product.ID>
+    get() {
+        return object: NavType<Product.ID>(false) {
+            override val name: String
+                get() = "productId"
+
+            override fun get(bundle: Bundle, key: String): Product.ID {
+                return bundle.getProductID(key)
+            }
+
+            override fun parseValue(value: String): Product.ID {
+                return Product.ID(value.toInt())
+            }
+
+            override fun put(bundle: Bundle, key: String, value: Product.ID) {
+                bundle.putProductID(key, value)
+            }
+        }
+    }
+
 sealed class Screen(
     val title: String,
     val icon: ImageVector,
     val route: String,
-    val content: @Composable (RootViewModel) -> Unit
+    val content: @Composable (NavHostController, RootViewModel) -> Unit
 ) {
     data object ProductList : Screen(
         title = "ProductList",
         icon = Icons.Filled.List,
         route = "productList",
-        content = { viewModel -> ProductListView(viewModel = viewModel.productList) }
+        content = { navController, rootViewModel ->
+            val productListViewModel = viewModel<ProductListViewModel>(
+                factory = rootViewModel.productList
+            )
+
+            ProductListView(
+                viewModel = productListViewModel,
+                openProductDetails = { productId ->
+                    navController.navigate("productDetails/${productId.value}")
+                }
+            )
+        }
     )
 
     data object Settings : Screen(
         title = "Settings",
         icon = Icons.Filled.Settings,
         route = "settings",
-        content = { viewModel -> SettingsView(viewModel = viewModel.settings) }
+        content = { _, rootViewModel ->
+            val settingsViewModel = viewModel<SettingsViewModel>(
+                factory = rootViewModel.settings
+            )
+
+            SettingsView(viewModel = settingsViewModel)
+        }
     )
 
     companion object {
@@ -66,6 +124,21 @@ fun RootView(
     val navController = rememberNavController()
 
     Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text("Blah") },
+                navigationIcon = {
+                    if(navController.previousBackStackEntry != null) {
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(
+                                imageVector = Icons.Filled.ArrowBack,
+                                contentDescription = "Back"
+                            )
+                        }
+                    }
+                },
+            )
+        },
         bottomBar = {
             NavigationBar {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -92,26 +165,64 @@ fun RootView(
     ) { innerPadding ->
         NavHost(navController, startDestination = Screen.ProductList.route, Modifier.padding(innerPadding)) {
             Screen.all.forEach { screen ->
-                composable(screen.route) { screen.content(viewModel) }
+                composable(screen.route) { screen.content(navController, viewModel) }
+            }
+
+            composable(
+                "productDetails/{productId}",
+                arguments = listOf(navArgument("productId") { type = NavType.ProductIDType })
+            ) {backstackEntry ->
+                val productId = backstackEntry.arguments!!.getProductID("productId")
+
+                val detailsViewModel = viewModel<ProductDetailViewModel>(
+                    factory = viewModel.productDetails(productId)
+                )
+
+                ProductDetailView(
+                    viewModel = detailsViewModel
+                )
             }
         }
     }
 }
 
 class RootViewModel(
-    private val dataSource: DataSource
+    val dataSource: DataSource
 ): ViewModel() {
-    val productList: ProductListViewModel
-        get() {
-            return ProductListViewModel(
-                productRepository = ProductRepository(
-                    dataSource = dataSource.products
-                )
-            )
-        }
+    private val productRepository = ProductRepository(dataSource = dataSource.products)
 
-    val settings: SettingsViewModel
-        get() {
-            return SettingsViewModel()
+    val productList: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T: ViewModel> create(
+            modelClass: Class<T>,
+            extras: CreationExtras
+        ): T {
+            return ProductListViewModel(
+                productRepository = productRepository
+            ) as T
         }
+    }
+
+    fun productDetails(id: Product.ID): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T: ViewModel> create(
+            modelClass: Class<T>,
+            extras: CreationExtras
+        ): T {
+            return ProductDetailViewModel(
+                productId = id,
+                repository = productRepository
+            ) as T
+        }
+    }
+
+    val settings: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T: ViewModel> create(
+            modelClass: Class<T>,
+            extras: CreationExtras
+        ): T {
+            return SettingsViewModel() as T
+        }
+    }
 }

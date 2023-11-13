@@ -5,4 +5,5 @@ import kotlinx.collections.immutable.ImmutableList
 
 interface ProductDataSource {
     suspend fun getProducts(): ImmutableList<Product>
+    suspend fun getProductDetails(id: Product.ID): Product
 }

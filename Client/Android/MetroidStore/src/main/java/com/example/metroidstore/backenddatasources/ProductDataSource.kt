@@ -1,5 +1,6 @@
 package com.example.metroidstore.backenddatasources
 
+import android.content.res.Resources.NotFoundException
 import com.example.metroidstore.datasources.ProductDataSource
 import com.example.metroidstore.model.Price
 import com.example.metroidstore.model.Product
@@ -20,7 +21,10 @@ class ProductDataSourceBackend(
 
     override suspend fun getProducts(): ImmutableList<Product> {
         val request = Request.Builder()
-            .url(host.newBuilder().addPathSegment("products").build())
+            .url(host.newBuilder()
+                .addPathSegment("products")
+                .build()
+            )
             .build()
 
         val response = client.newCall(request).await()
@@ -44,6 +48,7 @@ class ProductDataSourceBackend(
                     .build()
 
                 return@map Product(
+                    id = Product.ID(backendProduct.id),
                     image = ImageSourceBackend(client, imageRequest),
                     name = backendProduct.name,
                     type = backendProduct.type,
@@ -53,5 +58,43 @@ class ProductDataSourceBackend(
                 )
             }
             .toImmutableList()
+    }
+
+    override suspend fun getProductDetails(id: Product.ID): Product {
+        val request = Request.Builder()
+            .url(host.newBuilder()
+                .addPathSegment("products")
+                .addPathSegment("${id.value}")
+                .build()
+            )
+            .build()
+
+        val response = client.newCall(request).await()
+
+        val body = response.body
+
+        if(body == null)
+            throw NotFoundException("No product with ID ${id.value}")
+
+        val backendProduct = Json.decodeFromString<com.example.metroidstore.embeddedbackend.Product>(
+            body.string()
+        )
+
+        val imageRequest = Request.Builder()
+            .url(host.newBuilder()
+                .addEncodedPathSegments(backendProduct.image)
+                .build()
+            )
+            .build()
+
+        return Product(
+            id = Product.ID(backendProduct.id),
+            image = ImageSourceBackend(client, imageRequest),
+            name = backendProduct.name,
+            type = backendProduct.type,
+            game = backendProduct.game,
+            ratings = backendProduct.ratings.map { rawRating -> Rating.values().first { rating -> rating.value == rawRating } }.toImmutableList(),
+            price = Price(backendProduct.priceCents)
+        )
     }
 }
