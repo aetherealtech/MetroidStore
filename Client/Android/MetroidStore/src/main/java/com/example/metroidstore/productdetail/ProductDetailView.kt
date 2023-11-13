@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
@@ -22,9 +20,10 @@ import com.example.metroidstore.fakedatasources.ProductDataSourceFake
 import com.example.metroidstore.model.ProductID
 import com.example.metroidstore.repositories.ProductRepository
 import com.example.metroidstore.ui.theme.MetroidStoreTheme
-import com.example.metroidstore.utilities.mapState
 import com.example.metroidstore.utilities.parallelMap
 import com.example.metroidstore.widgets.AddToCartButton
+import com.example.metroidstore.widgets.AddToCartViewModel
+import com.example.metroidstore.widgets.AsyncLoadedShimmering
 import com.example.metroidstore.widgets.ImagesCarousel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -36,8 +35,6 @@ import kotlinx.coroutines.launch
 fun ProductDetailView(
     viewModel: ProductDetailViewModel
 ) {
-    val currentName by viewModel.name.collectAsState()
-
     Column(
         modifier = Modifier.padding(
             horizontal = 16.dp
@@ -45,11 +42,15 @@ fun ProductDetailView(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text(
-            text = currentName,
-            fontSize = 32.sp,
-            fontWeight = FontWeight.Medium
-        )
+        AsyncLoadedShimmering(
+            data = viewModel.name
+        ) { _, currentName ->
+            Text(
+                text = currentName,
+                fontSize = 32.sp,
+                fontWeight = FontWeight.Medium
+            )
+        }
 
         ImagesCarousel(
             modifier = Modifier
@@ -58,9 +59,13 @@ fun ProductDetailView(
             data = viewModel.images
         )
 
-        AddToCartButton(
-            onClick = { viewModel.addToCart() }
-        )
+        AsyncLoadedShimmering(
+            data = viewModel.addToCartViewModel
+        ) { _, addToCartViewModel ->
+            AddToCartButton(
+                viewModel = addToCartViewModel
+            )
+        }
     }
 }
 
@@ -71,10 +76,15 @@ class ProductDetailViewModel(
     private val _name = MutableStateFlow<String?>(null)
     private val _images = MutableStateFlow<ImmutableList<ImageBitmap>?>(null)
 
+    private val _addToCartViewModel = MutableStateFlow<AddToCartViewModel?>(null)
+
     val name = _name
-        .mapState { name -> name ?: "Loading..." }
+        .asStateFlow()
 
     val images = _images
+        .asStateFlow()
+
+    val addToCartViewModel = _addToCartViewModel
         .asStateFlow()
 
     init {
@@ -86,11 +96,9 @@ class ProductDetailViewModel(
             _images.value = product.images
                 .parallelMap { imageSource -> imageSource.load() }
                 .toImmutableList()
-        }
-    }
 
-    fun addToCart() {
-        println("Added ${name.value} to cart")
+            _addToCartViewModel.value = AddToCartViewModel(product)
+        }
     }
 }
 
