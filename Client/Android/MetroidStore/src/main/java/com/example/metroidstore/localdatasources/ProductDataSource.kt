@@ -1,4 +1,4 @@
-package com.example.metroidstore.embeddedbackend
+package com.example.metroidstore.localdatasources
 
 import android.database.sqlite.SQLiteDatabase
 import com.example.metroidstore.datasources.ProductDataSource
@@ -8,7 +8,7 @@ import com.example.metroidstore.model.Rating
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
-class ProductDataSourceEmbedded(
+class ProductDataSourceDatabase(
     private val database: SQLiteDatabase
 ): ProductDataSource {
     override suspend fun getProducts(): ImmutableList<Product> {
@@ -48,7 +48,7 @@ class ProductDataSourceEmbedded(
 
                 results.add(
                     Product(
-                        image = DatabaseImageSource(database, cursor.getInt(1)),
+                        image = ImageSourceDatabase(database, cursor.getInt(1)),
                         name = cursor.getString(2),
                         type = cursor.getString(3),
                         game = cursor.getString(4),

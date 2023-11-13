@@ -1,4 +1,4 @@
-package com.example.metroidstore.embeddedbackend
+package com.example.metroidstore.localdatasources
 
 import android.database.sqlite.SQLiteDatabase
 import android.graphics.BitmapFactory
@@ -8,7 +8,7 @@ import com.example.metroidstore.model.ImageSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-data class DatabaseImageSource(
+data class ImageSourceDatabase(
     private val database: SQLiteDatabase,
     private val imageId: Int
 ): ImageSource {

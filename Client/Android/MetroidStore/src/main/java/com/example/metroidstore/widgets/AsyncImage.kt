@@ -13,6 +13,8 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.res.painterResource
+import com.example.metroidstore.R
 import com.example.metroidstore.model.ImageSource
 
 @Composable
@@ -22,35 +24,50 @@ fun AsyncImage(
     contentDescription: String
 ) {
     val currentSource = rememberUpdatedState(source)
-    val loadedImage = remember { mutableStateOf<ImageBitmap?>(null) }
+    val loadedImage = remember { mutableStateOf<Result<ImageBitmap?>>(Result.success(null)) }
 
     LaunchedEffect(currentSource) {
-        loadedImage.value = source.load()
+        loadedImage.value = Result.runCatching { source.load() }
     }
 
     val currentLoadedImage by loadedImage
 
-    currentLoadedImage?.let { image ->
-        Box(
-            modifier = modifier,
-            contentAlignment = Alignment.Center
-        ) {
-            Image(
-                bitmap = image,
-                contentDescription = contentDescription,
-                modifier = Modifier
-                    .fillMaxSize(0.75f)
-            )
+    currentLoadedImage.fold(
+        onSuccess = { successfulImage ->
+            successfulImage?.let { image ->
+                Box(
+                    modifier = modifier,
+                    contentAlignment = Alignment.Center
+                ) {
+                    Image(
+                        bitmap = image,
+                        contentDescription = contentDescription,
+                        modifier = Modifier
+                            .fillMaxSize(0.75f)
+                    )
+                }
+            } ?: run {
+                Box(
+                    modifier = modifier,
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .fillMaxSize(0.5f)
+                    )
+                }
+            }
+        },
+        onFailure = {
+            Box(
+                modifier = modifier,
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.broken_image),
+                    contentDescription = "Image Failed"
+                )
+            }
         }
-    } ?: run {
-        Box(
-            modifier = modifier,
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator(
-                modifier = Modifier
-                    .fillMaxSize(0.5f)
-            )
-        }
-    }
+    )
 }
