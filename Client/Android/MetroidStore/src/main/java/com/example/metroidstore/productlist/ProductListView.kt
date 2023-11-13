@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 @Composable
-fun ProductList(
+fun ProductListView(
     modifier: Modifier = Modifier,
     viewModel: ProductListViewModel = ProductListViewModel()
 ) {
@@ -52,7 +52,7 @@ class ProductListViewModel(
 @Composable
 fun ProductListPreview() {
     MetroidStoreTheme {
-        ProductList(
+        ProductListView(
             viewModel = ProductListViewModel(
                 productRepository = ProductRepository(
                     dataSource = ProductDataSourceFake()

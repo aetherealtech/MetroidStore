@@ -59,6 +59,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
+    implementation("androidx.navigation:navigation-compose:2.7.5")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("ru.gildor.coroutines:kotlin-coroutines-okhttp:1.0")
     implementation("io.ktor:ktor-server-core:2.3.6")
