@@ -17,7 +17,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import com.example.metroidstore.model.ImageSource
-import com.example.metroidstore.model.Product
+import com.example.metroidstore.model.ProductID
+import com.example.metroidstore.model.ProductSummary
 import com.example.metroidstore.widgets.AsyncImage
 import com.example.metroidstore.widgets.PriceView
 import com.example.metroidstore.widgets.PriceViewModel
@@ -74,9 +75,9 @@ fun ProductRowView(
 }
 
 class ProductRowViewModel(
-    product: Product
+    product: ProductSummary
 ): ViewModel() {
-    val id: Product.ID
+    val id: ProductID
     val image: ImageSource
     val name: String
     val type: String

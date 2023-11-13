@@ -2,31 +2,31 @@ package com.example.metroidstore.utilities
 
 import android.os.Bundle
 import androidx.navigation.NavType
-import com.example.metroidstore.model.Product
+import com.example.metroidstore.model.ProductID
 
-fun Bundle.getProductID(key: String): Product.ID {
-    return Product.ID(getInt(key))
+fun Bundle.getProductID(key: String): ProductID {
+    return ProductID(getInt(key))
 }
 
-fun Bundle.putProductID(key: String, value: Product.ID) {
+fun Bundle.putProductID(key: String, value: ProductID) {
     putInt(key, value.value)
 }
 
-val NavType.Companion.ProductIDType: NavType<Product.ID>
+val NavType.Companion.ProductIDType: NavType<ProductID>
     get() {
-        return object: NavType<Product.ID>(false) {
+        return object: NavType<ProductID>(false) {
             override val name: String
                 get() = "productId"
 
-            override fun get(bundle: Bundle, key: String): Product.ID {
+            override fun get(bundle: Bundle, key: String): ProductID {
                 return bundle.getProductID(key)
             }
 
-            override fun parseValue(value: String): Product.ID {
-                return Product.ID(value.toInt())
+            override fun parseValue(value: String): ProductID {
+                return ProductID(value.toInt())
             }
 
-            override fun put(bundle: Bundle, key: String, value: Product.ID) {
+            override fun put(bundle: Bundle, key: String, value: ProductID) {
                 bundle.putProductID(key, value)
             }
         }

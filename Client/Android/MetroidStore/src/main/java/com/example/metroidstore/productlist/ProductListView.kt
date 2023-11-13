@@ -9,13 +9,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.CreationExtras
-import com.example.metroidstore.MainViewModel
 import com.example.metroidstore.fakedatasources.ProductDataSourceFake
-import com.example.metroidstore.model.Product
-import com.example.metroidstore.productdetail.ProductDetailViewModel
+import com.example.metroidstore.model.ProductID
 import com.example.metroidstore.repositories.ProductRepository
 import com.example.metroidstore.ui.theme.MetroidStoreTheme
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,7 +22,7 @@ import kotlinx.coroutines.launch
 fun ProductListView(
     modifier: Modifier = Modifier,
     viewModel: ProductListViewModel,
-    openProductDetails: (Product.ID) -> Unit
+    openProductDetails: (ProductID) -> Unit
 ) {
     val items by viewModel.items.collectAsState()
 

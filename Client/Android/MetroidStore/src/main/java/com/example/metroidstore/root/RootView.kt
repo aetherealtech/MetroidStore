@@ -31,7 +31,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.metroidstore.datasources.DataSource
-import com.example.metroidstore.model.Product
+import com.example.metroidstore.model.ProductID
 import com.example.metroidstore.productdetail.ProductDetailView
 import com.example.metroidstore.productdetail.ProductDetailViewModel
 import com.example.metroidstore.productlist.ProductListView
@@ -98,6 +98,9 @@ fun RootView(
 
     Scaffold(
         topBar = {
+            val navBackStackEntry by navController.currentBackStackEntryAsState()
+            val currentDestination = navBackStackEntry?.destination
+
             CenterAlignedTopAppBar(
                 title = { Text("Blah") },
                 navigationIcon = {
@@ -176,7 +179,7 @@ class RootViewModel(
         }
     }
 
-    fun productDetails(id: Product.ID): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+    fun productDetails(id: ProductID): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T: ViewModel> create(
             modelClass: Class<T>,

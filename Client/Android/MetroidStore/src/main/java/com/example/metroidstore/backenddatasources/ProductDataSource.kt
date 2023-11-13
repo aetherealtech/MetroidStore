@@ -3,7 +3,9 @@ package com.example.metroidstore.backenddatasources
 import android.content.res.Resources.NotFoundException
 import com.example.metroidstore.datasources.ProductDataSource
 import com.example.metroidstore.model.Price
-import com.example.metroidstore.model.Product
+import com.example.metroidstore.model.ProductDetails
+import com.example.metroidstore.model.ProductID
+import com.example.metroidstore.model.ProductSummary
 import com.example.metroidstore.model.Rating
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -19,7 +21,7 @@ class ProductDataSourceBackend(
 ): ProductDataSource {
     private val client = OkHttpClient()
 
-    override suspend fun getProducts(): ImmutableList<Product> {
+    override suspend fun getProducts(): ImmutableList<ProductSummary> {
         val request = Request.Builder()
             .url(host.newBuilder()
                 .addPathSegment("products")
@@ -34,7 +36,7 @@ class ProductDataSourceBackend(
         if(body == null)
             return persistentListOf()
 
-        val backendProducts = Json.decodeFromString<List<com.example.metroidstore.embeddedbackend.Product>>(
+        val backendProducts = Json.decodeFromString<List<com.example.metroidstore.embeddedbackend.ProductSummary>>(
             body.string()
         )
 
@@ -47,8 +49,8 @@ class ProductDataSourceBackend(
                     )
                     .build()
 
-                return@map Product(
-                    id = Product.ID(backendProduct.id),
+                return@map ProductSummary(
+                    id = ProductID(backendProduct.id),
                     image = ImageSourceBackend(client, imageRequest),
                     name = backendProduct.name,
                     type = backendProduct.type,
@@ -60,7 +62,7 @@ class ProductDataSourceBackend(
             .toImmutableList()
     }
 
-    override suspend fun getProductDetails(id: Product.ID): Product {
+    override suspend fun getProductDetails(id: ProductID): ProductDetails {
         val request = Request.Builder()
             .url(host.newBuilder()
                 .addPathSegment("products")
@@ -76,23 +78,30 @@ class ProductDataSourceBackend(
         if(body == null)
             throw NotFoundException("No product with ID ${id.value}")
 
-        val backendProduct = Json.decodeFromString<com.example.metroidstore.embeddedbackend.Product>(
+        val backendProduct = Json.decodeFromString<com.example.metroidstore.embeddedbackend.ProductDetails>(
             body.string()
         )
 
-        val imageRequest = Request.Builder()
-            .url(host.newBuilder()
-                .addEncodedPathSegments(backendProduct.image)
-                .build()
-            )
-            .build()
+        val images = backendProduct.images
+            .map { image ->
+                Request.Builder()
+                    .url(
+                        host.newBuilder()
+                            .addEncodedPathSegments(image)
+                            .build()
+                    )
+                    .build()
+            }
+            .map { imageRequest ->
+                ImageSourceBackend(client, imageRequest)
+            }
+            .toImmutableList()
 
-        return Product(
-            id = Product.ID(backendProduct.id),
-            image = ImageSourceBackend(client, imageRequest),
+        return ProductDetails(
             name = backendProduct.name,
             type = backendProduct.type,
             game = backendProduct.game,
+            images = images,
             ratings = backendProduct.ratings.map { rawRating -> Rating.values().first { rating -> rating.value == rawRating } }.toImmutableList(),
             price = Price(backendProduct.priceCents)
         )
