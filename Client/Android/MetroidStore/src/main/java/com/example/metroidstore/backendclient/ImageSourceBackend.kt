@@ -1,4 +1,4 @@
-package com.example.metroidstore.backenddatasources
+package com.example.metroidstore.backendclient
 
 import android.graphics.BitmapFactory
 import androidx.compose.ui.graphics.ImageBitmap

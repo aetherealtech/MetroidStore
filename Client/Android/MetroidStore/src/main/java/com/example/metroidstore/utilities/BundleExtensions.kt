@@ -16,7 +16,7 @@ val NavType.Companion.ProductIDType: NavType<ProductID>
     get() {
         return object: NavType<ProductID>(false) {
             override val name: String
-                get() = "productId"
+                get() = "productID"
 
             override fun get(bundle: Bundle, key: String): ProductID {
                 return bundle.getProductID(key)

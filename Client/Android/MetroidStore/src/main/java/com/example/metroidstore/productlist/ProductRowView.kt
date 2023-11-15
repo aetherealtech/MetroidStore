@@ -13,12 +13,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
+import com.example.metroidstore.fakedatasources.DataSourceFake
+import com.example.metroidstore.fakedatasources.ProductDataSourceFake
+import com.example.metroidstore.fakedatasources.summary
 import com.example.metroidstore.model.ImageSource
 import com.example.metroidstore.model.ProductID
 import com.example.metroidstore.model.ProductSummary
+import com.example.metroidstore.repositories.ProductRepository
+import com.example.metroidstore.ui.theme.MetroidStoreTheme
 import com.example.metroidstore.widgets.AsyncImage
 import com.example.metroidstore.widgets.PriceView
 import com.example.metroidstore.widgets.PriceViewModel
@@ -93,5 +99,17 @@ class ProductRowViewModel(
         game = product.game
         ratings = StarRatingViewModel.create(product.ratings)
         price = PriceViewModel(product.price)
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ProductRowPreview() {
+    MetroidStoreTheme {
+        ProductRowView(
+            viewModel = ProductRowViewModel(
+                product = DataSourceFake.fakeProducts[0].summary
+            )
+        )
     }
 }

@@ -10,11 +10,9 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import io.ktor.server.request.header
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonEncoder
-import kotlinx.serialization.json.encodeToStream
-import kotlinx.serialization.serializer
 
 class EmbeddedServer(
     port: UShort,
@@ -32,8 +30,8 @@ class EmbeddedServer(
                     call.respondText(Json.encodeToString(products))
                 }
 
-                get("/products/{productId}") {
-                    val product = database.product(call.parameters["productId"]!!.toInt())
+                get("/products/{productID}") {
+                    val product = database.product(call.parameters["productID"]!!.toInt())
                     if(product != null) {
                         call.respondText(Json.encodeToString(product))
                     } else {
@@ -41,9 +39,72 @@ class EmbeddedServer(
                     }
                 }
 
-                get("/images/{imageId}") {
-                    val image = database.image(call.parameters["imageId"]!!.toInt())
+                get("/images/{imageID}") {
+                    val image = database.image(call.parameters["imageID"]!!.toInt())
                     call.respondBytes(image, ContentType.defaultForFileExtension("png"))
+                }
+
+                get("/cart") {
+                    val username = call.request.header("Authorization")
+                    if(username == null) {
+                        call.respond(HttpStatusCode.Unauthorized)
+                        return@get
+                    }
+
+                    val cart = database.cart(username)
+                    call.respondText(Json.encodeToString(cart))
+                }
+
+                post("/cart/{productID}") {
+                    val username = call.request.header("Authorization")
+                    if(username == null) {
+                        call.respond(HttpStatusCode.Unauthorized)
+                        return@post
+                    }
+
+                    val productID = call.parameters["productID"]!!.toInt()
+
+                    val cart = database.addToCart(username, productID)
+                    call.respondText(Json.encodeToString(cart))
+                }
+
+                delete("/cart/{productID}") {
+                    val username = call.request.header("Authorization")
+                    if(username == null) {
+                        call.respond(HttpStatusCode.Unauthorized)
+                        return@delete
+                    }
+
+                    val productID = call.parameters["productID"]!!.toInt()
+
+                    val cart = database.removeFromCart(username, productID)
+                    call.respondText(Json.encodeToString(cart))
+                }
+
+                post("/cart/{productID}/decrement") {
+                    val username = call.request.header("Authorization")
+                    if(username == null) {
+                        call.respond(HttpStatusCode.Unauthorized)
+                        return@post
+                    }
+
+                    val productID = call.parameters["productID"]!!.toInt()
+
+                    val cart = database.decrementCartQuantity(username, productID)
+                    call.respondText(Json.encodeToString(cart))
+                }
+
+                post("/cart/{productID}/increment") {
+                    val username = call.request.header("Authorization")
+                    if(username == null) {
+                        call.respond(HttpStatusCode.Unauthorized)
+                        return@post
+                    }
+
+                    val productID = call.parameters["productID"]!!.toInt()
+
+                    val cart = database.incrementCartQuantity(username, productID)
+                    call.respondText(Json.encodeToString(cart))
                 }
             }
         }.start()

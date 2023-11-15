@@ -5,6 +5,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -30,12 +31,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.metroidstore.cart.CartView
+import com.example.metroidstore.cart.CartViewModel
 import com.example.metroidstore.datasources.DataSource
 import com.example.metroidstore.model.ProductID
 import com.example.metroidstore.productdetail.ProductDetailView
 import com.example.metroidstore.productdetail.ProductDetailViewModel
 import com.example.metroidstore.productlist.ProductListView
 import com.example.metroidstore.productlist.ProductListViewModel
+import com.example.metroidstore.repositories.CartRepository
 import com.example.metroidstore.repositories.ProductRepository
 import com.example.metroidstore.settings.SettingsView
 import com.example.metroidstore.settings.SettingsViewModel
@@ -51,7 +55,7 @@ sealed class Screen(
     val content: @Composable (NavHostController, RootViewModel) -> Unit
 ) {
     data object ProductList : Screen(
-        title = "ProductList",
+        title = "Browse",
         icon = Icons.Filled.List,
         route = "productList",
         content = { navController, rootViewModel ->
@@ -61,13 +65,30 @@ sealed class Screen(
 
             ProductListView(
                 viewModel = productListViewModel,
-                openProductDetails = { productId ->
-                    navController.navigate("productDetails/${productId.value}")
+                openProductDetails = { productID ->
+                    navController.navigate("productDetails/${productID.value}")
                 }
             )
         }
     )
 
+    data object Cart : Screen(
+        title = "Cart",
+        icon = Icons.Filled.ShoppingCart,
+        route = "cart",
+        content = { navController, rootViewModel ->
+            val cartViewModel = viewModel<CartViewModel>(
+                factory = rootViewModel.cart
+            )
+
+            CartView(
+                viewModel = cartViewModel,
+                openProductDetails = { productID ->
+                    navController.navigate("productDetails/${productID.value}")
+                }
+            )
+        }
+    )
     data object Settings : Screen(
         title = "Settings",
         icon = Icons.Filled.Settings,
@@ -84,7 +105,11 @@ sealed class Screen(
     companion object {
         val all: ImmutableList<Screen>
             get() {
-                return persistentListOf(ProductList, Settings)
+                return persistentListOf(
+                    ProductList,
+                    Cart,
+                    Settings
+                )
             }
     }
 }
@@ -127,7 +152,10 @@ fun RootView(
                         selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
                         onClick = {
                             navController.navigate(screen.route) {
-                                popUpTo(navController.graph.findStartDestination().id)
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    inclusive = true
+                                }
+                                navController.graph.setStartDestination(screen.route)
                                 launchSingleTop = true
                                 restoreState = true
                             }
@@ -143,13 +171,13 @@ fun RootView(
             }
 
             composable(
-                "productDetails/{productId}",
-                arguments = listOf(navArgument("productId") { type = NavType.ProductIDType })
+                "productDetails/{productID}",
+                arguments = listOf(navArgument("productID") { type = NavType.ProductIDType })
             ) {backstackEntry ->
-                val productId = backstackEntry.arguments!!.getProductID("productId")
+                val productID = backstackEntry.arguments!!.getProductID("productID")
 
                 val detailsViewModel = viewModel<ProductDetailViewModel>(
-                    factory = viewModel.productDetails(productId)
+                    factory = viewModel.productDetails(productID)
                 )
 
                 ProductDetailView(
@@ -163,7 +191,13 @@ fun RootView(
 class RootViewModel(
     val dataSource: DataSource
 ): ViewModel() {
-    private val productRepository = ProductRepository(dataSource = dataSource.products)
+    private val productRepository = ProductRepository(
+        dataSource = dataSource
+    )
+
+    private val cartRepository = CartRepository(
+        dataSource = dataSource.cart
+    )
 
     val productList: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
@@ -177,6 +211,18 @@ class RootViewModel(
         }
     }
 
+    val cart: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T: ViewModel> create(
+            modelClass: Class<T>,
+            extras: CreationExtras
+        ): T {
+            return CartViewModel(
+                repository = cartRepository
+            ) as T
+        }
+    }
+
     fun productDetails(id: ProductID): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T: ViewModel> create(
@@ -184,7 +230,7 @@ class RootViewModel(
             extras: CreationExtras
         ): T {
             return ProductDetailViewModel(
-                productId = id,
+                productID = id,
                 repository = productRepository
             ) as T
         }

@@ -1,9 +1,10 @@
-package com.example.metroidstore.embeddedbackend
+package com.example.metroidstore.backendmodel
 
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class ProductDetails(
+    val id: Int,
     val name: String,
     val type: String,
     val game: String,

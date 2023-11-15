@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.metroidstore.fakedatasources.ProductDataSourceFake
+import com.example.metroidstore.fakedatasources.DataSourceFake
 import com.example.metroidstore.model.ProductID
 import com.example.metroidstore.repositories.ProductRepository
 import com.example.metroidstore.ui.theme.MetroidStoreTheme
@@ -70,7 +70,7 @@ fun ProductDetailView(
 }
 
 class ProductDetailViewModel(
-    productId: ProductID,
+    productID: ProductID,
     repository: ProductRepository
 ): ViewModel() {
     private val _name = MutableStateFlow<String?>(null)
@@ -89,7 +89,7 @@ class ProductDetailViewModel(
 
     init {
         viewModelScope.launch {
-            val product = repository.getProductDetails(productId)
+            val product = repository.getProductDetails(productID)
 
             _name.value = product.name
 
@@ -97,7 +97,10 @@ class ProductDetailViewModel(
                 .parallelMap { imageSource -> imageSource.load() }
                 .toImmutableList()
 
-            _addToCartViewModel.value = AddToCartViewModel(product)
+            _addToCartViewModel.value = AddToCartViewModel(
+                product = product,
+                cartRepository = repository.cart
+            )
         }
     }
 }
@@ -108,9 +111,9 @@ fun ProductDetailPreview() {
     MetroidStoreTheme {
         ProductDetailView(
             viewModel = ProductDetailViewModel(
-                productId = ProductID(0),
+                productID = ProductID(0),
                 repository = ProductRepository(
-                    dataSource = ProductDataSourceFake()
+                    dataSource = DataSourceFake()
                 )
             )
         )

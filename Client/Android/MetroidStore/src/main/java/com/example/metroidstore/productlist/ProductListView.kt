@@ -10,10 +10,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.metroidstore.fakedatasources.ProductDataSourceFake
+import com.example.metroidstore.fakedatasources.DataSourceFake
 import com.example.metroidstore.model.ProductID
 import com.example.metroidstore.repositories.ProductRepository
 import com.example.metroidstore.ui.theme.MetroidStoreTheme
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -42,7 +45,7 @@ class ProductListViewModel(
     productRepository: ProductRepository
 ): ViewModel() {
 
-    private val _items = MutableStateFlow(emptyList<ProductRowViewModel>())
+    private val _items = MutableStateFlow<ImmutableList<ProductRowViewModel>>(persistentListOf())
 
     val items = _items.asStateFlow()
 
@@ -50,6 +53,7 @@ class ProductListViewModel(
         viewModelScope.launch {
             _items.value = productRepository.getProducts()
                 .map { product -> ProductRowViewModel(product) }
+                .toImmutableList()
         }
     }
 }
@@ -61,7 +65,7 @@ fun ProductListPreview() {
         ProductListView(
             viewModel = ProductListViewModel(
                 productRepository = ProductRepository(
-                    dataSource = ProductDataSourceFake()
+                    dataSource = DataSourceFake()
                 )
             ),
             openProductDetails = { }

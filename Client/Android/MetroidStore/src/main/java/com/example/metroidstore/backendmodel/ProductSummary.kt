@@ -1,4 +1,4 @@
-package com.example.metroidstore.embeddedbackend
+package com.example.metroidstore.backendmodel
 
 import kotlinx.serialization.Serializable
 

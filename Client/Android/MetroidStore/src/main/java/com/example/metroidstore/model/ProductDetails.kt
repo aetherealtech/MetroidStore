@@ -3,6 +3,7 @@ package com.example.metroidstore.model
 import kotlinx.collections.immutable.ImmutableList
 
 data class ProductDetails(
+    val id: ProductID,
     val name: String,
     val type: String,
     val game: String,

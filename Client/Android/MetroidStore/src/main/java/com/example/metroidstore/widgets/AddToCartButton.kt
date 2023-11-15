@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.metroidstore.model.ProductDetails
+import com.example.metroidstore.repositories.CartRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -44,7 +45,8 @@ fun AddToCartButton(
 }
 
 class AddToCartViewModel(
-    private val product: ProductDetails
+    private val product: ProductDetails,
+    private val cartRepository: CartRepository
 ): ViewModel() {
     val _confirmationViewModel = MutableSharedFlow<AddToCartConfirmationViewModel>()
 
@@ -53,7 +55,10 @@ class AddToCartViewModel(
 
     fun addToCart() {
         viewModelScope.launch {
-            _confirmationViewModel.emit( AddToCartConfirmationViewModel(product = product))
+            _confirmationViewModel.emit(AddToCartConfirmationViewModel(
+                product = product,
+                cartRepository = cartRepository
+            ))
         }
     }
 }
