@@ -2,15 +2,18 @@ package com.example.metroidstore.cart
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -30,6 +33,7 @@ import com.example.metroidstore.model.ProductID
 import com.example.metroidstore.repositories.CartRepository
 import com.example.metroidstore.repositories.ProductRepository
 import com.example.metroidstore.ui.theme.MetroidStoreTheme
+import com.example.metroidstore.utilities.mapState
 import com.example.metroidstore.widgets.AsyncLoadedShimmering
 import com.example.metroidstore.widgets.PriceView
 import com.example.metroidstore.widgets.PriceViewModel
@@ -45,76 +49,79 @@ fun CartView(
     viewModel: CartViewModel,
     openProductDetails: (ProductID) -> Unit
 ) {
-    AsyncLoadedShimmering(
-        modifier = modifier,
-        data = viewModel.cart
-    ) { modifier, cart ->
-        LazyColumn(
-            modifier = modifier
-                .padding(horizontal = 16.dp)
-        ) {
-            item {
-                Column(
-                    modifier = Modifier
-                        .padding(vertical = 24.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Subtotal",
-                            fontSize = 18.sp
-                        )
-                        PriceView(
-                            viewModel = cart.subtotal
-                        )
-                    }
+    val busy by viewModel.busy.collectAsState()
 
-                    Button(
-                        onClick = { viewModel.proceedToCheckout() },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            contentColor = Color.Black,
-                            containerColor = Color(0xFFFFDD00)
-                        )
+    Box(contentAlignment = Alignment.Center) {
+        if(busy) {
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .size(64.dp)
+            )
+        }
+        AsyncLoadedShimmering(
+            modifier = modifier,
+            data = viewModel.cart
+        ) { modifier, cart ->
+            LazyColumn(
+                modifier = modifier
+                    .padding(horizontal = 16.dp)
+            ) {
+                item {
+                    Column(
+                        modifier = Modifier
+                            .padding(vertical = 24.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Text(text = "Proceed to Checkout (${cart.items.size} items)")
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Subtotal",
+                                fontSize = 18.sp
+                            )
+                            PriceView(
+                                viewModel = cart.subtotal
+                            )
+                        }
+
+                        Button(
+                            onClick = { viewModel.proceedToCheckout() },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(8.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                contentColor = Color.Black,
+                                containerColor = Color(0xFFFFDD00)
+                            )
+                        ) {
+                            Text(text = "Proceed to Checkout (${cart.items.size} items)")
+                        }
                     }
                 }
-            }
 
-            items(cart.items) { rowViewModel ->
-                CartRowView(
-                    modifier = Modifier.clickable {
-                        openProductDetails(rowViewModel.id)
-                    },
-                    viewModel = rowViewModel
-                )
+                items(cart.items) { rowViewModel ->
+                    CartRowView(
+                        modifier = Modifier.clickable {
+                            openProductDetails(rowViewModel.id)
+                        },
+                        viewModel = rowViewModel
+                    )
+                }
             }
         }
     }
 }
 
 class CartViewModel(
-    repository: CartRepository
+    private val repository: CartRepository
 ): ViewModel() {
     data class Cart(
         val subtotal: PriceViewModel,
         val items: ImmutableList<CartRowViewModel>
     )
 
-    private val _cart = MutableStateFlow<Cart?>(null)
-
-    val cart = _cart
-        .asStateFlow()
-
-    init {
-        viewModelScope.launch {
-            val cart = repository.getCart()
-
+    val cart = repository.cart
+        .mapState { cart ->
             val subtotal = cart
                 .map { item -> item.price }
                 .fold(Price.zero) { lhs, rhs -> lhs + rhs }
@@ -126,10 +133,16 @@ class CartViewModel(
                 ) }
                 .toImmutableList()
 
-            _cart.value = Cart(
+            return@mapState Cart(
                 subtotal = PriceViewModel(price = subtotal),
                 items = items
             )
+        }
+
+    val busy = repository.busy
+    init {
+        viewModelScope.launch {
+            repository.updateCart()
         }
     }
 

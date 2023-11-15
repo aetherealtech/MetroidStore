@@ -166,12 +166,13 @@ fun SQLiteDatabase.decrementCartQuantity(
 
     try {
         execSQL(
-            "UPDATE CartItems SET quantity = quantity - 1 WHERE username = ? AND productID = ?",
+            "DELETE FROM CartItems WHERE username = ? AND productID = ? AND quantity = 1",
             arrayOf(username, productID)
         )
 
         execSQL(
-            "DELETE FROM CartItems WHERE quantity = 0"
+            "UPDATE CartItems SET quantity = quantity - 1 WHERE username = ? AND productID = ?",
+            arrayOf(username, productID)
         )
 
         val cart = cart(username)

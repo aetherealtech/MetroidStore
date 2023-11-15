@@ -17,6 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.metroidstore.fakedatasources.DataSourceFake
 import com.example.metroidstore.fakedatasources.cartItem
 import com.example.metroidstore.model.CartItem
@@ -29,6 +30,11 @@ import com.example.metroidstore.widgets.PriceView
 import com.example.metroidstore.widgets.PriceViewModel
 import com.example.metroidstore.widgets.QuantityControl
 import com.example.metroidstore.widgets.ShadowButton
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import kotlin.coroutines.CoroutineContext
 
 @Composable
 fun CartRowView(
@@ -86,9 +92,11 @@ fun CartRowView(
 }
 
 class CartRowViewModel(
-    repository: CartRepository,
+    private val repository: CartRepository,
     product: CartItem
 ): ViewModel() {
+    private val _busy = MutableStateFlow(false)
+
     val id: ProductID
     val image: ImageSource
     val name: String
@@ -96,6 +104,8 @@ class CartRowViewModel(
 
     val quantity = product.quantity
 
+    val busy = _busy
+        .asStateFlow()
     init {
         id = product.productID
         image = product.image
@@ -104,19 +114,21 @@ class CartRowViewModel(
     }
 
     fun decrementQuantity() {
-//        if(_quantity.value == 1) {
-//            delete()
-//        } else {
-//            _quantity.value -= 1
-//        }
+        viewModelScope.launch {
+            repository.decrementQuantity(id)
+        }
     }
 
     fun incrementQuantity() {
-//        _quantity.value += 1
+        viewModelScope.launch {
+            repository.incrementQuantity(id)
+        }
     }
 
     fun delete() {
-
+        viewModelScope.launch {
+            repository.removeFromCart(id)
+        }
     }
 }
 

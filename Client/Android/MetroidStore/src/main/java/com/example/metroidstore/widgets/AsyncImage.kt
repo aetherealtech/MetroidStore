@@ -23,10 +23,10 @@ fun AsyncImage(
     source: ImageSource,
     contentDescription: String
 ) {
-    val currentSource = rememberUpdatedState(source)
     val loadedImage = remember { mutableStateOf<Result<ImageBitmap?>>(Result.success(null)) }
 
-    LaunchedEffect(currentSource) {
+    LaunchedEffect(source) {
+        loadedImage.value = Result.success(null)
         loadedImage.value = Result.runCatching { source.load() }
     }
 
