@@ -144,7 +144,7 @@ class BackendClient(
                     productID = ProductID(backendCartItem.productID),
                     image = ImageSourceBackend(client, imageRequest),
                     name = backendCartItem.name,
-                    price = Price(backendCartItem.priceCents),
+                    pricePerUnit = Price(backendCartItem.priceCents),
                     quantity = backendCartItem.quantity
                 )
             }

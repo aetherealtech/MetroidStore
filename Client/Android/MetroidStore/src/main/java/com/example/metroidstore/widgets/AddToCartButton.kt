@@ -46,7 +46,8 @@ fun AddToCartButton(
 
 class AddToCartViewModel(
     private val product: ProductDetails,
-    private val cartRepository: CartRepository
+    private val cartRepository: CartRepository,
+    private val viewCart: () -> Unit
 ): ViewModel() {
     val _confirmationViewModel = MutableSharedFlow<AddToCartConfirmationViewModel>()
 
@@ -57,7 +58,8 @@ class AddToCartViewModel(
         viewModelScope.launch {
             _confirmationViewModel.emit(AddToCartConfirmationViewModel(
                 product = product,
-                cartRepository = cartRepository
+                cartRepository = cartRepository,
+                viewCart = viewCart
             ))
         }
     }

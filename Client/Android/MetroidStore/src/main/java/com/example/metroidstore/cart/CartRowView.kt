@@ -30,11 +30,9 @@ import com.example.metroidstore.widgets.PriceView
 import com.example.metroidstore.widgets.PriceViewModel
 import com.example.metroidstore.widgets.QuantityControl
 import com.example.metroidstore.widgets.ShadowButton
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlin.coroutines.CoroutineContext
 
 @Composable
 fun CartRowView(
@@ -110,7 +108,7 @@ class CartRowViewModel(
         id = product.productID
         image = product.image
         name = product.name
-        price = PriceViewModel(product.price)
+        price = PriceViewModel(product.pricePerUnit)
     }
 
     fun decrementQuantity() {

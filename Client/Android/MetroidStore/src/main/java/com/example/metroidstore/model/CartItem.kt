@@ -4,6 +4,8 @@ data class CartItem(
     val productID: ProductID,
     val name: String,
     val image: ImageSource,
-    val price: Price,
+    val pricePerUnit: Price,
     val quantity: Int
-)
+) {
+    val price = pricePerUnit * quantity
+}

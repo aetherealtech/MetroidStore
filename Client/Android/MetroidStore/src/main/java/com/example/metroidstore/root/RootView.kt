@@ -121,6 +121,17 @@ fun RootView(
 ) {
     val navController = rememberNavController()
 
+    fun selectTab(screen: Screen) {
+        navController.navigate(screen.route) {
+            popUpTo(navController.graph.findStartDestination().id) {
+                inclusive = true
+            }
+            navController.graph.setStartDestination(screen.route)
+            launchSingleTop = true
+            restoreState = true
+        }
+    }
+
     Scaffold(
         topBar = {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -151,14 +162,7 @@ fun RootView(
                         label = { Text(screen.title) },
                         selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
                         onClick = {
-                            navController.navigate(screen.route) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    inclusive = true
-                                }
-                                navController.graph.setStartDestination(screen.route)
-                                launchSingleTop = true
-                                restoreState = true
-                            }
+                            selectTab(screen)
                         }
                     )
                 }
@@ -177,7 +181,12 @@ fun RootView(
                 val productID = backstackEntry.arguments!!.getProductID("productID")
 
                 val detailsViewModel = viewModel<ProductDetailViewModel>(
-                    factory = viewModel.productDetails(productID)
+                    factory = viewModel.productDetails(
+                        id = productID,
+                        viewCart = {
+                            selectTab(Screen.Cart)
+                        }
+                    )
                 )
 
                 ProductDetailView(
@@ -223,7 +232,10 @@ class RootViewModel(
         }
     }
 
-    fun productDetails(id: ProductID): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+    fun productDetails(
+        id: ProductID,
+        viewCart: () -> Unit
+    ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T: ViewModel> create(
             modelClass: Class<T>,
@@ -231,7 +243,8 @@ class RootViewModel(
         ): T {
             return ProductDetailViewModel(
                 productID = id,
-                repository = productRepository
+                repository = productRepository,
+                viewCart = viewCart
             ) as T
         }
     }

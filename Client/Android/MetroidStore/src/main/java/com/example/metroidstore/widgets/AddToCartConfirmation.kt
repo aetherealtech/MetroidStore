@@ -1,18 +1,32 @@
 package com.example.metroidstore.widgets
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.metroidstore.cart.CartRowView
+import com.example.metroidstore.cart.CartRowViewModel
+import com.example.metroidstore.fakedatasources.DataSourceFake
+import com.example.metroidstore.fakedatasources.cartItem
+import com.example.metroidstore.fakedatasources.details
 import com.example.metroidstore.model.ProductDetails
 import com.example.metroidstore.repositories.CartRepository
+import com.example.metroidstore.ui.theme.MetroidStoreTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -36,7 +50,8 @@ fun AddToCartConfirmation(
 
 class AddToCartConfirmationViewModel(
     private val product: ProductDetails,
-    private val cartRepository: CartRepository
+    private val cartRepository: CartRepository,
+    private val viewCart: () -> Unit
 ): ViewModel() {
     private val _addedViewModel = MutableStateFlow<AddedToCartViewModel?>(null)
 
@@ -46,7 +61,10 @@ class AddToCartConfirmationViewModel(
         viewModelScope.launch {
             cartRepository.addToCart(product.id)
 
-            _addedViewModel.value = AddedToCartViewModel(product)
+            _addedViewModel.value = AddedToCartViewModel(
+                product = product,
+                viewCart = viewCart
+            )
         }
     }
 }
@@ -57,20 +75,49 @@ fun AddedToCartView(
     onClose: () -> Unit,
 ) {
     CloseableView(onClose = onClose) {
-        Column {
+        Column(
+            modifier = Modifier.height(256.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             Text(
-                text = viewModel.text,
-                modifier = Modifier.height(256.dp)
+                text = viewModel.text
             )
+            Button(
+                onClick = { viewModel.viewCart() },
+                modifier = Modifier.fillMaxWidth(0.75f),
+                shape = RoundedCornerShape(8.dp),
+                colors = ButtonDefaults.buttonColors(
+                    contentColor = Color.Black,
+                    containerColor = Color(0xFFFFDD00)
+                )
+            ) {
+                Text(text = "View Cart")
+            }
         }
     }
 }
 class AddedToCartViewModel(
-    private val product: ProductDetails
+    private val product: ProductDetails,
+    val viewCart: () -> Unit
 ): ViewModel() {
     val text: String
 
     init {
         text = "Added ${product.name} to Cart"
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AddedToCartPreview() {
+    MetroidStoreTheme {
+        AddedToCartView(
+            viewModel = AddedToCartViewModel(
+                product = DataSourceFake.fakeProducts[0].details,
+                viewCart = { }
+            ),
+            onClose = { }
+        )
     }
 }

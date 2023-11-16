@@ -92,7 +92,7 @@ fun DataSourceFake.Product.cartItem(
         productID = id,
         name = name,
         image = images[0],
-        price = price,
+        pricePerUnit = price,
         quantity = quantity
     )
 }

@@ -71,7 +71,8 @@ fun ProductDetailView(
 
 class ProductDetailViewModel(
     productID: ProductID,
-    repository: ProductRepository
+    repository: ProductRepository,
+    private val viewCart: () -> Unit
 ): ViewModel() {
     private val _name = MutableStateFlow<String?>(null)
     private val _images = MutableStateFlow<ImmutableList<ImageBitmap>?>(null)
@@ -99,7 +100,8 @@ class ProductDetailViewModel(
 
             _addToCartViewModel.value = AddToCartViewModel(
                 product = product,
-                cartRepository = repository.cart
+                cartRepository = repository.cart,
+                viewCart = viewCart
             )
         }
     }
@@ -114,7 +116,8 @@ fun ProductDetailPreview() {
                 productID = ProductID(0),
                 repository = ProductRepository(
                     dataSource = DataSourceFake()
-                )
+                ),
+                viewCart = { }
             )
         )
     }
