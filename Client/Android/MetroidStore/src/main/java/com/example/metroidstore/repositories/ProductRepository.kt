@@ -13,11 +13,6 @@ class ProductRepository(
     private val productsProductDataSource = dataSource.products
 
     val cart = CartRepository(dataSource.cart)
-    suspend fun getProducts(): ImmutableList<ProductSummary> {
-        return productsProductDataSource.getProducts()
-    }
-
-    suspend fun getProductDetails(id: ProductID): ProductDetails {
-        return productsProductDataSource.getProductDetails(id)
-    }
+    suspend fun getProducts() = productsProductDataSource.getProducts()
+    suspend fun getProductDetails(id: ProductID) = productsProductDataSource.getProductDetails(id)
 }

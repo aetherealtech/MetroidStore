@@ -49,4 +49,5 @@ class DataSourceFake: DataSource {
 
     override val products = ProductDataSourceFake(fakeProducts)
     override val cart = CartDataSourceFake(fakeProducts)
+    override val user = UserDataSourceFake()
 }

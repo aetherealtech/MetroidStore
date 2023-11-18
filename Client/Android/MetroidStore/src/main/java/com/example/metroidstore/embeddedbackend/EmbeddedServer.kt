@@ -106,6 +106,34 @@ class EmbeddedServer(
                     val cart = database.incrementCartQuantity(username, productID)
                     call.respondText(Json.encodeToString(cart))
                 }
+
+                get("/addresses") {
+                    val username = call.request.header("Authorization")
+                    if(username == null) {
+                        call.respond(HttpStatusCode.Unauthorized)
+                        return@get
+                    }
+
+                    val addresses = database.addresses(username)
+                    call.respondText(Json.encodeToString(addresses))
+                }
+
+                get("/shippingMethods") {
+                    val shippingMethods = database.shippingMethods()
+                    call.respondText(Json.encodeToString(shippingMethods))
+                }
+
+
+                get("/paymentMethods") {
+                    val username = call.request.header("Authorization")
+                    if(username == null) {
+                        call.respond(HttpStatusCode.Unauthorized)
+                        return@get
+                    }
+
+                    val paymentMethods = database.paymentMethods(username)
+                    call.respondText(Json.encodeToString(paymentMethods))
+                }
             }
         }.start()
     }

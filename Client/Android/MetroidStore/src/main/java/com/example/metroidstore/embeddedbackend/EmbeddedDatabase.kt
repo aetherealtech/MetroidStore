@@ -5,8 +5,11 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteCursor
 import android.database.sqlite.SQLiteDatabase
 import com.example.metroidstore.backendmodel.CartItem
+import com.example.metroidstore.backendmodel.PaymentMethodSummary
 import com.example.metroidstore.backendmodel.ProductDetails
 import com.example.metroidstore.backendmodel.ProductSummary
+import com.example.metroidstore.backendmodel.ShippingMethod
+import com.example.metroidstore.backendmodel.UserAddressSummary
 import kotlinx.collections.immutable.toImmutableList
 import java.io.File
 
@@ -269,5 +272,67 @@ fun SQLiteDatabase.image(id: Int): ByteArray {
         cursor.moveToFirst()
 
         return@use cursor.getBlob(0)
+    }
+}
+
+fun SQLiteDatabase.addresses(username: String): List<UserAddressSummary> {
+    return rawQuery(
+        "SELECT addressID, name, isPrimary FROM UserAddresses WHERE username = ?",
+        arrayOf(username)
+    ).use { cursor ->
+        val results = mutableListOf<UserAddressSummary>()
+
+        while(cursor.moveToNext()) {
+            results.add(
+                UserAddressSummary(
+                    addressID = cursor.getInt(0),
+                    name = cursor.getString(1),
+                    isPrimary = cursor.getInt(2) != 0
+                )
+            )
+        }
+
+        return@use results.toImmutableList()
+    }
+}
+
+fun SQLiteDatabase.shippingMethods(): List<ShippingMethod> {
+    return rawQuery(
+        "SELECT name, cost FROM ShippingMethods",
+        emptyArray()
+    ).use { cursor ->
+        val results = mutableListOf<ShippingMethod>()
+
+        while(cursor.moveToNext()) {
+            results.add(
+                ShippingMethod(
+                    name = cursor.getString(0),
+                    costCents = cursor.getInt(1)
+                )
+            )
+        }
+
+        return@use results.toImmutableList()
+    }
+}
+
+fun SQLiteDatabase.paymentMethods(username: String): List<PaymentMethodSummary> {
+    return rawQuery(
+        "SELECT id, name, isPrimary FROM PaymentMethods WHERE username = ?",
+        arrayOf(username)
+    ).use { cursor ->
+        val results = mutableListOf<PaymentMethodSummary>()
+
+        while(cursor.moveToNext()) {
+            results.add(
+                PaymentMethodSummary(
+                    id = cursor.getInt(0),
+                    name = cursor.getString(1),
+                    isPrimary = cursor.getInt(2) != 0
+                )
+            )
+        }
+
+        return@use results.toImmutableList()
     }
 }

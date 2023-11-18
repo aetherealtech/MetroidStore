@@ -19,19 +19,21 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.metroidstore.fakedatasources.DataSourceFake
-import com.example.metroidstore.model.Address
 import com.example.metroidstore.model.CartItem
-import com.example.metroidstore.model.PaymentMethod
+import com.example.metroidstore.model.PaymentMethodSummary
 import com.example.metroidstore.model.Percent
 import com.example.metroidstore.model.Price
 import com.example.metroidstore.model.ShippingMethod
 import com.example.metroidstore.model.UserAddressSummary
 import com.example.metroidstore.model.subtotal
 import com.example.metroidstore.repositories.CartRepository
+import com.example.metroidstore.repositories.UserRepository
 import com.example.metroidstore.ui.theme.MetroidStoreTheme
 import com.example.metroidstore.utilities.StateFlows
 import com.example.metroidstore.utilities.mapState
+import com.example.metroidstore.widgets.BusyView
 import com.example.metroidstore.widgets.DropDownList
 import com.example.metroidstore.widgets.DropDownViewModel
 import com.example.metroidstore.widgets.PriceView
@@ -40,6 +42,7 @@ import com.example.metroidstore.widgets.PrimaryCallToAction
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 @Composable
 fun CheckoutView(
@@ -48,65 +51,53 @@ fun CheckoutView(
 ) {
     val canPlaceOrder by viewModel.canPlaceOrder.collectAsState()
 
-    @Composable
-    fun PricePartView(
-        size: TextUnit = 16.sp,
-        title: String,
-        price: PriceViewModel,
-        combiner: String? = null
+    BusyView(
+        busy = viewModel.busy
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = modifier
+                .fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("$title: ", fontSize = size)
-            PriceView(price, size = size)
-            if(combiner != null) {
-                Text(" $combiner", fontSize = size)
-            }
-        }
-    }
-
-    Column(
-        modifier = modifier
-            .fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        CheckoutSummaryView(
-            viewModel = viewModel.summary
-        )
-
-        DropDownList(
-            viewModel = viewModel.addresses,
-            optionDisplay = { address -> address.displayName },
-            additionalOption = { Text("Add New Address") }
-        )
-
-        DropDownList(
-            viewModel = viewModel.shippingMethods,
-            optionDisplay = { shippingMethod -> shippingMethod.displayName }
-        )
-
-        DropDownList(
-            viewModel = viewModel.paymentMethods,
-            optionDisplay = { paymentMethod -> paymentMethod.displayName },
-            additionalOption = { Text("Add New Payment Method") }
-        )
-
-        Box(
-            modifier = Modifier.fillMaxWidth(0.75f)
-        ) {
-            PrimaryCallToAction(
-                enabled = canPlaceOrder,
-                onClick = { viewModel.placeOrder() },
-                text = "Place Order"
+            CheckoutSummaryView(
+                viewModel = viewModel.summary
             )
+
+            DropDownList(
+                viewModel = viewModel.addresses,
+                optionDisplay = { address -> address.displayName },
+                additionalOption = { Text("Add New Address") }
+            )
+
+            DropDownList(
+                viewModel = viewModel.shippingMethods,
+                optionDisplay = { shippingMethod -> shippingMethod.displayName }
+            )
+
+            DropDownList(
+                viewModel = viewModel.paymentMethods,
+                optionDisplay = { paymentMethod -> paymentMethod.displayName },
+                additionalOption = { Text("Add New Payment Method") }
+            )
+
+            Box(
+                modifier = Modifier.fillMaxWidth(0.75f)
+            ) {
+                PrimaryCallToAction(
+                    enabled = canPlaceOrder,
+                    onClick = { viewModel.placeOrder() },
+                    text = "Place Order"
+                )
+            }
         }
     }
 }
 
 class CheckoutViewModel(
-    cartRepository: CartRepository
+    cartRepository: CartRepository,
+    userRepository: UserRepository
+
 ): ViewModel() {
     data class AddressViewModel(
         val address: UserAddressSummary
@@ -121,7 +112,7 @@ class CheckoutViewModel(
     }
 
     data class PaymentMethodViewModel(
-        val method: PaymentMethod
+        val method: PaymentMethodSummary
     ) {
         val displayName = method.name
     }
@@ -134,51 +125,49 @@ class CheckoutViewModel(
 
     val canPlaceOrder: StateFlow<Boolean>
 
+    val busy = userRepository.busy
+
     init {
-        val fakeAddresses = listOf(
-            UserAddressSummary(Address.ID(0), "Home"),
-            UserAddressSummary(Address.ID(0), "Office"),
-            UserAddressSummary(Address.ID(0), "Secret Lair"),
-        )
-
-        val fakeShippingMethods = listOf(
-            ShippingMethod("Slow", Price(1000)),
-            ShippingMethod("Fast", Price(5000)),
-        )
-
-        val fakePaymentMethods = listOf(
-            PaymentMethod(PaymentMethod.ID(0), "Credit"),
-            PaymentMethod(PaymentMethod.ID(1), "Theft"),
-        )
-
         val cart = cartRepository.cart
 
         addresses = DropDownViewModel(
             title = "Shipping Address",
-            options = fakeAddresses
-                .map { address -> AddressViewModel(
-                    address = address
-                ) }
-                .toImmutableList(),
+            options = userRepository.addresses
+                .mapState { addresses ->
+                    addresses.map { address ->
+                        AddressViewModel(
+                            address = address
+                        )
+                    }
+                        .toImmutableList()
+                },
             additionalOption = { addNewAddress() }
         )
 
         shippingMethods = DropDownViewModel(
             title = "Shipping Method",
-            options = fakeShippingMethods
-                .map { shippingMethod -> ShippingMethodViewModel(
-                    method = shippingMethod
-                ) }
-                .toImmutableList()
+            options = userRepository.shippingMethods
+                .mapState { shippingMethods ->
+                    shippingMethods.map { shippingMethod ->
+                        ShippingMethodViewModel(
+                            method = shippingMethod
+                        )
+                    }
+                    .toImmutableList()
+                }
         )
 
         paymentMethods = DropDownViewModel(
             title = "Payment Method",
-            options = fakePaymentMethods
-                .map { paymentMethod -> PaymentMethodViewModel(
-                    method = paymentMethod
-                ) }
-                .toImmutableList(),
+            options = userRepository.paymentMethods
+                .mapState { paymentMethods ->
+                    paymentMethods.map { paymentMethod ->
+                        PaymentMethodViewModel(
+                            method = paymentMethod
+                        )
+                    }
+                        .toImmutableList()
+                },
             additionalOption = { addNewPaymentMethod() }
         )
 
@@ -200,6 +189,18 @@ class CheckoutViewModel(
                     selections.third != null
                 ).contains(false)
             }
+
+        viewModelScope.launch {
+            userRepository.updateAddresses()
+            userRepository.updateShippingMethods()
+            userRepository.updatePaymentMethods()
+
+            addresses.selection.value = addresses.options.value
+                .find { viewModel -> viewModel.address.isPrimary }
+
+            paymentMethods.selection.value = paymentMethods.options.value
+                .find { paymentMethod -> paymentMethod.method.isPrimary }
+        }
     }
 
     fun placeOrder() {
@@ -310,6 +311,9 @@ fun CheckoutPreview() {
             viewModel = CheckoutViewModel(
                 cartRepository = CartRepository(
                     dataSource = DataSourceFake().cart
+                ),
+                userRepository = UserRepository(
+                    dataSource = DataSourceFake().user
                 )
             )
         )

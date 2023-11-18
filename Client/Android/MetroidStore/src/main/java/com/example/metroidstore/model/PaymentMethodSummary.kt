@@ -1,8 +1,9 @@
 package com.example.metroidstore.model
 
-data class PaymentMethod(
+data class PaymentMethodSummary(
     val id: ID,
-    val name: String
+    val name: String,
+    val isPrimary: Boolean
 ) {
     data class ID(val value: Int)
 }

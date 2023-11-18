@@ -1,12 +1,16 @@
 package com.example.metroidstore.backendclient
 
 import android.content.res.Resources
+import com.example.metroidstore.model.Address
 import com.example.metroidstore.model.CartItem
+import com.example.metroidstore.model.PaymentMethodSummary
 import com.example.metroidstore.model.Price
 import com.example.metroidstore.model.ProductDetails
 import com.example.metroidstore.model.ProductID
 import com.example.metroidstore.model.ProductSummary
 import com.example.metroidstore.model.Rating
+import com.example.metroidstore.model.ShippingMethod
+import com.example.metroidstore.model.UserAddressSummary
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.serialization.json.Json
@@ -20,24 +24,6 @@ import ru.gildor.coroutines.okhttp.await
 class BackendClient(
     private val host: HttpUrl
 ) {
-    private val client = OkHttpClient()
-    private val username = "mother_brain"
-
-    private fun buildRequest(
-        modifyRequest: (Request.Builder) -> Unit = { },
-        modifyURL: (HttpUrl.Builder) -> Unit
-    ): Request {
-        val urlBuilder = host.newBuilder()
-        modifyURL(urlBuilder)
-
-        val requestBuilder = Request.Builder()
-            .url(urlBuilder.build())
-            .header(name = "Authorization", value = username)
-        modifyRequest(requestBuilder)
-
-        return requestBuilder
-            .build()
-    }
     suspend fun getProducts(): ImmutableList<ProductSummary> {
         val request = buildRequest { urlBuilder ->
             urlBuilder
@@ -121,7 +107,7 @@ class BackendClient(
         )
     }
 
-    private fun handleCartResponse(response: Response): List<CartItem> {
+    private fun handleCartResponse(response: Response): ImmutableList<CartItem> {
         val body = response.body
 
         if(body == null)
@@ -151,7 +137,7 @@ class BackendClient(
             .toImmutableList()
     }
 
-    suspend fun getCart(): List<CartItem> {
+    suspend fun getCart(): ImmutableList<CartItem> {
         val request = buildRequest { urlBuilder ->
             urlBuilder
                 .addPathSegment("cart")
@@ -162,7 +148,7 @@ class BackendClient(
         return handleCartResponse(response)
     }
 
-    suspend fun addToCart(productID: ProductID): List<CartItem> {
+    suspend fun addToCart(productID: ProductID): ImmutableList<CartItem> {
         val request = buildRequest(
             modifyRequest = { builder -> builder.post(byteArrayOf().toRequestBody()) }
         ) { urlBuilder ->
@@ -176,7 +162,7 @@ class BackendClient(
         return handleCartResponse(response)
     }
 
-    suspend fun removeFromCart(productID: ProductID): List<CartItem> {
+    suspend fun removeFromCart(productID: ProductID): ImmutableList<CartItem> {
         val request = buildRequest(
             modifyRequest = { builder -> builder.delete() }
         ) { urlBuilder ->
@@ -190,7 +176,7 @@ class BackendClient(
         return handleCartResponse(response)
     }
 
-    suspend fun decrementQuantity(productID: ProductID): List<CartItem> {
+    suspend fun decrementQuantity(productID: ProductID): ImmutableList<CartItem> {
         val request = buildRequest(
             modifyRequest = { builder -> builder.post(byteArrayOf().toRequestBody()) }
         ) { urlBuilder ->
@@ -205,7 +191,7 @@ class BackendClient(
         return handleCartResponse(response)
     }
 
-    suspend fun incrementQuantity(productID: ProductID): List<CartItem> {
+    suspend fun incrementQuantity(productID: ProductID): ImmutableList<CartItem> {
         val request = buildRequest(
             modifyRequest = { builder -> builder.post(byteArrayOf().toRequestBody()) }
         ) { urlBuilder ->
@@ -218,5 +204,107 @@ class BackendClient(
         val response = client.newCall(request).await()
 
         return handleCartResponse(response)
+    }
+    
+    suspend fun getAddresses(): ImmutableList<UserAddressSummary> {
+        val request = buildRequest { urlBuilder ->
+            urlBuilder
+                .addPathSegment("addresses")
+        }
+
+        val response = client.newCall(request).await()
+
+        val body = response.body
+
+        if(body == null)
+            throw IllegalStateException("Did not receive a response")
+
+        val backendAddresses = Json.decodeFromString<List<com.example.metroidstore.backendmodel.UserAddressSummary>>(
+            body.string()
+        )
+
+        return backendAddresses
+            .map { backendAddress ->
+                UserAddressSummary(
+                    addressID = Address.ID(backendAddress.addressID),
+                    name = backendAddress.name,
+                    isPrimary = backendAddress.isPrimary
+                )
+            }
+            .toImmutableList()
+    }
+
+    suspend fun getShippingMethods(): ImmutableList<ShippingMethod> {
+        val request = buildRequest { urlBuilder ->
+            urlBuilder
+                .addPathSegment("shippingMethods")
+        }
+
+        val response = client.newCall(request).await()
+
+        val body = response.body
+
+        if(body == null)
+            throw IllegalStateException("Did not receive a response")
+
+        val backendMethods = Json.decodeFromString<List<com.example.metroidstore.backendmodel.ShippingMethod>>(
+            body.string()
+        )
+
+        return backendMethods
+            .map { backendMethod ->
+                ShippingMethod(
+                    name = backendMethod.name,
+                    cost = Price(backendMethod.costCents)
+                )
+            }
+            .toImmutableList()
+    }
+
+    suspend fun getPaymentMethods(): ImmutableList<PaymentMethodSummary> {
+        val request = buildRequest { urlBuilder ->
+            urlBuilder
+                .addPathSegment("paymentMethods")
+        }
+
+        val response = client.newCall(request).await()
+
+        val body = response.body
+
+        if(body == null)
+            throw IllegalStateException("Did not receive a response")
+
+        val backendMethods = Json.decodeFromString<List<com.example.metroidstore.backendmodel.PaymentMethodSummary>>(
+            body.string()
+        )
+
+        return backendMethods
+            .map { backendMethod ->
+                PaymentMethodSummary(
+                    id = PaymentMethodSummary.ID(backendMethod.id),
+                    name = backendMethod.name,
+                    isPrimary = backendMethod.isPrimary
+                )
+            }
+            .toImmutableList()
+    }
+
+    private val client = OkHttpClient()
+    private val username = "mother_brain"
+
+    private fun buildRequest(
+        modifyRequest: (Request.Builder) -> Unit = { },
+        modifyURL: (HttpUrl.Builder) -> Unit
+    ): Request {
+        val urlBuilder = host.newBuilder()
+        modifyURL(urlBuilder)
+
+        val requestBuilder = Request.Builder()
+            .url(urlBuilder.build())
+            .header(name = "Authorization", value = username)
+        modifyRequest(requestBuilder)
+
+        return requestBuilder
+            .build()
     }
 }

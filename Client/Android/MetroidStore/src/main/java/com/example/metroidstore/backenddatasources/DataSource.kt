@@ -11,4 +11,5 @@ class DataSourceBackend(
 
     override val products = ProductDataSourceBackend(client)
     override val cart = CartDataSourceBackend(client)
+    override val user = UserDataSourceBackend(client)
 }

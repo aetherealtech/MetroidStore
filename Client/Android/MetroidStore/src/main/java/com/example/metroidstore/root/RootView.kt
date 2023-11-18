@@ -43,6 +43,7 @@ import com.example.metroidstore.productlist.ProductListView
 import com.example.metroidstore.productlist.ProductListViewModel
 import com.example.metroidstore.repositories.CartRepository
 import com.example.metroidstore.repositories.ProductRepository
+import com.example.metroidstore.repositories.UserRepository
 import com.example.metroidstore.settings.SettingsView
 import com.example.metroidstore.settings.SettingsViewModel
 import com.example.metroidstore.utilities.ProductIDType
@@ -139,7 +140,7 @@ fun RootView(
             val currentDestination = navBackStackEntry?.destination
 
             CenterAlignedTopAppBar(
-                title = { Text("Blah") },
+                title = { Text("Metroid Store") },
                 navigationIcon = {
                     if(navController.previousBackStackEntry != null) {
                         IconButton(onClick = { navController.popBackStack() }) {
@@ -221,6 +222,10 @@ class RootViewModel(
         dataSource = dataSource.cart
     )
 
+    private val userRepository = UserRepository(
+        dataSource = dataSource.user
+    )
+
     fun productList(
         openProductDetails: (ProductID) -> Unit,
     ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
@@ -277,7 +282,8 @@ class RootViewModel(
             extras: CreationExtras
         ): T {
             return CheckoutViewModel(
-                cartRepository = cartRepository
+                cartRepository = cartRepository,
+                userRepository = userRepository
             ) as T
         }
     }

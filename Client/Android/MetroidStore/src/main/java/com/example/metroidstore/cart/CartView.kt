@@ -29,6 +29,7 @@ import com.example.metroidstore.repositories.CartRepository
 import com.example.metroidstore.ui.theme.MetroidStoreTheme
 import com.example.metroidstore.utilities.mapState
 import com.example.metroidstore.widgets.AsyncLoadedShimmering
+import com.example.metroidstore.widgets.BusyView
 import com.example.metroidstore.widgets.PriceView
 import com.example.metroidstore.widgets.PriceViewModel
 import com.example.metroidstore.widgets.PrimaryCallToAction
@@ -42,20 +43,13 @@ fun CartView(
     modifier: Modifier = Modifier,
     viewModel: CartViewModel
 ) {
-    val busy by viewModel.busy.collectAsState()
-    val items by viewModel.items.collectAsState()
-
-    Box(contentAlignment = Alignment.Center) {
-        if(busy) {
-            CircularProgressIndicator(
-                modifier = Modifier
-                    .size(64.dp)
-            )
-        }
+    BusyView(
+        busy = viewModel.busy
+    ) {
         AsyncLoadedShimmering(
             modifier = modifier,
             data = viewModel.items
-        ) { modifier, cart ->
+        ) { modifier, items ->
             LazyColumn(
                 modifier = modifier
                     .padding(horizontal = 16.dp)

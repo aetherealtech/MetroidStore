@@ -15,7 +15,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,6 +29,7 @@ fun <T> DropDownList(
     val expanded = remember { mutableStateOf(false) }
 
     val currentExpanded by expanded
+    val currentOptions by viewModel.options.collectAsState()
     val currentSelection by viewModel.selection.collectAsState()
 
     ExposedDropdownMenuBox(
@@ -51,7 +54,7 @@ fun <T> DropDownList(
             expanded = currentExpanded,
             onDismissRequest = { expanded.value = false }
         ) {
-            viewModel.options.forEach { option ->
+            currentOptions.forEach { option ->
                 DropdownMenuItem(
                     text = { Text(optionDisplay(option)) },
                     onClick = {
@@ -82,7 +85,7 @@ fun <T> DropDownList(
 
 class DropDownViewModel<T>(
     val title: String,
-    val options: List<T>,
+    val options: StateFlow<ImmutableList<T>>,
     selectedOption: T? = null,
     val additionalOption: (() -> Unit)? = null
 ) {
