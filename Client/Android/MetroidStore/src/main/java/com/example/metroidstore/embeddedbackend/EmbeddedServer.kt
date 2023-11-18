@@ -2,6 +2,7 @@ package com.example.metroidstore.embeddedbackend
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
+import com.example.metroidstore.backendmodel.NewOrder
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.defaultForFileExtension
@@ -11,6 +12,8 @@ import io.ktor.server.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.request.header
+import io.ktor.server.request.receiveText
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -133,6 +136,30 @@ class EmbeddedServer(
 
                     val paymentMethods = database.paymentMethods(username)
                     call.respondText(Json.encodeToString(paymentMethods))
+                }
+
+                post("/orders") {
+                    val username = call.request.header("Authorization")
+                    if(username == null) {
+                        call.respond(HttpStatusCode.Unauthorized)
+                        return@post
+                    }
+
+                    val newOrder = Json.decodeFromString<NewOrder>(call.receiveText())
+
+                    try {
+                        database.placeOrder(
+                            username = username,
+                            addressID = newOrder.addressID,
+                            shippingMethodName = newOrder.shippingMethodName,
+                            paymentMethodID = newOrder.paymentMethodID
+                        )
+                    } catch(error: Exception) {
+                        call.respond(HttpStatusCode.InternalServerError, error.localizedMessage)
+                        return@post
+                    }
+
+                    call.respond(HttpStatusCode.OK)
                 }
             }
         }.start()

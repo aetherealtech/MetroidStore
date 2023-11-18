@@ -49,7 +49,7 @@ fun CheckoutView(
     modifier: Modifier = Modifier,
     viewModel: CheckoutViewModel
 ) {
-    val canPlaceOrder by viewModel.canPlaceOrder.collectAsState()
+    val placeOrder by viewModel.placeOrder.collectAsState()
 
     BusyView(
         busy = viewModel.busy
@@ -85,8 +85,7 @@ fun CheckoutView(
                 modifier = Modifier.fillMaxWidth(0.75f)
             ) {
                 PrimaryCallToAction(
-                    enabled = canPlaceOrder,
-                    onClick = { viewModel.placeOrder() },
+                    onClick = placeOrder,
                     text = "Place Order"
                 )
             }
@@ -97,7 +96,6 @@ fun CheckoutView(
 class CheckoutViewModel(
     cartRepository: CartRepository,
     userRepository: UserRepository
-
 ): ViewModel() {
     data class AddressViewModel(
         val address: UserAddressSummary
@@ -123,7 +121,7 @@ class CheckoutViewModel(
     val shippingMethods: DropDownViewModel<ShippingMethodViewModel>
     val paymentMethods: DropDownViewModel<PaymentMethodViewModel>
 
-    val canPlaceOrder: StateFlow<Boolean>
+    val placeOrder: StateFlow<(() -> Unit)?>
 
     val busy = userRepository.busy
 
@@ -176,18 +174,29 @@ class CheckoutViewModel(
             shippingMethod = shippingMethods.selection.mapState { viewModel -> viewModel?.method }
         )
 
-        canPlaceOrder = StateFlows
+        placeOrder = StateFlows
             .combine(
                 addresses.selection,
                 shippingMethods.selection,
                 paymentMethods.selection
             )
             .mapState { selections ->
-                !listOf(
-                    selections.first != null,
-                    selections.second != null,
-                    selections.third != null
-                ).contains(false)
+                val address = selections.first
+                val shippingMethod = selections.second
+                val paymentMethod = selections.third
+
+                if(address == null || shippingMethod == null || paymentMethod == null)
+                    return@mapState null
+
+                return@mapState {
+                    viewModelScope.launch {
+                        userRepository.placeOrder(
+                            addressID = address.address.addressID,
+                            shippingMethod = shippingMethod.method,
+                            paymentMethodID = paymentMethod.method.id
+                        )
+                    }
+                }
             }
 
         viewModelScope.launch {
@@ -201,10 +210,6 @@ class CheckoutViewModel(
             paymentMethods.selection.value = paymentMethods.options.value
                 .find { paymentMethod -> paymentMethod.method.isPrimary }
         }
-    }
-
-    fun placeOrder() {
-
     }
 
     fun addNewAddress() {

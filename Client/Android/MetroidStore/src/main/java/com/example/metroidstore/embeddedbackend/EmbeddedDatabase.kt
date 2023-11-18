@@ -4,6 +4,7 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteCursor
 import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteOpenHelper
 import com.example.metroidstore.backendmodel.CartItem
 import com.example.metroidstore.backendmodel.PaymentMethodSummary
 import com.example.metroidstore.backendmodel.ProductDetails
@@ -28,11 +29,15 @@ class EmbeddedDatabase {
                 }
             }
 
-            return SQLiteDatabase.openDatabase(
+            val db = SQLiteDatabase.openDatabase(
                 dbFile.path,
                 null,
                 SQLiteDatabase.CREATE_IF_NECESSARY
             )
+
+            db.execSQL("PRAGMA foreign_keys = ON")
+
+            return db
         }
     }
 }
@@ -334,5 +339,45 @@ fun SQLiteDatabase.paymentMethods(username: String): List<PaymentMethodSummary> 
         }
 
         return@use results.toImmutableList()
+    }
+}
+
+fun SQLiteDatabase.placeOrder(
+    username: String,
+    addressID: Int,
+    shippingMethodName: String,
+    paymentMethodID: Int
+) {
+    beginTransaction()
+
+    try {
+        execSQL(
+            "INSERT INTO Orders (username, addressID, shippingMethod, paymentMethodID) VALUES (?, ?, ?, ?)",
+            arrayOf(username, addressID, shippingMethodName, paymentMethodID)
+        )
+
+        val orderID = rawQuery(
+            "SELECT last_insert_rowid()",
+            emptyArray()
+        ).use { cursor ->
+            cursor.moveToNext()
+            return@use cursor.getInt(0)
+        }
+
+        execSQL(
+            "INSERT INTO OrderItems SELECT ?, productID, quantity FROM CartItems WHERE username = ?",
+            arrayOf(orderID, username)
+        )
+
+        execSQL(
+            "DELETE FROM CartItems WHERE username = ?",
+            arrayOf(username)
+        )
+
+        setTransactionSuccessful()
+    } catch (error: Exception) {
+        println(error.localizedMessage)
+    } finally {
+        endTransaction()
     }
 }

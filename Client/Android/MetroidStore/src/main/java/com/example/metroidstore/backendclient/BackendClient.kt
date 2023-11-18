@@ -3,6 +3,7 @@ package com.example.metroidstore.backendclient
 import android.content.res.Resources
 import com.example.metroidstore.model.Address
 import com.example.metroidstore.model.CartItem
+import com.example.metroidstore.model.NewOrder
 import com.example.metroidstore.model.PaymentMethodSummary
 import com.example.metroidstore.model.Price
 import com.example.metroidstore.model.ProductDetails
@@ -13,6 +14,7 @@ import com.example.metroidstore.model.ShippingMethod
 import com.example.metroidstore.model.UserAddressSummary
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
@@ -287,6 +289,26 @@ class BackendClient(
                 )
             }
             .toImmutableList()
+    }
+
+    suspend fun placeOrder(order: NewOrder) {
+        val backendOrder = com.example.metroidstore.backendmodel.NewOrder(
+            addressID = order.addressID.value,
+            shippingMethodName = order.shippingMethod.name,
+            paymentMethodID = order.paymentMethodID.value
+        )
+
+        val request = buildRequest(
+            modifyRequest = { builder -> builder.post(Json.encodeToString(backendOrder).toRequestBody()) }
+        ) { urlBuilder ->
+            urlBuilder
+                .addPathSegment("orders")
+        }
+
+        val response = client.newCall(request).await()
+
+        if(!response.isSuccessful)
+            throw IllegalStateException(response.message)
     }
 
     private val client = OkHttpClient()

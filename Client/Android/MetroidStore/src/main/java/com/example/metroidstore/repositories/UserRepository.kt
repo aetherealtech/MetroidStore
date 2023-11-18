@@ -1,7 +1,9 @@
 package com.example.metroidstore.repositories
 
 import com.example.metroidstore.datasources.UserDataSource
+import com.example.metroidstore.model.Address
 import com.example.metroidstore.model.CartItem
+import com.example.metroidstore.model.NewOrder
 import com.example.metroidstore.model.PaymentMethodSummary
 import com.example.metroidstore.model.ShippingMethod
 import com.example.metroidstore.model.UserAddressSummary
@@ -45,6 +47,18 @@ class UserRepository(
 
     suspend fun updatePaymentMethods() {
         update { _paymentMethods.value = dataSource.getPaymentMethods() }
+    }
+
+    suspend fun placeOrder(
+        addressID: Address.ID,
+        shippingMethod: ShippingMethod,
+        paymentMethodID: PaymentMethodSummary.ID
+    ) {
+        dataSource.placeOrder(NewOrder(
+            addressID = addressID,
+            shippingMethod = shippingMethod,
+            paymentMethodID = paymentMethodID
+        ))
     }
 
     private suspend fun update(

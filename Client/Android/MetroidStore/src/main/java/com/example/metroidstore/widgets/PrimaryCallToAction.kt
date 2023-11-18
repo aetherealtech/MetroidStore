@@ -14,15 +14,14 @@ import com.example.metroidstore.ui.theme.Colors
 @Composable
 fun PrimaryCallToAction(
     modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    onClick: () -> Unit,
+    onClick: (() -> Unit)?,
     text: String
 ) {
     Button(
-        onClick = onClick,
+        onClick = { onClick?.invoke() },
         modifier = modifier
             .fillMaxWidth(),
-        enabled = enabled,
+        enabled = onClick != null,
         shape = RoundedCornerShape(8.dp),
         colors = ButtonDefaults.buttonColors(
             contentColor = Color.Black,
