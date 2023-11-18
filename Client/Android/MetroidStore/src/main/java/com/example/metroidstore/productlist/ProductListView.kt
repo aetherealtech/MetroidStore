@@ -24,17 +24,13 @@ import kotlinx.coroutines.launch
 @Composable
 fun ProductListView(
     modifier: Modifier = Modifier,
-    viewModel: ProductListViewModel,
-    openProductDetails: (ProductID) -> Unit
+    viewModel: ProductListViewModel
 ) {
     val items by viewModel.items.collectAsState()
 
     LazyColumn(modifier = modifier) {
         this.items(items) { rowViewModel ->
             ProductRowView(
-                modifier = Modifier.clickable {
-                    openProductDetails(rowViewModel.id)
-                },
                 viewModel = rowViewModel
             )
         }
@@ -42,7 +38,8 @@ fun ProductListView(
 }
 
 class ProductListViewModel(
-    productRepository: ProductRepository
+    productRepository: ProductRepository,
+    selectProduct: (ProductID) -> Unit
 ): ViewModel() {
 
     private val _items = MutableStateFlow<ImmutableList<ProductRowViewModel>>(persistentListOf())
@@ -52,7 +49,10 @@ class ProductListViewModel(
     init {
         viewModelScope.launch {
             _items.value = productRepository.getProducts()
-                .map { product -> ProductRowViewModel(product) }
+                .map { product -> ProductRowViewModel(
+                    product = product,
+                    select = { selectProduct(product.id) }
+                ) }
                 .toImmutableList()
         }
     }
@@ -66,9 +66,9 @@ fun ProductListPreview() {
             viewModel = ProductListViewModel(
                 productRepository = ProductRepository(
                     dataSource = DataSourceFake()
-                )
-            ),
-            openProductDetails = { }
+                ),
+                selectProduct = { }
+            )
         )
     }
 }

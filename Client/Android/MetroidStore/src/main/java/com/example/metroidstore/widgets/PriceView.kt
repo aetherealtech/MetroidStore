@@ -3,6 +3,7 @@ package com.example.metroidstore.widgets
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import com.example.metroidstore.model.Price
@@ -11,12 +12,13 @@ import java.text.DecimalFormat
 
 @Composable
 fun PriceView(
-    viewModel: PriceViewModel
+    viewModel: PriceViewModel,
+    size: TextUnit = 24.sp,
 ) {
     Text(
         text = viewModel.price,
         fontWeight = FontWeight.Bold,
-        fontSize = 24.sp
+        fontSize = size
     )
 }
 

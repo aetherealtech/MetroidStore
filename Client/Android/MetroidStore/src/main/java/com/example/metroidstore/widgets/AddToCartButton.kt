@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.metroidstore.model.ProductDetails
 import com.example.metroidstore.repositories.CartRepository
+import com.example.metroidstore.ui.theme.Colors
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -28,7 +29,7 @@ fun AddToCartButton(
         shape = RoundedCornerShape(50),
         colors = ButtonDefaults.buttonColors(
             contentColor = Color.Black,
-            containerColor = Color(0xFFFFDD00)
+            containerColor = Colors.PrimaryCallToAction
         )
     ) {
         Text(text = "Add to Cart")

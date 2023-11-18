@@ -1,5 +1,6 @@
 package com.example.metroidstore.cart
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,6 +42,7 @@ fun CartRowView(
 ) {
     Box(
         modifier = modifier
+            .clickable { viewModel.select() }
     ) {
         Column {
             Row(
@@ -91,7 +93,8 @@ fun CartRowView(
 
 class CartRowViewModel(
     private val repository: CartRepository,
-    product: CartItem
+    product: CartItem,
+    val select: () -> Unit,
 ): ViewModel() {
     private val _busy = MutableStateFlow(false)
 
@@ -138,6 +141,7 @@ fun CartRowPreview() {
             viewModel = CartRowViewModel(
                 repository = CartRepository(dataSource = DataSourceFake().cart),
                 product = DataSourceFake.fakeProducts[0].cartItem(quantity = 3),
+                select = { }
             )
         )
     }

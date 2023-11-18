@@ -1,6 +1,7 @@
 package com.example.metroidstore.widgets
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -83,16 +84,13 @@ fun AddedToCartView(
             Text(
                 text = viewModel.text
             )
-            Button(
-                onClick = { viewModel.viewCart() },
-                modifier = Modifier.fillMaxWidth(0.75f),
-                shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(
-                    contentColor = Color.Black,
-                    containerColor = Color(0xFFFFDD00)
-                )
+            Box(
+                modifier = Modifier.fillMaxWidth(0.75f)
             ) {
-                Text(text = "View Cart")
+                PrimaryCallToAction(
+                    onClick = { viewModel.viewCart() },
+                    text = "View Cart"
+                )
             }
         }
     }

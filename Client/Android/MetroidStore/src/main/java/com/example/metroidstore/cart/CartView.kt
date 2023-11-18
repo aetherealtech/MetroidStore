@@ -1,18 +1,13 @@
 package com.example.metroidstore.cart
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,32 +15,35 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.metroidstore.fakedatasources.DataSourceFake
-import com.example.metroidstore.model.Price
+import com.example.metroidstore.model.CartItem
 import com.example.metroidstore.model.ProductID
+import com.example.metroidstore.model.itemCount
+import com.example.metroidstore.model.subtotal
 import com.example.metroidstore.repositories.CartRepository
 import com.example.metroidstore.ui.theme.MetroidStoreTheme
 import com.example.metroidstore.utilities.mapState
 import com.example.metroidstore.widgets.AsyncLoadedShimmering
 import com.example.metroidstore.widgets.PriceView
 import com.example.metroidstore.widgets.PriceViewModel
+import com.example.metroidstore.widgets.PrimaryCallToAction
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 @Composable
 fun CartView(
     modifier: Modifier = Modifier,
-    viewModel: CartViewModel,
-    openProductDetails: (ProductID) -> Unit
+    viewModel: CartViewModel
 ) {
     val busy by viewModel.busy.collectAsState()
+    val items by viewModel.items.collectAsState()
 
     Box(contentAlignment = Alignment.Center) {
         if(busy) {
@@ -56,23 +54,20 @@ fun CartView(
         }
         AsyncLoadedShimmering(
             modifier = modifier,
-            data = viewModel.cart
+            data = viewModel.items
         ) { modifier, cart ->
             LazyColumn(
                 modifier = modifier
                     .padding(horizontal = 16.dp)
             ) {
                 item {
-                    CartSummaryView(cart = cart) {
-                        viewModel.proceedToCheckout()
-                    }
+                    CartSummaryView(
+                        viewModel = viewModel.summary
+                    )
                 }
 
-                items(cart.items) { rowViewModel ->
+                items(items) { rowViewModel ->
                     CartRowView(
-                        modifier = Modifier.clickable {
-                            openProductDetails(rowViewModel.id)
-                        },
                         viewModel = rowViewModel
                     )
                 }
@@ -83,11 +78,14 @@ fun CartView(
 
 @Composable
 fun CartSummaryView(
-    cart: CartViewModel.Cart,
-    proceedToCheckout: () -> Unit
+    modifier: Modifier = Modifier,
+    viewModel: CartSummaryViewModel
 ) {
+    val subtotal by viewModel.subtotal.collectAsState()
+    val primaryActionTitle by viewModel.primaryActionTitle.collectAsState()
+
     Column(
-        modifier = Modifier
+        modifier = modifier
             .padding(vertical = 24.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -100,66 +98,57 @@ fun CartSummaryView(
                 fontSize = 18.sp
             )
             PriceView(
-                viewModel = cart.subtotal
+                viewModel = subtotal
             )
         }
 
-        Button(
-            onClick = { proceedToCheckout() },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(8.dp),
-            colors = ButtonDefaults.buttonColors(
-                contentColor = Color.Black,
-                containerColor = Color(0xFFFFDD00)
-            )
-        ) {
-            Text(text = "Proceed to Checkout (${cart.itemCount} items)")
-        }
+        PrimaryCallToAction(
+            onClick = { viewModel.proceedToCheckout() },
+            text = primaryActionTitle
+        )
     }
 }
 class CartViewModel(
-    private val repository: CartRepository
+    private val repository: CartRepository,
+    selectItem: (ProductID) -> Unit,
+    proceedToCheckout: () -> Unit
 ): ViewModel() {
-    data class Cart(
-        val subtotal: PriceViewModel,
-        val itemCount: Int,
-        val items: ImmutableList<CartRowViewModel>
-    )
+    val busy = repository.busy
 
-    val cart = repository.cart
+    val items = repository.cart
         .mapState { cart ->
-            val subtotal = cart
-                .map { item -> item.price }
-                .fold(Price.zero) { lhs, rhs -> lhs + rhs }
-
-            val itemCount = cart
-                .map { item -> item.quantity }
-                .fold(0) { lhs, rhs -> lhs + rhs }
-
-            val items = cart
-                .map { cartItem -> CartRowViewModel(
-                    repository = repository,
-                    product = cartItem
-                ) }
+            cart
+                .map { cartItem ->
+                    CartRowViewModel(
+                        repository = repository,
+                        product = cartItem,
+                        select = { selectItem(cartItem.productID) }
+                    )
+                }
                 .toImmutableList()
-
-            return@mapState Cart(
-                subtotal = PriceViewModel(price = subtotal),
-                itemCount = itemCount,
-                items = items
-            )
         }
 
-    val busy = repository.busy
+    val summary = CartSummaryViewModel(
+        cart = repository.cart,
+        proceedToCheckout = proceedToCheckout
+    )
+
     init {
         viewModelScope.launch {
             repository.updateCart()
         }
     }
+}
 
-    fun proceedToCheckout() {
+class CartSummaryViewModel(
+    cart: StateFlow<ImmutableList<CartItem>>,
+    val proceedToCheckout: () -> Unit
+): ViewModel() {
+    val subtotal = cart
+        .mapState { cart -> PriceViewModel(cart.subtotal) }
 
-    }
+    val primaryActionTitle = cart
+        .mapState { cart -> "Proceed to Checkout (${cart.itemCount} items)" }
 }
 
 @Preview(showBackground = true)
@@ -170,9 +159,10 @@ fun CartPreview() {
             viewModel = CartViewModel(
                 repository = CartRepository(
                     dataSource = DataSourceFake().cart
-                )
-            ),
-            openProductDetails = { }
+                ),
+                selectItem = { },
+                proceedToCheckout = { }
+            )
         )
     }
 }

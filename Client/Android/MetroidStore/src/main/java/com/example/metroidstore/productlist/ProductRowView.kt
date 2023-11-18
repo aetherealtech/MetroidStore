@@ -1,5 +1,6 @@
 package com.example.metroidstore.productlist
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,6 +39,7 @@ fun ProductRowView(
 ) {
     Box(
         modifier = modifier
+            .clickable { viewModel.select() }
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -81,7 +83,8 @@ fun ProductRowView(
 }
 
 class ProductRowViewModel(
-    product: ProductSummary
+    product: ProductSummary,
+    val select: () -> Unit
 ): ViewModel() {
     val id: ProductID
     val image: ImageSource
@@ -108,7 +111,8 @@ fun ProductRowPreview() {
     MetroidStoreTheme {
         ProductRowView(
             viewModel = ProductRowViewModel(
-                product = DataSourceFake.fakeProducts[0].summary
+                product = DataSourceFake.fakeProducts[0].summary,
+                select = { }
             )
         )
     }

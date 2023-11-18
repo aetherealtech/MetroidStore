@@ -33,6 +33,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.metroidstore.cart.CartView
 import com.example.metroidstore.cart.CartViewModel
+import com.example.metroidstore.checkout.CheckoutView
+import com.example.metroidstore.checkout.CheckoutViewModel
 import com.example.metroidstore.datasources.DataSource
 import com.example.metroidstore.model.ProductID
 import com.example.metroidstore.productdetail.ProductDetailView
@@ -60,14 +62,13 @@ sealed class Screen(
         route = "productList",
         content = { navController, rootViewModel ->
             val productListViewModel = viewModel<ProductListViewModel>(
-                factory = rootViewModel.productList
+                factory = rootViewModel.productList(
+                    openProductDetails = { productID -> navController.navigate("productDetails/${productID.value}") }
+                )
             )
 
             ProductListView(
-                viewModel = productListViewModel,
-                openProductDetails = { productID ->
-                    navController.navigate("productDetails/${productID.value}")
-                }
+                viewModel = productListViewModel
             )
         }
     )
@@ -78,14 +79,14 @@ sealed class Screen(
         route = "cart",
         content = { navController, rootViewModel ->
             val cartViewModel = viewModel<CartViewModel>(
-                factory = rootViewModel.cart
+                factory = rootViewModel.cart(
+                    openProductDetails = { productID -> navController.navigate("productDetails/${productID.value}") },
+                    openCheckout = { navController.navigate("checkout") }
+                )
             )
 
             CartView(
-                viewModel = cartViewModel,
-                openProductDetails = { productID ->
-                    navController.navigate("productDetails/${productID.value}")
-                }
+                viewModel = cartViewModel
             )
         }
     )
@@ -193,6 +194,18 @@ fun RootView(
                     viewModel = detailsViewModel
                 )
             }
+
+            composable(
+                "checkout"
+            ) {backstackEntry ->
+                val detailsViewModel = viewModel<CheckoutViewModel>(
+                    factory = viewModel.checkout()
+                )
+
+                CheckoutView(
+                    viewModel = detailsViewModel
+                )
+            }
         }
     }
 }
@@ -208,26 +221,34 @@ class RootViewModel(
         dataSource = dataSource.cart
     )
 
-    val productList: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+    fun productList(
+        openProductDetails: (ProductID) -> Unit,
+    ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T: ViewModel> create(
             modelClass: Class<T>,
             extras: CreationExtras
         ): T {
             return ProductListViewModel(
-                productRepository = productRepository
+                productRepository = productRepository,
+                selectProduct = openProductDetails
             ) as T
         }
     }
 
-    val cart: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+    fun cart(
+        openProductDetails: (ProductID) -> Unit,
+        openCheckout: () -> Unit,
+    ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T: ViewModel> create(
             modelClass: Class<T>,
             extras: CreationExtras
         ): T {
             return CartViewModel(
-                repository = cartRepository
+                repository = cartRepository,
+                selectItem = openProductDetails,
+                proceedToCheckout = openCheckout
             ) as T
         }
     }
@@ -245,6 +266,18 @@ class RootViewModel(
                 productID = id,
                 repository = productRepository,
                 viewCart = viewCart
+            ) as T
+        }
+    }
+
+    fun checkout(): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T: ViewModel> create(
+            modelClass: Class<T>,
+            extras: CreationExtras
+        ): T {
+            return CheckoutViewModel(
+                cartRepository = cartRepository
             ) as T
         }
     }
