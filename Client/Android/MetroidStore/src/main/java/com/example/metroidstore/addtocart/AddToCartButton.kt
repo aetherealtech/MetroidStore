@@ -1,4 +1,4 @@
-package com.example.metroidstore.widgets
+package com.example.metroidstore.addtocart
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -13,9 +13,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.metroidstore.model.ProductDetails
 import com.example.metroidstore.repositories.CartRepository
 import com.example.metroidstore.ui.theme.Colors
-import kotlinx.coroutines.flow.Flow
+import com.example.metroidstore.widgets.BottomModal
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
@@ -35,14 +34,9 @@ fun AddToCartButton(
         Text(text = "Add to Cart")
     }
 
-    BottomModal(
-        data = viewModel.confirmationViewModel
-    ) { confirmationViewModel, onClose ->
-        AddToCartConfirmation(
-            viewModel = confirmationViewModel,
-            onClose = onClose
-        )
-    }
+    AddToCartConfirmation(
+        viewModel = viewModel.confirmationViewModel
+    )
 }
 
 class AddToCartViewModel(

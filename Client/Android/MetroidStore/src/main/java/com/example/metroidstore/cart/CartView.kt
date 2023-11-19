@@ -1,14 +1,11 @@
 package com.example.metroidstore.cart
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -32,7 +29,8 @@ import com.example.metroidstore.widgets.AsyncLoadedShimmering
 import com.example.metroidstore.widgets.BusyView
 import com.example.metroidstore.widgets.PriceView
 import com.example.metroidstore.widgets.PriceViewModel
-import com.example.metroidstore.widgets.PrimaryCallToAction
+import com.example.metroidstore.uitoolkit.PrimaryCallToAction
+import com.example.metroidstore.uitoolkit.PrimaryCallToActionViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.StateFlow
@@ -76,7 +74,7 @@ fun CartSummaryView(
     viewModel: CartSummaryViewModel
 ) {
     val subtotal by viewModel.subtotal.collectAsState()
-    val primaryActionTitle by viewModel.primaryActionTitle.collectAsState()
+    val primaryAction by viewModel.primaryAction.collectAsState()
 
     Column(
         modifier = modifier
@@ -97,8 +95,7 @@ fun CartSummaryView(
         }
 
         PrimaryCallToAction(
-            onClick = { viewModel.proceedToCheckout() },
-            text = primaryActionTitle
+            viewModel = primaryAction
         )
     }
 }
@@ -136,13 +133,18 @@ class CartViewModel(
 
 class CartSummaryViewModel(
     cart: StateFlow<ImmutableList<CartItem>>,
-    val proceedToCheckout: () -> Unit
+    private val proceedToCheckout: () -> Unit
 ): ViewModel() {
     val subtotal = cart
         .mapState { cart -> PriceViewModel(cart.subtotal) }
 
-    val primaryActionTitle = cart
-        .mapState { cart -> "Proceed to Checkout (${cart.itemCount} items)" }
+    val primaryAction = cart
+        .mapState { cart ->
+            PrimaryCallToActionViewModel(
+                action = if (cart.isEmpty()) null else proceedToCheckout,
+                text = "Proceed to Checkout (${cart.itemCount} items)"
+            )
+        }
 }
 
 @Preview(showBackground = true)

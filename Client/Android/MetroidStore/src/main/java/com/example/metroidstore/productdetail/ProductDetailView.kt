@@ -21,8 +21,8 @@ import com.example.metroidstore.model.ProductID
 import com.example.metroidstore.repositories.ProductRepository
 import com.example.metroidstore.ui.theme.MetroidStoreTheme
 import com.example.metroidstore.utilities.parallelMap
-import com.example.metroidstore.widgets.AddToCartButton
-import com.example.metroidstore.widgets.AddToCartViewModel
+import com.example.metroidstore.addtocart.AddToCartButton
+import com.example.metroidstore.addtocart.AddToCartViewModel
 import com.example.metroidstore.widgets.AsyncLoadedShimmering
 import com.example.metroidstore.widgets.ImagesCarousel
 import kotlinx.collections.immutable.ImmutableList

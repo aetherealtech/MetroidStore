@@ -1,7 +1,6 @@
 package com.example.metroidstore.checkout
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,12 +21,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.metroidstore.fakedatasources.DataSourceFake
 import com.example.metroidstore.model.CartItem
+import com.example.metroidstore.model.NewOrder
+import com.example.metroidstore.model.OrderID
 import com.example.metroidstore.model.PaymentMethodSummary
 import com.example.metroidstore.model.Percent
 import com.example.metroidstore.model.Price
 import com.example.metroidstore.model.ShippingMethod
 import com.example.metroidstore.model.UserAddressSummary
 import com.example.metroidstore.model.subtotal
+import com.example.metroidstore.orderconfirmation.PlaceOrderButton
+import com.example.metroidstore.orderconfirmation.PlaceOrderViewModel
 import com.example.metroidstore.repositories.CartRepository
 import com.example.metroidstore.repositories.UserRepository
 import com.example.metroidstore.ui.theme.MetroidStoreTheme
@@ -38,7 +41,6 @@ import com.example.metroidstore.widgets.DropDownList
 import com.example.metroidstore.widgets.DropDownViewModel
 import com.example.metroidstore.widgets.PriceView
 import com.example.metroidstore.widgets.PriceViewModel
-import com.example.metroidstore.widgets.PrimaryCallToAction
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.StateFlow
@@ -49,8 +51,6 @@ fun CheckoutView(
     modifier: Modifier = Modifier,
     viewModel: CheckoutViewModel
 ) {
-    val placeOrder by viewModel.placeOrder.collectAsState()
-
     BusyView(
         busy = viewModel.busy
     ) {
@@ -81,21 +81,17 @@ fun CheckoutView(
                 additionalOption = { Text("Add New Payment Method") }
             )
 
-            Box(
-                modifier = Modifier.fillMaxWidth(0.75f)
-            ) {
-                PrimaryCallToAction(
-                    onClick = placeOrder,
-                    text = "Place Order"
-                )
-            }
+            PlaceOrderButton(
+                viewModel = viewModel.placeOrder
+            )
         }
     }
 }
 
 class CheckoutViewModel(
     cartRepository: CartRepository,
-    userRepository: UserRepository
+    userRepository: UserRepository,
+    viewOrder: (OrderID) -> Unit
 ): ViewModel() {
     data class AddressViewModel(
         val address: UserAddressSummary
@@ -121,7 +117,7 @@ class CheckoutViewModel(
     val shippingMethods: DropDownViewModel<ShippingMethodViewModel>
     val paymentMethods: DropDownViewModel<PaymentMethodViewModel>
 
-    val placeOrder: StateFlow<(() -> Unit)?>
+    val placeOrder: PlaceOrderViewModel
 
     val busy = userRepository.busy
 
@@ -174,7 +170,7 @@ class CheckoutViewModel(
             shippingMethod = shippingMethods.selection.mapState { viewModel -> viewModel?.method }
         )
 
-        placeOrder = StateFlows
+        val order = StateFlows
             .combine(
                 addresses.selection,
                 shippingMethods.selection,
@@ -188,16 +184,18 @@ class CheckoutViewModel(
                 if(address == null || shippingMethod == null || paymentMethod == null)
                     return@mapState null
 
-                return@mapState {
-                    viewModelScope.launch {
-                        userRepository.placeOrder(
-                            addressID = address.address.addressID,
-                            shippingMethod = shippingMethod.method,
-                            paymentMethodID = paymentMethod.method.id
-                        )
-                    }
-                }
+                return@mapState NewOrder(
+                    addressID = address.address.addressID,
+                    shippingMethod = shippingMethod.method,
+                    paymentMethodID = paymentMethod.method.id
+                )
             }
+
+        placeOrder = PlaceOrderViewModel(
+            order = order,
+            userRepository = userRepository,
+            viewOrder = viewOrder
+        )
 
         viewModelScope.launch {
             userRepository.updateAddresses()
@@ -319,7 +317,8 @@ fun CheckoutPreview() {
                 ),
                 userRepository = UserRepository(
                     dataSource = DataSourceFake().user
-                )
+                ),
+                viewOrder = { }
             )
         )
     }

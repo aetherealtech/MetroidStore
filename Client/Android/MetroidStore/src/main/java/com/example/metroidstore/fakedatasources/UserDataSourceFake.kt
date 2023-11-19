@@ -3,6 +3,7 @@ package com.example.metroidstore.fakedatasources
 import com.example.metroidstore.datasources.UserDataSource
 import com.example.metroidstore.model.Address
 import com.example.metroidstore.model.NewOrder
+import com.example.metroidstore.model.OrderID
 import com.example.metroidstore.model.PaymentMethodSummary
 import com.example.metroidstore.model.Price
 import com.example.metroidstore.model.ShippingMethod
@@ -33,7 +34,7 @@ class UserDataSourceFake: UserDataSource {
         )
     }
 
-    override suspend fun placeOrder(order: NewOrder) {
-
+    override suspend fun placeOrder(order: NewOrder): OrderID {
+        return OrderID(0)
     }
 }

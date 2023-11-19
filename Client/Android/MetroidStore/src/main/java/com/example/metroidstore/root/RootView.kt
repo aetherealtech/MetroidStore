@@ -3,6 +3,7 @@ package com.example.metroidstore.root
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ShoppingCart
@@ -36,6 +37,7 @@ import com.example.metroidstore.cart.CartViewModel
 import com.example.metroidstore.checkout.CheckoutView
 import com.example.metroidstore.checkout.CheckoutViewModel
 import com.example.metroidstore.datasources.DataSource
+import com.example.metroidstore.model.OrderID
 import com.example.metroidstore.model.ProductID
 import com.example.metroidstore.productdetail.ProductDetailView
 import com.example.metroidstore.productdetail.ProductDetailViewModel
@@ -46,7 +48,9 @@ import com.example.metroidstore.repositories.ProductRepository
 import com.example.metroidstore.repositories.UserRepository
 import com.example.metroidstore.settings.SettingsView
 import com.example.metroidstore.settings.SettingsViewModel
+import com.example.metroidstore.utilities.OrderIDType
 import com.example.metroidstore.utilities.ProductIDType
+import com.example.metroidstore.utilities.getOrderID
 import com.example.metroidstore.utilities.getProductID
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -91,6 +95,21 @@ sealed class Screen(
             )
         }
     )
+
+    data object Orders : Screen(
+        title = "Orders",
+        icon = Icons.Filled.ArrowForward,
+        route = "orders",
+        content = { _, rootViewModel ->
+            Text(text = "Orders")
+//            val settingsViewModel = viewModel<SettingsViewModel>(
+//                factory = rootViewModel.settings
+//            )
+//
+//            SettingsView(viewModel = settingsViewModel)
+        }
+    )
+
     data object Settings : Screen(
         title = "Settings",
         icon = Icons.Filled.Settings,
@@ -110,6 +129,7 @@ sealed class Screen(
                 return persistentListOf(
                     ProductList,
                     Cart,
+                    Orders,
                     Settings
                 )
             }
@@ -132,6 +152,11 @@ fun RootView(
             launchSingleTop = true
             restoreState = true
         }
+    }
+
+    fun viewOrder(orderID: OrderID) {
+        selectTab(Screen.Orders)
+        navController.navigate("orders/${orderID.value}")
     }
 
     Scaffold(
@@ -200,12 +225,36 @@ fun RootView(
                 "checkout"
             ) {backstackEntry ->
                 val detailsViewModel = viewModel<CheckoutViewModel>(
-                    factory = viewModel.checkout()
+                    factory = viewModel.checkout(
+                        viewOrder = { orderID -> viewOrder(orderID) }
+                    )
                 )
 
                 CheckoutView(
                     viewModel = detailsViewModel
                 )
+            }
+
+            composable(
+                "orders/{orderID}",
+                arguments = listOf(navArgument("orderID") { type = NavType.OrderIDType })
+            ) {backstackEntry ->
+                val orderID = backstackEntry.arguments!!.getOrderID("orderID")
+
+                Text(text = "Order: ${orderID.value}")
+
+//                val detailsViewModel = viewModel<ProductDetailViewModel>(
+//                    factory = viewModel.productDetails(
+//                        id = orderID,
+//                        viewCart = {
+//                            selectTab(Screen.Cart)
+//                        }
+//                    )
+//                )
+//
+//                ProductDetailView(
+//                    viewModel = detailsViewModel
+//                )
             }
         }
     }
@@ -275,7 +324,9 @@ class RootViewModel(
         }
     }
 
-    fun checkout(): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+    fun checkout(
+        viewOrder: (OrderID) -> Unit
+    ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T: ViewModel> create(
             modelClass: Class<T>,
@@ -283,7 +334,8 @@ class RootViewModel(
         ): T {
             return CheckoutViewModel(
                 cartRepository = cartRepository,
-                userRepository = userRepository
+                userRepository = userRepository,
+                viewOrder = viewOrder
             ) as T
         }
     }

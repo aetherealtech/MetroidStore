@@ -49,17 +49,7 @@ class UserRepository(
         update { _paymentMethods.value = dataSource.getPaymentMethods() }
     }
 
-    suspend fun placeOrder(
-        addressID: Address.ID,
-        shippingMethod: ShippingMethod,
-        paymentMethodID: PaymentMethodSummary.ID
-    ) {
-        dataSource.placeOrder(NewOrder(
-            addressID = addressID,
-            shippingMethod = shippingMethod,
-            paymentMethodID = paymentMethodID
-        ))
-    }
+    suspend fun placeOrder(order: NewOrder) = dataSource.placeOrder(order)
 
     private suspend fun update(
         action: suspend () -> Unit

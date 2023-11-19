@@ -147,19 +147,14 @@ class EmbeddedServer(
 
                     val newOrder = Json.decodeFromString<NewOrder>(call.receiveText())
 
-                    try {
-                        database.placeOrder(
-                            username = username,
-                            addressID = newOrder.addressID,
-                            shippingMethodName = newOrder.shippingMethodName,
-                            paymentMethodID = newOrder.paymentMethodID
-                        )
-                    } catch(error: Exception) {
-                        call.respond(HttpStatusCode.InternalServerError, error.localizedMessage)
-                        return@post
-                    }
+                    val orderID = database.placeOrder(
+                        username = username,
+                        addressID = newOrder.addressID,
+                        shippingMethodName = newOrder.shippingMethodName,
+                        paymentMethodID = newOrder.paymentMethodID
+                    )
 
-                    call.respond(HttpStatusCode.OK)
+                    call.respondText("$orderID")
                 }
             }
         }.start()

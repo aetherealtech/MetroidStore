@@ -4,6 +4,7 @@ import android.content.res.Resources
 import com.example.metroidstore.model.Address
 import com.example.metroidstore.model.CartItem
 import com.example.metroidstore.model.NewOrder
+import com.example.metroidstore.model.OrderID
 import com.example.metroidstore.model.PaymentMethodSummary
 import com.example.metroidstore.model.Price
 import com.example.metroidstore.model.ProductDetails
@@ -291,7 +292,7 @@ class BackendClient(
             .toImmutableList()
     }
 
-    suspend fun placeOrder(order: NewOrder) {
+    suspend fun placeOrder(order: NewOrder): OrderID {
         val backendOrder = com.example.metroidstore.backendmodel.NewOrder(
             addressID = order.addressID.value,
             shippingMethodName = order.shippingMethod.name,
@@ -309,6 +310,13 @@ class BackendClient(
 
         if(!response.isSuccessful)
             throw IllegalStateException(response.message)
+
+        val body = response.body
+
+        if(body == null)
+            throw IllegalStateException("Did not receive a response")
+
+        return OrderID(body.string().toInt())
     }
 
     private val client = OkHttpClient()

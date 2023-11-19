@@ -157,10 +157,6 @@ fun SQLiteDatabase.removeFromCart(
         setTransactionSuccessful()
 
         return cart
-    } catch (error: Exception) {
-        println(error.localizedMessage)
-
-        return emptyList()
     } finally {
         endTransaction()
     }
@@ -188,10 +184,6 @@ fun SQLiteDatabase.decrementCartQuantity(
         setTransactionSuccessful()
 
         return cart
-    } catch (error: Exception) {
-        println(error.localizedMessage)
-
-        return emptyList()
     } finally {
         endTransaction()
     }
@@ -214,10 +206,6 @@ fun SQLiteDatabase.incrementCartQuantity(
         setTransactionSuccessful()
 
         return cart
-    } catch (error: Exception) {
-        println(error.localizedMessage)
-
-        return emptyList()
     } finally {
         endTransaction()
     }
@@ -347,7 +335,7 @@ fun SQLiteDatabase.placeOrder(
     addressID: Int,
     shippingMethodName: String,
     paymentMethodID: Int
-) {
+): Int {
     beginTransaction()
 
     try {
@@ -375,8 +363,8 @@ fun SQLiteDatabase.placeOrder(
         )
 
         setTransactionSuccessful()
-    } catch (error: Exception) {
-        println(error.localizedMessage)
+
+        return orderID
     } finally {
         endTransaction()
     }
