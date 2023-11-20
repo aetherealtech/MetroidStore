@@ -15,3 +15,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "Metroid Store"
 include(":MetroidStore")
+include(":BackendModel")
+include(":BackendClient")
+include(":CustomerClientModel")
+include(":EmbeddedBackend")

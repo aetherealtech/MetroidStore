@@ -25,6 +25,7 @@ import aetherealtech.metroidstore.customerclient.addtocart.AddToCartButton
 import aetherealtech.metroidstore.customerclient.addtocart.AddToCartViewModel
 import aetherealtech.metroidstore.customerclient.widgets.AsyncLoadedShimmering
 import aetherealtech.metroidstore.customerclient.widgets.ImagesCarousel
+import androidx.compose.ui.graphics.asImageBitmap
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -95,7 +96,7 @@ class ProductDetailViewModel(
             _name.value = product.name
 
             _images.value = product.images
-                .parallelMap { imageSource -> imageSource.load() }
+                .parallelMap { imageSource -> imageSource.load().asImageBitmap() }
                 .toImmutableList()
 
             _addToCartViewModel.value = AddToCartViewModel(

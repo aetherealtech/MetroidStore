@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.res.painterResource
 import com.aetherealtech.metroidstore.customerclient.R
 import aetherealtech.metroidstore.customerclient.model.ImageSource
+import androidx.compose.ui.graphics.asImageBitmap
 
 @Composable
 fun AsyncImage(
@@ -26,7 +27,7 @@ fun AsyncImage(
 
     LaunchedEffect(source) {
         loadedImage.value = Result.success(null)
-        loadedImage.value = Result.runCatching { source.load() }
+        loadedImage.value = Result.runCatching { source.load().asImageBitmap() }
     }
 
     val currentLoadedImage by loadedImage

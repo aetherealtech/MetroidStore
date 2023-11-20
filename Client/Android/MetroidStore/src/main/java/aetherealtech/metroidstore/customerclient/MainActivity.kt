@@ -14,7 +14,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.compose.viewModel
 import aetherealtech.metroidstore.customerclient.backenddatasources.DataSourceBackend
-import aetherealtech.metroidstore.customerclient.embeddedbackend.EmbeddedServer
+import aetherealtech.metroidstore.embeddedbackend.EmbeddedServer
 import aetherealtech.metroidstore.customerclient.root.RootView
 import aetherealtech.metroidstore.customerclient.root.RootViewModel
 import aetherealtech.metroidstore.customerclient.ui.theme.MetroidStoreTheme
