@@ -14,9 +14,11 @@ The purpose of this codebase is to demonstrate by example my knowledge and skill
 
 All the code here is written exclusively by me (full transparency, *some* of it may have been heavily inspired by Stackoverflow answers, modified as needed), to fulfill virtual requirements I created based on my experience with real commercial software.  In addition to demonstrating my technical knowledge and skills, this code also demonstrates my coding style, including my approach to design and architecture.
 
+(If the introduction above makes no sense to you, just read [this](https://en.wikipedia.org/wiki/Metroid).  It's not necessary to understand or use the software here, it's just a simulated online store where you can buy things like Amazon.)
+
 ## Components
 
-Currently the code consists only of a native Android app for the customer of the virtual business (the "customer client"), with a minimal backend server embedded into the app (it runs as an embedded server on the same device as the app) to support the client functionality.  This means to run it all you have to do is build and run the app in Android Studio.
+Currently the system consists only of a native Android app for the customer of the virtual business (the "customer client"), with a minimal backend server embedded into the app (it runs as an embedded server on the same device as the app) to support the client functionality.  This means to run it all you have to do is build and run the app in Android Studio.
 
 As I continue to work on it, I will build a true backend that will run in Docker on the development machine, ported to various tech stacks (Ruby on Rails, ASP.NET, Java Spring, Nest.js, etc.), port the customer client to different devices and tech stacks (native iOS, .NET MAUI, React Native, Flutter, React Web, etc.), and write additional clients (CRM web site and desktop app, warehouse worker mobile app, delivery driver mobile app).  The purpose of writing components on multiple tech stacks is to demonstrate my subject matter expertise in each one.
 
