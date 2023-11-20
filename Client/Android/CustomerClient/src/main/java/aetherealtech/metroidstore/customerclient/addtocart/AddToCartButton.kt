@@ -50,13 +50,11 @@ class AddToCartViewModel(
 
     fun addToCart() {
         viewModelScope.launch {
-            _confirmationViewModel.emit(
-                AddToCartConfirmationViewModel(
+            _confirmationViewModel.emit(AddToCartConfirmationViewModel(
                 product = product,
                 cartRepository = cartRepository,
                 viewCart = viewCart
-            )
-            )
+            ))
         }
     }
 }
