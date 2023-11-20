@@ -10,21 +10,21 @@ import aetherealtech.metroidstore.backendmodel.ProductSummary
 import aetherealtech.metroidstore.backendmodel.ShippingMethod
 import aetherealtech.metroidstore.backendmodel.UserAddressSummary
 import kotlinx.collections.immutable.toImmutableList
+import java.io.BufferedReader
 import java.io.File
+import java.io.InputStreamReader
+import java.util.stream.Collectors
 
 class EmbeddedDatabase {
     companion object {
         fun load(context: Context): SQLiteDatabase {
             val dbFile = File(context.filesDir, "MetroidStore.db")
 
-            if(!dbFile.exists()) {
-                dbFile.createNewFile()
+            var needsSeed = false
 
-                context.assets.open("MetroidStore.db").use { dbAssetStream ->
-                    dbFile.outputStream().use { dbFileStream ->
-                        dbAssetStream.copyTo(dbFileStream)
-                    }
-                }
+            if(!dbFile.exists()) {
+                needsSeed = true
+                dbFile.createNewFile()
             }
 
             val db = SQLiteDatabase.openDatabase(
@@ -34,6 +34,17 @@ class EmbeddedDatabase {
             )
 
             db.execSQL("PRAGMA foreign_keys = ON")
+
+            if(needsSeed) {
+                context.assets.open("MetroidStore.sql").use { dbAssetStream ->
+                    BufferedReader(InputStreamReader(dbAssetStream))
+                        .lines()
+                        .collect(Collectors.joining("\n"))
+                        .split(";")
+                        .filter { statement -> !statement.isEmpty() }
+                        .forEach { statement -> db.execSQL(statement) }
+                }
+            }
 
             return db
         }
