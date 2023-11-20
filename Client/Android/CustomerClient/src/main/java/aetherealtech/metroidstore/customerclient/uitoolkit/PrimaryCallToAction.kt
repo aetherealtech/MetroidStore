@@ -39,6 +39,7 @@ fun PrimaryCallToAction(
     text: String
 ) {
     PrimaryCallToAction(
+        modifier = modifier,
         viewModel = PrimaryCallToActionViewModel(
             action = onClick,
             text = text

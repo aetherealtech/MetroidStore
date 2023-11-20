@@ -21,6 +21,7 @@ import aetherealtech.metroidstore.customerclient.ui.theme.MetroidStoreTheme
 import aetherealtech.metroidstore.customerclient.uitoolkit.PrimaryCallToAction
 import aetherealtech.metroidstore.customerclient.widgets.PriceView
 import aetherealtech.metroidstore.customerclient.widgets.PriceViewModel
+import androidx.compose.foundation.layout.wrapContentWidth
 import kotlinx.datetime.Clock
 import java.text.DateFormat
 import java.util.Date
@@ -33,12 +34,16 @@ fun OrderSummaryRow(
         Row(
             modifier = Modifier
                 .padding(vertical = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(32.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column {
                 Text(
                     text = viewModel.date,
+                    fontSize = 24.sp
+                )
+                Text(
+                    text = viewModel.time,
                     fontSize = 24.sp
                 )
                 Text(
@@ -64,14 +69,20 @@ class OrderSummaryRowViewModel(
     val viewOrder: (OrderID) -> Unit
 ): ViewModel() {
     val date: String
+    val time: String
     val items: String
     val total: PriceViewModel
 
     init {
-        date = DateFormat.getDateTimeInstance(
-            DateFormat.MEDIUM,
+        val orderDate = Date(order.date.toEpochMilliseconds())
+
+        date = DateFormat.getDateInstance(
+            DateFormat.MEDIUM
+        ).format(orderDate)
+
+        time = DateFormat.getTimeInstance(
             DateFormat.SHORT
-        ).format(Date(order.date.toEpochMilliseconds()))
+        ).format(orderDate)
 
         items = "${order.items} Items"
 
