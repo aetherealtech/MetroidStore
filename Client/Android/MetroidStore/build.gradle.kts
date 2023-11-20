@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.metroidstore"
+    namespace = "com.aetherealtech.metroidstore.customerclient"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.metroidstore"
+        applicationId = "com.aetherealtech.metroidstore.customerclient"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
