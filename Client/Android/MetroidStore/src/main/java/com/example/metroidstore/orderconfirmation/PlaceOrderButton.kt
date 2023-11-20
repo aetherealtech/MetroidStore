@@ -11,10 +11,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.metroidstore.model.NewOrder
 import com.example.metroidstore.model.OrderID
 import com.example.metroidstore.repositories.UserRepository
-import com.example.metroidstore.uitoolkit.ConfirmationModal
-import com.example.metroidstore.utilities.mapState
-import com.example.metroidstore.widgets.BottomModal
 import com.example.metroidstore.uitoolkit.PrimaryCallToAction
+import com.example.metroidstore.utilities.mapState
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow

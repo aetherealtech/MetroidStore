@@ -39,11 +39,14 @@ import com.example.metroidstore.checkout.CheckoutViewModel
 import com.example.metroidstore.datasources.DataSource
 import com.example.metroidstore.model.OrderID
 import com.example.metroidstore.model.ProductID
+import com.example.metroidstore.orders.OrdersView
+import com.example.metroidstore.orders.OrdersViewModel
 import com.example.metroidstore.productdetail.ProductDetailView
 import com.example.metroidstore.productdetail.ProductDetailViewModel
 import com.example.metroidstore.productlist.ProductListView
 import com.example.metroidstore.productlist.ProductListViewModel
 import com.example.metroidstore.repositories.CartRepository
+import com.example.metroidstore.repositories.OrderRepository
 import com.example.metroidstore.repositories.ProductRepository
 import com.example.metroidstore.repositories.UserRepository
 import com.example.metroidstore.settings.SettingsView
@@ -100,13 +103,14 @@ sealed class Screen(
         title = "Orders",
         icon = Icons.Filled.ArrowForward,
         route = "orders",
-        content = { _, rootViewModel ->
-            Text(text = "Orders")
-//            val settingsViewModel = viewModel<SettingsViewModel>(
-//                factory = rootViewModel.settings
-//            )
-//
-//            SettingsView(viewModel = settingsViewModel)
+        content = { navController, rootViewModel ->
+            val ordersViewModel = viewModel<OrdersViewModel>(
+                factory = rootViewModel.orders(
+                    viewOrder = { orderID -> navController.viewOrder(orderID) }
+                )
+            )
+
+            OrdersView(viewModel = ordersViewModel)
         }
     )
 
@@ -136,28 +140,28 @@ sealed class Screen(
     }
 }
 
+fun NavHostController.selectTab(screen: Screen) {
+    navigate(screen.route) {
+        popUpTo(graph.findStartDestination().id) {
+            inclusive = true
+        }
+        graph.setStartDestination(screen.route)
+        launchSingleTop = true
+        restoreState = true
+    }
+}
+
+fun NavHostController.viewOrder(orderID: OrderID) {
+    selectTab(Screen.Orders)
+    navigate("orders/${orderID.value}")
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RootView(
     viewModel: RootViewModel
 ) {
     val navController = rememberNavController()
-
-    fun selectTab(screen: Screen) {
-        navController.navigate(screen.route) {
-            popUpTo(navController.graph.findStartDestination().id) {
-                inclusive = true
-            }
-            navController.graph.setStartDestination(screen.route)
-            launchSingleTop = true
-            restoreState = true
-        }
-    }
-
-    fun viewOrder(orderID: OrderID) {
-        selectTab(Screen.Orders)
-        navController.navigate("orders/${orderID.value}")
-    }
 
     Scaffold(
         topBar = {
@@ -189,7 +193,7 @@ fun RootView(
                         label = { Text(screen.title) },
                         selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
                         onClick = {
-                            selectTab(screen)
+                            navController.selectTab(screen)
                         }
                     )
                 }
@@ -211,7 +215,7 @@ fun RootView(
                     factory = viewModel.productDetails(
                         id = productID,
                         viewCart = {
-                            selectTab(Screen.Cart)
+                            navController.selectTab(Screen.Cart)
                         }
                     )
                 )
@@ -226,7 +230,7 @@ fun RootView(
             ) {backstackEntry ->
                 val detailsViewModel = viewModel<CheckoutViewModel>(
                     factory = viewModel.checkout(
-                        viewOrder = { orderID -> viewOrder(orderID) }
+                        viewOrder = { orderID -> navController.viewOrder(orderID) }
                     )
                 )
 
@@ -273,6 +277,10 @@ class RootViewModel(
 
     private val userRepository = UserRepository(
         dataSource = dataSource.user
+    )
+
+    private val orderRepository = OrderRepository(
+        dataSource = dataSource.orders
     )
 
     fun productList(
@@ -335,6 +343,21 @@ class RootViewModel(
             return CheckoutViewModel(
                 cartRepository = cartRepository,
                 userRepository = userRepository,
+                viewOrder = viewOrder
+            ) as T
+        }
+    }
+
+    fun orders(
+        viewOrder: (OrderID) -> Unit
+    ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T: ViewModel> create(
+            modelClass: Class<T>,
+            extras: CreationExtras
+        ): T {
+            return OrdersViewModel(
+                repository = orderRepository,
                 viewOrder = viewOrder
             ) as T
         }

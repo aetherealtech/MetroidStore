@@ -5,6 +5,7 @@ import com.example.metroidstore.model.Address
 import com.example.metroidstore.model.CartItem
 import com.example.metroidstore.model.NewOrder
 import com.example.metroidstore.model.OrderID
+import com.example.metroidstore.model.OrderSummary
 import com.example.metroidstore.model.PaymentMethodSummary
 import com.example.metroidstore.model.Price
 import com.example.metroidstore.model.ProductDetails
@@ -15,6 +16,7 @@ import com.example.metroidstore.model.ShippingMethod
 import com.example.metroidstore.model.UserAddressSummary
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.datetime.Instant
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okhttp3.HttpUrl
@@ -287,6 +289,35 @@ class BackendClient(
                     id = PaymentMethodSummary.ID(backendMethod.id),
                     name = backendMethod.name,
                     isPrimary = backendMethod.isPrimary
+                )
+            }
+            .toImmutableList()
+    }
+
+    suspend fun getOrders(): ImmutableList<OrderSummary> {
+        val request = buildRequest { urlBuilder ->
+            urlBuilder
+                .addPathSegment("orders")
+        }
+
+        val response = client.newCall(request).await()
+
+        val body = response.body
+
+        if(body == null)
+            throw IllegalStateException("Did not receive a response")
+
+        val backendOrders = Json.decodeFromString<List<com.example.metroidstore.backendmodel.OrderSummary>>(
+            body.string()
+        )
+
+        return backendOrders
+            .map { backendOrder ->
+                OrderSummary(
+                    id = OrderID(backendOrder.id),
+                    date = Instant.parse(backendOrder.date),
+                    items = backendOrder.items,
+                    total = Price(backendOrder.totalCents)
                 )
             }
             .toImmutableList()

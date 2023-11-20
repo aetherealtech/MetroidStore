@@ -13,7 +13,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.metroidstore.model.ProductDetails
 import com.example.metroidstore.repositories.CartRepository
 import com.example.metroidstore.ui.theme.Colors
-import com.example.metroidstore.widgets.BottomModal
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch

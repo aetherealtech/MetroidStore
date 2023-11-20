@@ -1,6 +1,7 @@
 package com.example.metroidstore.fakedatasources
 
 import com.example.metroidstore.datasources.DataSource
+import com.example.metroidstore.datasources.OrderDataSource
 import com.example.metroidstore.model.ImageSource
 import com.example.metroidstore.model.ImageSourceData
 import com.example.metroidstore.model.Price
@@ -50,4 +51,5 @@ class DataSourceFake: DataSource {
     override val products = ProductDataSourceFake(fakeProducts)
     override val cart = CartDataSourceFake(fakeProducts)
     override val user = UserDataSourceFake()
+    override val orders = OrderDataSourceFake()
 }

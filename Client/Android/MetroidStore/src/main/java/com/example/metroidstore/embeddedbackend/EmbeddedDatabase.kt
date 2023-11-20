@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteCursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import com.example.metroidstore.backendmodel.CartItem
+import com.example.metroidstore.backendmodel.OrderSummary
 import com.example.metroidstore.backendmodel.PaymentMethodSummary
 import com.example.metroidstore.backendmodel.ProductDetails
 import com.example.metroidstore.backendmodel.ProductSummary
@@ -367,5 +368,43 @@ fun SQLiteDatabase.placeOrder(
         return orderID
     } finally {
         endTransaction()
+    }
+}
+
+fun SQLiteDatabase.orders(username: String): List<OrderSummary> {
+    return rawQuery(
+        """
+            SELECT Orders.id, Orders.createdAt, ShippingMethods.cost AS shippingCost, SUM(OrderItems.quantity) AS items, SUM(QuantityPrices.quantityPrice) AS subtotal
+            FROM OrderItems
+            LEFT JOIN Orders ON OrderItems.orderID = Orders.id
+            LEFT JOIN ShippingMethods ON Orders.shippingMethod = ShippingMethods.name
+            JOIN (SELECT OI.orderID, OI.productID, Products.price * OI.quantity AS quantityPrice FROM Products LEFT JOIN OrderItems OI on Products.id = OI.productID) AS QuantityPrices on (OrderItems.orderID, OrderItems.productID) = (QuantityPrices.orderID, QuantityPrices.productID)
+            WHERE Orders.username = ?
+            GROUP BY Orders.id
+            ORDER BY Orders.createdAt
+        """,
+        arrayOf(username)
+    ).use { cursor ->
+        val results = mutableListOf<OrderSummary>()
+
+        while(cursor.moveToNext()) {
+            val shippingCost = cursor.getInt(2)
+            val subtotal = cursor.getInt(4)
+
+            val taxesPercent = 10
+
+            val total = (subtotal + shippingCost) * (100 + taxesPercent) / 100
+
+            results.add(
+                OrderSummary(
+                    id = cursor.getInt(0),
+                    date = cursor.getString(1),
+                    items = cursor.getInt(3),
+                    totalCents = total
+                )
+            )
+        }
+
+        return@use results.toImmutableList()
     }
 }
