@@ -13,9 +13,9 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/BackendClient" />
             <option value="$PROJECT_DIR$/BackendModel" />
+            <option value="$PROJECT_DIR$/CustomerClient" />
             <option value="$PROJECT_DIR$/CustomerClientModel" />
             <option value="$PROJECT_DIR$/EmbeddedBackend" />
-            <option value="$PROJECT_DIR$/MetroidStore" />
           </set>
         </option>
       </GradleProjectSettings>
