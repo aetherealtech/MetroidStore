@@ -6,5 +6,6 @@ data class OrderSummary(
     val id: OrderID,
     val date: Instant,
     val items: Int,
-    val total: Price
+    val total: Price,
+    val latestStatus: OrderStatus
 )

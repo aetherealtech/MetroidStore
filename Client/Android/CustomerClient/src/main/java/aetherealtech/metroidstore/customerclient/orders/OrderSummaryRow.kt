@@ -15,13 +15,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import aetherealtech.metroidstore.customerclient.model.OrderID
+import aetherealtech.metroidstore.customerclient.model.OrderStatus
 import aetherealtech.metroidstore.customerclient.model.OrderSummary
 import aetherealtech.metroidstore.customerclient.model.Price
 import aetherealtech.metroidstore.customerclient.ui.theme.MetroidStoreTheme
 import aetherealtech.metroidstore.customerclient.uitoolkit.PrimaryCallToAction
 import aetherealtech.metroidstore.customerclient.widgets.PriceView
 import aetherealtech.metroidstore.customerclient.widgets.PriceViewModel
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.ui.text.font.FontWeight
 import kotlinx.datetime.Clock
 import java.text.DateFormat
 import java.util.Date
@@ -31,34 +35,40 @@ fun OrderSummaryRow(
     viewModel: OrderSummaryRowViewModel
 ) {
     Box {
-        Row(
-            modifier = Modifier
-                .padding(vertical = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(32.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column {
-                Text(
-                    text = viewModel.date,
-                    fontSize = 24.sp
-                )
-                Text(
-                    text = viewModel.time,
-                    fontSize = 24.sp
-                )
-                Text(
-                    text = viewModel.items,
-                    fontSize = 20.sp
-                )
-                PriceView(
-                    viewModel = viewModel.total
+        Column {
+            Text(
+                text = viewModel.date,
+                fontSize = 24.sp
+            )
+            Text(
+                text = viewModel.status,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Row(
+                modifier = Modifier
+                    .padding(vertical = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(32.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column {
+                    Text(
+                        text = viewModel.items,
+                        fontSize = 20.sp
+                    )
+                    PriceView(
+                        viewModel = viewModel.total
+                    )
+                }
+
+                Spacer(modifier = Modifier.weight(1.0f))
+
+                PrimaryCallToAction(
+                    modifier = Modifier.width(128.dp),
+                    onClick = { viewModel.viewOrder() },
+                    text = "View Order"
                 )
             }
-
-            PrimaryCallToAction(
-                onClick = { viewModel.viewOrder() },
-                text = "View Order"
-            )
         }
         Divider()
     }
@@ -69,20 +79,19 @@ class OrderSummaryRowViewModel(
     val viewOrder: (OrderID) -> Unit
 ): ViewModel() {
     val date: String
-    val time: String
+    val status: String
     val items: String
     val total: PriceViewModel
 
     init {
         val orderDate = Date(order.date.toEpochMilliseconds())
 
-        date = DateFormat.getDateInstance(
-            DateFormat.MEDIUM
-        ).format(orderDate)
-
-        time = DateFormat.getTimeInstance(
+        date = DateFormat.getDateTimeInstance(
+            DateFormat.MEDIUM,
             DateFormat.SHORT
         ).format(orderDate)
+
+        status = order.latestStatus.value
 
         items = "${order.items} Items"
 
@@ -100,7 +109,7 @@ fun OrderSummaryRowPreview() {
     MetroidStoreTheme {
         OrderSummaryRow(
             viewModel = OrderSummaryRowViewModel(
-                order = OrderSummary(OrderID(0), Clock.System.now(), 5, Price(15000)),
+                order = OrderSummary(OrderID(0), Clock.System.now(), 5, Price(15000), OrderStatus.SHIPPED),
                 viewOrder = { }
             )
         )

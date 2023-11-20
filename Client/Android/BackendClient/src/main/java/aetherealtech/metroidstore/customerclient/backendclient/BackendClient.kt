@@ -5,6 +5,7 @@ import aetherealtech.metroidstore.customerclient.model.Address
 import aetherealtech.metroidstore.customerclient.model.CartItem
 import aetherealtech.metroidstore.customerclient.model.NewOrder
 import aetherealtech.metroidstore.customerclient.model.OrderID
+import aetherealtech.metroidstore.customerclient.model.OrderStatus
 import aetherealtech.metroidstore.customerclient.model.OrderSummary
 import aetherealtech.metroidstore.customerclient.model.PaymentMethodSummary
 import aetherealtech.metroidstore.customerclient.model.Price
@@ -61,9 +62,7 @@ class BackendClient(
                     name = backendProduct.name,
                     type = backendProduct.type,
                     game = backendProduct.game,
-                    ratings = backendProduct.ratings.map { rawRating ->
-                        Rating.values().first { rating -> rating.value == rawRating }
-                    }.toImmutableList(),
+                    ratings = backendProduct.ratings.map { rawRating -> Rating.parse(rawRating) }.toImmutableList(),
                     price = Price(backendProduct.priceCents)
                 )
             }
@@ -109,7 +108,7 @@ class BackendClient(
             type = backendProduct.type,
             game = backendProduct.game,
             images = images,
-            ratings = backendProduct.ratings.map { rawRating -> Rating.values().first { rating -> rating.value == rawRating } }.toImmutableList(),
+            ratings = backendProduct.ratings.map { rawRating -> Rating.parse(rawRating) }.toImmutableList(),
             price = Price(backendProduct.priceCents)
         )
     }
@@ -319,7 +318,8 @@ class BackendClient(
                     id = OrderID(backendOrder.id),
                     date = Instant.parse(backendOrder.date),
                     items = backendOrder.items,
-                    total = Price(backendOrder.totalCents)
+                    total = Price(backendOrder.totalCents),
+                    latestStatus = OrderStatus.parse(backendOrder.latestStatus)
                 )
             }
             .toImmutableList()

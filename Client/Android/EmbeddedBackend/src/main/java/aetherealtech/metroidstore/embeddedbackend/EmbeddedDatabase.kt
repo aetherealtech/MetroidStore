@@ -382,11 +382,12 @@ fun SQLiteDatabase.placeOrder(
 fun SQLiteDatabase.orders(username: String): List<OrderSummary> {
     return rawQuery(
         """
-            SELECT Orders.id, Orders.createdAt, ShippingMethods.cost AS shippingCost, SUM(OrderItems.quantity) AS items, SUM(QuantityPrices.quantityPrice) AS subtotal
+            SELECT Orders.id, Orders.createdAt, ShippingMethods.cost AS shippingCost, SUM(OrderItems.quantity) AS items, SUM(QuantityPrices.quantityPrice) AS subtotal, LatestOrderStatuses.latestStatus
             FROM OrderItems
             LEFT JOIN Orders ON OrderItems.orderID = Orders.id
             LEFT JOIN ShippingMethods ON Orders.shippingMethod = ShippingMethods.name
-            JOIN (SELECT OI.orderID, OI.productID, Products.price * OI.quantity AS quantityPrice FROM Products LEFT JOIN OrderItems OI on Products.id = OI.productID) AS QuantityPrices on (OrderItems.orderID, OrderItems.productID) = (QuantityPrices.orderID, QuantityPrices.productID)
+            JOIN (SELECT OI.orderID, OI.productID, Products.price * OI.quantity AS quantityPrice FROM Products LEFT JOIN OrderItems OI on Products.id = OI.productID) AS QuantityPrices ON (OrderItems.orderID, OrderItems.productID) = (QuantityPrices.orderID, QuantityPrices.productID)
+            JOIN (SELECT Orders.id AS orderID, coalesce(OrderActivities.status, (SELECT OrderStatuses.name FROM OrderStatuses LIMIT 1)) AS latestStatus FROM Orders LEFT JOIN OrderActivities ON OrderActivities.id = (SELECT OrderActivities.id FROM OrderActivities WHERE OrderActivities.orderID = Orders.id ORDER BY OrderActivities.date DESC LIMIT 1)) AS LatestOrderStatuses ON LatestOrderStatuses.orderID = Orders.id
             WHERE Orders.username = ?
             GROUP BY Orders.id
             ORDER BY Orders.createdAt
@@ -408,7 +409,8 @@ fun SQLiteDatabase.orders(username: String): List<OrderSummary> {
                     id = cursor.getInt(0),
                     date = cursor.getString(1),
                     items = cursor.getInt(3),
-                    totalCents = total
+                    totalCents = total,
+                    latestStatus = cursor.getString(5)
                 )
             )
         }
