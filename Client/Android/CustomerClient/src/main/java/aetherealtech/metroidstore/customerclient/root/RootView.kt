@@ -39,6 +39,8 @@ import aetherealtech.metroidstore.customerclient.checkout.CheckoutViewModel
 import aetherealtech.metroidstore.customerclient.datasources.DataSource
 import aetherealtech.metroidstore.customerclient.model.OrderID
 import aetherealtech.metroidstore.customerclient.model.ProductID
+import aetherealtech.metroidstore.customerclient.orderdetails.OrderDetailsView
+import aetherealtech.metroidstore.customerclient.orderdetails.OrderDetailsViewModel
 import aetherealtech.metroidstore.customerclient.orders.OrdersView
 import aetherealtech.metroidstore.customerclient.orders.OrdersViewModel
 import aetherealtech.metroidstore.customerclient.productdetail.ProductDetailView
@@ -71,7 +73,7 @@ sealed class Screen(
         content = { navController, rootViewModel ->
             val productListViewModel = viewModel<ProductListViewModel>(
                 factory = rootViewModel.productList(
-                    openProductDetails = { productID -> navController.navigate("productDetails/${productID.value}") }
+                    openProductDetails = { productID -> navController.viewProductDetails(productID) }
                 )
             )
 
@@ -88,7 +90,7 @@ sealed class Screen(
         content = { navController, rootViewModel ->
             val cartViewModel = viewModel<CartViewModel>(
                 factory = rootViewModel.cart(
-                    openProductDetails = { productID -> navController.navigate("productDetails/${productID.value}") },
+                    openProductDetails = { productID -> navController.viewProductDetails(productID) },
                     openCheckout = { navController.navigate("checkout") }
                 )
             )
@@ -149,6 +151,10 @@ fun NavHostController.selectTab(screen: Screen) {
         launchSingleTop = true
         restoreState = true
     }
+}
+
+fun NavHostController.viewProductDetails(productID: ProductID) {
+    navigate("productDetails/${productID.value}")
 }
 
 fun NavHostController.viewOrder(orderID: OrderID) {
@@ -245,20 +251,16 @@ fun RootView(
             ) {backstackEntry ->
                 val orderID = backstackEntry.arguments!!.getOrderID("orderID")
 
-                Text(text = "Order: ${orderID.value}")
+                val detailsViewModel = viewModel<OrderDetailsViewModel>(
+                    factory = viewModel.orderDetails(
+                        id = orderID,
+                        viewProductDetails = { productID -> navController.viewProductDetails(productID) }
+                    )
+                )
 
-//                val detailsViewModel = viewModel<ProductDetailViewModel>(
-//                    factory = viewModel.productDetails(
-//                        id = orderID,
-//                        viewCart = {
-//                            selectTab(Screen.Cart)
-//                        }
-//                    )
-//                )
-//
-//                ProductDetailView(
-//                    viewModel = detailsViewModel
-//                )
+                OrderDetailsView(
+                    viewModel = detailsViewModel
+                )
             }
         }
     }
@@ -359,6 +361,23 @@ class RootViewModel(
             return OrdersViewModel(
                 repository = orderRepository,
                 viewOrder = viewOrder
+            ) as T
+        }
+    }
+
+    fun orderDetails(
+        id: OrderID,
+        viewProductDetails: (ProductID) -> Unit
+    ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T: ViewModel> create(
+            modelClass: Class<T>,
+            extras: CreationExtras
+        ): T {
+            return OrderDetailsViewModel(
+                orderID = id,
+                repository = orderRepository,
+                selectItem = viewProductDetails
             ) as T
         }
     }

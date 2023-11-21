@@ -5,6 +5,7 @@ import aetherealtech.metroidstore.customerclient.model.ImageSource
 import android.graphics.Bitmap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import ru.gildor.coroutines.okhttp.await
@@ -13,6 +14,20 @@ data class ImageSourceBackend(
     private val client: OkHttpClient,
     private val request: Request
 ): ImageSource {
+    constructor(
+        client: OkHttpClient,
+        host: HttpUrl,
+        path: String
+    ) : this(
+        client = client,
+        request = Request.Builder()
+            .url(host.newBuilder()
+                .addEncodedPathSegments(path)
+                .build()
+            )
+            .build()
+    )
+
     override suspend fun load(): Bitmap {
         val response = client.newCall(request).await()
 

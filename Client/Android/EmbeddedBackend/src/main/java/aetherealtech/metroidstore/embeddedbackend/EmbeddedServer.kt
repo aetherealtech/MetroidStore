@@ -166,6 +166,20 @@ class EmbeddedServer(
 
                     call.respondText("$orderID")
                 }
+
+                get("/orders/{orderID}") {
+                    val orderID = call.parameters["orderID"]!!.toInt()
+
+                    try {
+                        val order = database.order(
+                            orderID = orderID
+                        )
+
+                        call.respondText(Json.encodeToString(order))
+                    } catch (error: Exception) {
+                        println(error.localizedMessage)
+                    }
+                }
             }
         }.start()
     }

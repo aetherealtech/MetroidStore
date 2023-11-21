@@ -3,6 +3,7 @@ package aetherealtech.metroidstore.embeddedbackend
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import aetherealtech.metroidstore.backendmodel.CartItem
+import aetherealtech.metroidstore.backendmodel.OrderDetails
 import aetherealtech.metroidstore.backendmodel.OrderSummary
 import aetherealtech.metroidstore.backendmodel.PaymentMethodSummary
 import aetherealtech.metroidstore.backendmodel.ProductDetails
@@ -14,6 +15,8 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
 import java.util.stream.Collectors
+
+val taxesPercent = 10
 
 class EmbeddedDatabase {
     companion object {
@@ -379,7 +382,9 @@ fun SQLiteDatabase.placeOrder(
     }
 }
 
-fun SQLiteDatabase.orders(username: String): List<OrderSummary> {
+fun SQLiteDatabase.orders(
+    username: String
+): List<OrderSummary> {
     return rawQuery(
         """
             SELECT Orders.id, Orders.createdAt, ShippingMethods.cost AS shippingCost, SUM(OrderItems.quantity) AS items, SUM(QuantityPrices.quantityPrice) AS subtotal, LatestOrderStatuses.latestStatus
@@ -390,7 +395,7 @@ fun SQLiteDatabase.orders(username: String): List<OrderSummary> {
             JOIN (SELECT Orders.id AS orderID, coalesce(OrderActivities.status, (SELECT OrderStatuses.name FROM OrderStatuses LIMIT 1)) AS latestStatus FROM Orders LEFT JOIN OrderActivities ON OrderActivities.id = (SELECT OrderActivities.id FROM OrderActivities WHERE OrderActivities.orderID = Orders.id ORDER BY OrderActivities.date DESC LIMIT 1)) AS LatestOrderStatuses ON LatestOrderStatuses.orderID = Orders.id
             WHERE Orders.username = ?
             GROUP BY Orders.id
-            ORDER BY Orders.createdAt
+            ORDER BY Orders.createdAt DESC
         """,
         arrayOf(username)
     ).use { cursor ->
@@ -399,8 +404,6 @@ fun SQLiteDatabase.orders(username: String): List<OrderSummary> {
         while(cursor.moveToNext()) {
             val shippingCost = cursor.getInt(2)
             val subtotal = cursor.getInt(4)
-
-            val taxesPercent = 10
 
             val total = (subtotal + shippingCost) * (100 + taxesPercent) / 100
 
@@ -416,5 +419,63 @@ fun SQLiteDatabase.orders(username: String): List<OrderSummary> {
         }
 
         return@use results.toImmutableList()
+    }
+}
+
+fun SQLiteDatabase.order(
+    orderID: Int
+): OrderDetails {
+    return rawQuery(
+        """
+            SELECT Orders.createdAt AS date, UserAddresses.name AS address, Orders.shippingMethod, PaymentMethods.name AS paymentMethod, ShippingMethods.cost AS shippingCost, LatestOrderStatuses.latestStatus, Products.id, Products.name, ProductImages.imageID, OrderItems.quantity, Products.price
+            FROM OrderItems
+            LEFT JOIN Orders ON OrderItems.orderID = Orders.id
+            LEFT JOIN ShippingMethods ON Orders.shippingMethod = ShippingMethods.name
+            LEFT JOIN Products ON Products.id = OrderItems.productID
+            LEFT JOIN ProductImages ON ProductImages.productID = Products.id
+            LEFT JOIN UserAddresses ON (UserAddresses.username, UserAddresses.addressID) = (Orders.username, Orders.addressID)
+            LEFT JOIN PaymentMethods ON (PaymentMethods.username, PaymentMethods.id) = (Orders.username, Orders.paymentMethodID)
+            JOIN (SELECT Orders.id AS orderID, coalesce(OrderActivities.status, (SELECT OrderStatuses.name FROM OrderStatuses LIMIT 1)) AS latestStatus FROM Orders LEFT JOIN OrderActivities ON OrderActivities.id = (SELECT OrderActivities.id FROM OrderActivities WHERE OrderActivities.orderID = Orders.id ORDER BY OrderActivities.date DESC LIMIT 1)) AS LatestOrderStatuses ON LatestOrderStatuses.orderID = Orders.id
+            WHERE OrderItems.orderID = ? AND ProductImages.isPrimary
+        """,
+        arrayOf("$orderID")
+    ).use { cursor ->
+        val items = mutableListOf<OrderDetails.Item>()
+
+        var subtotal = 0
+
+        while(cursor.moveToNext()) {
+            val quantity = cursor.getInt(9)
+            val pricePerUnit = cursor.getInt(10)
+
+            val price = quantity * pricePerUnit
+            subtotal += price
+
+            items.add(
+                OrderDetails.Item(
+                    productID = cursor.getInt(6),
+                    name = cursor.getString(7),
+                    image = "images/${cursor.getInt(8)}",
+                    quantity = quantity,
+                    priceCents = price
+                )
+            )
+        }
+
+        cursor.moveToPrevious()
+
+        val shippingCost = cursor.getInt(4)
+
+        val total = (subtotal + shippingCost) * (100 + taxesPercent) / 100
+
+        return@use OrderDetails(
+            date = cursor.getString(0),
+            address = cursor.getString(1),
+            shippingMethod = cursor.getString(2),
+            paymentMethod = cursor.getString(3),
+            totalCents = total,
+            latestStatus = cursor.getString(5),
+            items = items
+        )
     }
 }

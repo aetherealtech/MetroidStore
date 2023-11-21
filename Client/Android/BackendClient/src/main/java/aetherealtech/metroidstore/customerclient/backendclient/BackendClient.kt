@@ -4,6 +4,7 @@ import android.content.res.Resources
 import aetherealtech.metroidstore.customerclient.model.Address
 import aetherealtech.metroidstore.customerclient.model.CartItem
 import aetherealtech.metroidstore.customerclient.model.NewOrder
+import aetherealtech.metroidstore.customerclient.model.OrderDetails
 import aetherealtech.metroidstore.customerclient.model.OrderID
 import aetherealtech.metroidstore.customerclient.model.OrderStatus
 import aetherealtech.metroidstore.customerclient.model.OrderSummary
@@ -49,16 +50,9 @@ class BackendClient(
 
         return backendProducts
             .map { backendProduct ->
-                val imageRequest = Request.Builder()
-                    .url(host.newBuilder()
-                        .addEncodedPathSegments(backendProduct.image)
-                        .build()
-                    )
-                    .build()
-
-                return@map ProductSummary(
+                ProductSummary(
                     id = ProductID(backendProduct.id),
-                    image = ImageSourceBackend(client, imageRequest),
+                    image = ImageSourceBackend(client, host, backendProduct.image),
                     name = backendProduct.name,
                     type = backendProduct.type,
                     game = backendProduct.game,
@@ -87,28 +81,17 @@ class BackendClient(
             body.string()
         )
 
-        val images = backendProduct.images
-            .map { image ->
-                Request.Builder()
-                    .url(
-                        host.newBuilder()
-                            .addEncodedPathSegments(image)
-                            .build()
-                    )
-                    .build()
-            }
-            .map { imageRequest ->
-                ImageSourceBackend(client, imageRequest)
-            }
-            .toImmutableList()
-
         return ProductDetails(
             id = ProductID(backendProduct.id),
             name = backendProduct.name,
             type = backendProduct.type,
             game = backendProduct.game,
-            images = images,
-            ratings = backendProduct.ratings.map { rawRating -> Rating.parse(rawRating) }.toImmutableList(),
+            images = backendProduct.images
+                .map { image -> ImageSourceBackend(client, host, image) }
+                .toImmutableList(),
+            ratings = backendProduct.ratings
+                .map { rawRating -> Rating.parse(rawRating) }
+                .toImmutableList(),
             price = Price(backendProduct.priceCents)
         )
     }
@@ -125,16 +108,9 @@ class BackendClient(
 
         return backendCartItems
             .map { backendCartItem ->
-                val imageRequest = Request.Builder()
-                    .url(host.newBuilder()
-                        .addEncodedPathSegments(backendCartItem.image)
-                        .build()
-                    )
-                    .build()
-
-                return@map CartItem(
+                CartItem(
                     productID = ProductID(backendCartItem.productID),
-                    image = ImageSourceBackend(client, imageRequest),
+                    image = ImageSourceBackend(client, host, backendCartItem.image),
                     name = backendCartItem.name,
                     pricePerUnit = Price(backendCartItem.priceCents),
                     quantity = backendCartItem.quantity
@@ -323,6 +299,45 @@ class BackendClient(
                 )
             }
             .toImmutableList()
+    }
+
+    suspend fun getOrder(id: OrderID): OrderDetails {
+        val request = buildRequest { urlBuilder ->
+            urlBuilder
+                .addPathSegment("orders")
+                .addPathSegment("${id.value}")
+        }
+
+        val response = client.newCall(request).await()
+
+        val body = response.body
+
+        if(body == null)
+            throw IllegalStateException("Did not receive a response")
+
+        val backendOrder = Json.decodeFromString<aetherealtech.metroidstore.backendmodel.OrderDetails>(
+            body.string()
+        )
+
+        return OrderDetails(
+            date = Instant.parse(backendOrder.date),
+            address = backendOrder.address,
+            shippingMethod = backendOrder.shippingMethod,
+            paymentMethod = backendOrder.paymentMethod,
+            total = Price(backendOrder.totalCents),
+            latestStatus = OrderStatus.parse(backendOrder.latestStatus),
+            items = backendOrder.items
+                .map { backendItem ->
+                    OrderDetails.Item(
+                        productID = ProductID(backendItem.productID),
+                        name = backendItem.name,
+                        image = ImageSourceBackend(client, host, backendItem.image),
+                        quantity = backendItem.quantity,
+                        price = Price(backendItem.priceCents)
+                    )
+                }
+                .toImmutableList()
+        )
     }
 
     suspend fun placeOrder(order: NewOrder): OrderID {

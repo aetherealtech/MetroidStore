@@ -1,6 +1,8 @@
 package aetherealtech.metroidstore.customerclient.repositories
 
 import aetherealtech.metroidstore.customerclient.datasources.OrderDataSource
+import aetherealtech.metroidstore.customerclient.model.OrderDetails
+import aetherealtech.metroidstore.customerclient.model.OrderID
 import aetherealtech.metroidstore.customerclient.model.OrderSummary
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -22,6 +24,10 @@ class OrderRepository(
 
     suspend fun updateOrders() {
         update { dataSource.getOrders() }
+    }
+
+    suspend fun getOrder(id: OrderID): OrderDetails {
+        return dataSource.getOrder(id)
     }
 
     private suspend fun update(

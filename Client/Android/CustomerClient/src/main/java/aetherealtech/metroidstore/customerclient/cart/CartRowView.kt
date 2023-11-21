@@ -96,8 +96,6 @@ class CartRowViewModel(
     product: CartItem,
     val select: () -> Unit,
 ): ViewModel() {
-    private val _busy = MutableStateFlow(false)
-
     val id: ProductID
     val image: ImageSource
     val name: String
@@ -105,8 +103,6 @@ class CartRowViewModel(
 
     val quantity = product.quantity
 
-    val busy = _busy
-        .asStateFlow()
     init {
         id = product.productID
         image = product.image
