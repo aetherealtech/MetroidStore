@@ -1,6 +1,7 @@
 package aetherealtech.metroidstore.customerclient.repositories
 
 import aetherealtech.metroidstore.customerclient.datasources.OrderDataSource
+import aetherealtech.metroidstore.customerclient.model.OrderActivity
 import aetherealtech.metroidstore.customerclient.model.OrderDetails
 import aetherealtech.metroidstore.customerclient.model.OrderID
 import aetherealtech.metroidstore.customerclient.model.OrderSummary
@@ -28,6 +29,10 @@ class OrderRepository(
 
     suspend fun getOrder(id: OrderID): OrderDetails {
         return dataSource.getOrder(id)
+    }
+
+    suspend fun getOrderActivity(id: OrderID): ImmutableList<OrderActivity> {
+        return dataSource.getOrderActivity(id)
     }
 
     private suspend fun update(

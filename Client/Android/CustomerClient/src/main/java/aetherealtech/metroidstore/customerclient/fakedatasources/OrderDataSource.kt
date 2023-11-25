@@ -1,6 +1,7 @@
 package aetherealtech.metroidstore.customerclient.fakedatasources
 
 import aetherealtech.metroidstore.customerclient.datasources.OrderDataSource
+import aetherealtech.metroidstore.customerclient.model.OrderActivity
 import aetherealtech.metroidstore.customerclient.model.OrderDetails
 import aetherealtech.metroidstore.customerclient.model.OrderID
 import aetherealtech.metroidstore.customerclient.model.OrderStatus
@@ -54,6 +55,14 @@ class OrderDataSourceFake(
                 products[1].orderItem(quantity = 1),
                 products[2].orderItem(quantity = 3)
             )
+        )
+    }
+
+    override suspend fun getOrderActivity(id: OrderID): ImmutableList<OrderActivity> {
+        return persistentListOf(
+            OrderActivity(status = OrderStatus.PREPARING, date = Clock.System.now() - 8.days),
+            OrderActivity(status = OrderStatus.SHIPPED, date = Clock.System.now() - 4.days),
+            OrderActivity(status = OrderStatus.DELIVERED, date = Clock.System.now() - 2.days)
         )
     }
 }

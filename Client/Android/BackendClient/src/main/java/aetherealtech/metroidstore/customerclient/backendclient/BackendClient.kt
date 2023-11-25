@@ -4,6 +4,7 @@ import android.content.res.Resources
 import aetherealtech.metroidstore.customerclient.model.Address
 import aetherealtech.metroidstore.customerclient.model.CartItem
 import aetherealtech.metroidstore.customerclient.model.NewOrder
+import aetherealtech.metroidstore.customerclient.model.OrderActivity
 import aetherealtech.metroidstore.customerclient.model.OrderDetails
 import aetherealtech.metroidstore.customerclient.model.OrderID
 import aetherealtech.metroidstore.customerclient.model.OrderStatus
@@ -338,6 +339,35 @@ class BackendClient(
                 }
                 .toImmutableList()
         )
+    }
+
+    suspend fun getOrderActivity(id: OrderID): ImmutableList<OrderActivity> {
+        val request = buildRequest { urlBuilder ->
+            urlBuilder
+                .addPathSegment("orders")
+                .addPathSegment("${id.value}")
+                .addPathSegment("activity")
+        }
+
+        val response = client.newCall(request).await()
+
+        val body = response.body
+
+        if(body == null)
+            throw IllegalStateException("Did not receive a response")
+
+        val backendActivities = Json.decodeFromString<List<aetherealtech.metroidstore.backendmodel.OrderActivity>>(
+            body.string()
+        )
+
+        return backendActivities
+            .map { backendActivity ->
+                OrderActivity(
+                    status = OrderStatus.parse(backendActivity.status),
+                    date = Instant.parse(backendActivity.date)
+                )
+            }
+            .toImmutableList()
     }
 
     suspend fun placeOrder(order: NewOrder): OrderID {

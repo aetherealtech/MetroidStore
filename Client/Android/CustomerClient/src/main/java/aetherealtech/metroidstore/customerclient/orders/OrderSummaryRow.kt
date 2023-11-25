@@ -20,6 +20,7 @@ import aetherealtech.metroidstore.customerclient.model.OrderSummary
 import aetherealtech.metroidstore.customerclient.model.Price
 import aetherealtech.metroidstore.customerclient.ui.theme.MetroidStoreTheme
 import aetherealtech.metroidstore.customerclient.uitoolkit.PrimaryCallToAction
+import aetherealtech.metroidstore.customerclient.utilities.displayString
 import aetherealtech.metroidstore.customerclient.widgets.PriceView
 import aetherealtech.metroidstore.customerclient.widgets.PriceViewModel
 import androidx.compose.foundation.layout.Spacer
@@ -84,13 +85,7 @@ class OrderSummaryRowViewModel(
     val total: PriceViewModel
 
     init {
-        val orderDate = Date(order.date.toEpochMilliseconds())
-
-        date = DateFormat.getDateTimeInstance(
-            DateFormat.MEDIUM,
-            DateFormat.SHORT
-        ).format(orderDate)
-
+        date = order.date.displayString
         status = order.latestStatus.value
 
         items = "${order.items} Items"

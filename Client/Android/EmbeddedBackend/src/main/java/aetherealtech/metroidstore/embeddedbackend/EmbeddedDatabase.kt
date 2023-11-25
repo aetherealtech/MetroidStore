@@ -3,6 +3,7 @@ package aetherealtech.metroidstore.embeddedbackend
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import aetherealtech.metroidstore.backendmodel.CartItem
+import aetherealtech.metroidstore.backendmodel.OrderActivity
 import aetherealtech.metroidstore.backendmodel.OrderDetails
 import aetherealtech.metroidstore.backendmodel.OrderSummary
 import aetherealtech.metroidstore.backendmodel.PaymentMethodSummary
@@ -477,5 +478,36 @@ fun SQLiteDatabase.order(
             latestStatus = cursor.getString(5),
             items = items
         )
+    }
+}
+
+fun SQLiteDatabase.orderActivity(
+    orderID: Int
+): List<OrderActivity> {
+    return rawQuery(
+        """
+            SELECT status, date FROM (
+                SELECT orderID, status, date
+                FROM OrderActivities
+                UNION
+                SELECT id, (SELECT name FROM OrderStatuses LIMIT 1), createdAt FROM Orders
+            )
+            WHERE orderID = ?
+            ORDER BY date
+        """,
+        arrayOf("$orderID")
+    ).use { cursor ->
+        val result = mutableListOf<OrderActivity>()
+
+        while(cursor.moveToNext()) {
+            result.add(
+                OrderActivity(
+                    status = cursor.getString(0),
+                    date = cursor.getString(1)
+                )
+            )
+        }
+
+        return@use result
     }
 }

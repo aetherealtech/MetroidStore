@@ -170,15 +170,21 @@ class EmbeddedServer(
                 get("/orders/{orderID}") {
                     val orderID = call.parameters["orderID"]!!.toInt()
 
-                    try {
-                        val order = database.order(
-                            orderID = orderID
-                        )
+                    val order = database.order(
+                        orderID = orderID
+                    )
 
-                        call.respondText(Json.encodeToString(order))
-                    } catch (error: Exception) {
-                        println(error.localizedMessage)
-                    }
+                    call.respondText(Json.encodeToString(order))
+                }
+
+                get("/orders/{orderID}/activity") {
+                    val orderID = call.parameters["orderID"]!!.toInt()
+
+                    val activities = database.orderActivity(
+                        orderID = orderID
+                    )
+
+                    call.respondText(Json.encodeToString(activities))
                 }
             }
         }.start()

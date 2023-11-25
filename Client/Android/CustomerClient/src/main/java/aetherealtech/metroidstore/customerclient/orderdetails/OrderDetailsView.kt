@@ -4,10 +4,13 @@ import aetherealtech.metroidstore.customerclient.fakedatasources.DataSourceFake
 import aetherealtech.metroidstore.customerclient.model.OrderDetails
 import aetherealtech.metroidstore.customerclient.model.OrderID
 import aetherealtech.metroidstore.customerclient.model.ProductID
+import aetherealtech.metroidstore.customerclient.orderactivity.OrderActivityView
+import aetherealtech.metroidstore.customerclient.orderactivity.OrderActivityViewModel
 import aetherealtech.metroidstore.customerclient.repositories.OrderRepository
 import aetherealtech.metroidstore.customerclient.ui.theme.MetroidStoreTheme
-import aetherealtech.metroidstore.customerclient.uitoolkit.PrimaryCallToAction
+import aetherealtech.metroidstore.customerclient.utilities.displayString
 import aetherealtech.metroidstore.customerclient.widgets.AsyncLoadedShimmering
+import aetherealtech.metroidstore.customerclient.widgets.CenterModal
 import aetherealtech.metroidstore.customerclient.widgets.PriceView
 import aetherealtech.metroidstore.customerclient.widgets.PriceViewModel
 import androidx.compose.foundation.clickable
@@ -18,7 +21,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -30,11 +32,11 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.text.DateFormat
-import java.util.Date
 
 @Composable
 fun OrderDetailsView(
@@ -128,11 +130,19 @@ fun OrderDetailsSummaryView(
 
             Text(
                 modifier = Modifier
-                    .clickable {  },
+                    .clickable { viewModel.viewActivity() },
                 text = "View Updates",
                 color = Color.Blue
             )
         }
+    }
+
+    CenterModal(
+        data = viewModel.activity
+    ) { activityViewModel, _ ->
+        OrderActivityView(
+            viewModel = activityViewModel
+        )
     }
 }
 
@@ -152,7 +162,13 @@ class OrderDetailsViewModel(
 
             _content.value = OrderDetailsContentViewModel(
                 orderDetails = orderDetails,
-                selectItem = selectItem
+                selectItem = selectItem,
+                activityViewModelFactory = {
+                    OrderActivityViewModel(
+                        orderID = orderID,
+                        repository = repository
+                    )
+                }
             )
         }
     }
@@ -160,10 +176,12 @@ class OrderDetailsViewModel(
 
 class OrderDetailsContentViewModel(
     orderDetails: OrderDetails,
-    selectItem: (ProductID) -> Unit
+    selectItem: (ProductID) -> Unit,
+    activityViewModelFactory: () -> OrderActivityViewModel
 ): ViewModel() {
     val summary = OrderDetailsSummaryViewModel(
-        orderDetails = orderDetails
+        orderDetails = orderDetails,
+        activityViewModelFactory = activityViewModelFactory
     )
 
     val items = orderDetails.items
@@ -177,8 +195,11 @@ class OrderDetailsContentViewModel(
 }
 
 class OrderDetailsSummaryViewModel(
-    orderDetails: OrderDetails
+    orderDetails: OrderDetails,
+    private val activityViewModelFactory: () -> OrderActivityViewModel
 ): ViewModel() {
+    private val _activity = MutableSharedFlow<OrderActivityViewModel>()
+
     val date: String
     val status: String
     val total: PriceViewModel
@@ -186,14 +207,11 @@ class OrderDetailsSummaryViewModel(
     val shippingMethod: String
     val paymentMethod: String
 
+    val activity = _activity
+        .asSharedFlow()
+
     init {
-        val orderDate = Date(orderDetails.date.toEpochMilliseconds())
-
-        date = DateFormat.getDateTimeInstance(
-            DateFormat.MEDIUM,
-            DateFormat.SHORT
-        ).format(orderDate)
-
+        date = orderDetails.date.displayString
         status = orderDetails.latestStatus.value
 
         total = PriceViewModel(orderDetails.total)
@@ -201,6 +219,12 @@ class OrderDetailsSummaryViewModel(
         address = "Deliver to: ${orderDetails.address}"
         shippingMethod = "Shipping Method: ${orderDetails.shippingMethod}"
         paymentMethod = "Payment Method: ${orderDetails.paymentMethod}"
+    }
+
+    fun viewActivity() {
+        viewModelScope.launch {
+            _activity.emit(activityViewModelFactory())
+        }
     }
 }
 
