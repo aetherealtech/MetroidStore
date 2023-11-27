@@ -7,17 +7,61 @@ import aetherealtech.metroidstore.customerclient.model.OrderID
 import aetherealtech.metroidstore.customerclient.model.PaymentMethodSummary
 import aetherealtech.metroidstore.customerclient.model.Price
 import aetherealtech.metroidstore.customerclient.model.ShippingMethod
+import aetherealtech.metroidstore.customerclient.model.UserAddressDetails
 import aetherealtech.metroidstore.customerclient.model.UserAddressSummary
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 
 class UserDataSourceFake: UserDataSource {
-    override suspend fun getAddresses(): ImmutableList<UserAddressSummary> {
-        return persistentListOf(
-            UserAddressSummary(Address.ID(0), "Home", isPrimary = true),
-            UserAddressSummary(Address.ID(0), "Office", isPrimary = false),
-            UserAddressSummary(Address.ID(0), "Secret Lair", isPrimary = false),
+    private val _addresses = persistentListOf(
+        UserAddressDetails(
+            name = "Home",
+            address = Address(
+                id = Address.ID(0),
+                street1 = Address.Street1("123 Fake St."),
+                street2 = null,
+                locality = Address.Locality("Fakerton"),
+                province = Address.Province("CA"),
+                country = Address.Country("USA"),
+                planet = Address.Planet("Earth"),
+                postalCode = Address.PostalCode("90210")
+            ),
+            isPrimary = true
+        ),
+        UserAddressDetails(
+            name = "Office",
+            address = Address(
+                id = Address.ID(1),
+                street1 = Address.Street1("5634 Main St."),
+                street2 = Address.Street2("#43"),
+                locality = Address.Locality("Fakerton"),
+                province = Address.Province("CA"),
+                country = Address.Country("USA"),
+                planet = Address.Planet("Earth"),
+                postalCode = Address.PostalCode("90210")
+            ),
+            isPrimary = false
+        ),
+        UserAddressDetails(
+            name = "Secret Lair",
+            address = Address(
+                id = Address.ID(2),
+                street1 = Address.Street1("41114 Definitely Not Here Ave."),
+                street2 = null,
+                locality = Address.Locality("Shhh"),
+                province = Address.Province("CA"),
+                country = Address.Country("USA"),
+                planet = Address.Planet("Earth"),
+                postalCode = Address.PostalCode("90210")
+            ),
+            isPrimary = false
         )
+    )
+    override suspend fun getAddresses(): ImmutableList<UserAddressSummary> {
+        return _addresses
+            .map { address -> address.summary }
+            .toImmutableList()
     }
 
     override suspend fun getShippingMethods(): ImmutableList<ShippingMethod> {
@@ -34,7 +78,18 @@ class UserDataSourceFake: UserDataSource {
         )
     }
 
+    override suspend fun getAddressDetails(): ImmutableList<UserAddressDetails> {
+        return _addresses
+    }
+
     override suspend fun placeOrder(order: NewOrder): OrderID {
         return OrderID(0)
     }
 }
+
+val UserAddressDetails.summary: UserAddressSummary
+    get() = UserAddressSummary(
+        addressID = address.id,
+        name = name,
+        isPrimary = isPrimary
+    )

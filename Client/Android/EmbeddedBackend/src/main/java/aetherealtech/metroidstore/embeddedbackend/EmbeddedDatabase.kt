@@ -10,6 +10,7 @@ import aetherealtech.metroidstore.backendmodel.PaymentMethodSummary
 import aetherealtech.metroidstore.backendmodel.ProductDetails
 import aetherealtech.metroidstore.backendmodel.ProductSummary
 import aetherealtech.metroidstore.backendmodel.ShippingMethod
+import aetherealtech.metroidstore.backendmodel.UserAddressDetails
 import aetherealtech.metroidstore.backendmodel.UserAddressSummary
 import kotlinx.collections.immutable.toImmutableList
 import java.io.BufferedReader
@@ -509,5 +510,48 @@ fun SQLiteDatabase.orderActivity(
         }
 
         return@use result
+    }
+}
+
+fun SQLiteDatabase.addressDetails(username: String): List<UserAddressDetails> {
+    return rawQuery(
+        """
+            SELECT 
+                UserAddresses.name, 
+                Addresses.id, 
+                Addresses.street1,
+                Addresses.street2, 
+                Addresses.locality, 
+                Addresses.province, 
+                Addresses.country, 
+                Addresses.planet, 
+                Addresses.postalCode, 
+                UserAddresses.isPrimary 
+            FROM UserAddresses
+            JOIN Addresses ON Addresses.id = UserAddresses.addressID
+            WHERE username = ?
+            """,
+        arrayOf(username)
+    ).use { cursor ->
+        val results = mutableListOf<UserAddressDetails>()
+
+        while(cursor.moveToNext()) {
+            results.add(
+                UserAddressDetails(
+                    name = cursor.getString(0),
+                    addressID = cursor.getInt(1),
+                    street1 = cursor.getString(2),
+                    street2 = cursor.getString(3),
+                    locality = cursor.getString(4),
+                    province = cursor.getString(5),
+                    country = cursor.getString(6),
+                    planet = cursor.getString(7),
+                    postalCode = cursor.getString(8),
+                    isPrimary = cursor.getInt(9) != 0
+                )
+            )
+        }
+
+        return@use results.toImmutableList()
     }
 }

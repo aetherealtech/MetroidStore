@@ -16,6 +16,7 @@ import aetherealtech.metroidstore.customerclient.model.ProductID
 import aetherealtech.metroidstore.customerclient.model.ProductSummary
 import aetherealtech.metroidstore.customerclient.model.Rating
 import aetherealtech.metroidstore.customerclient.model.ShippingMethod
+import aetherealtech.metroidstore.customerclient.model.UserAddressDetails
 import aetherealtech.metroidstore.customerclient.model.UserAddressSummary
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -395,6 +396,44 @@ class BackendClient(
             throw IllegalStateException("Did not receive a response")
 
         return OrderID(body.string().toInt())
+    }
+
+    suspend fun getAddressDetails(): ImmutableList<UserAddressDetails> {
+        val request = buildRequest { urlBuilder ->
+            urlBuilder
+                .addPathSegment("addresses")
+                .addPathSegment("details")
+        }
+
+        val response = client.newCall(request).await()
+
+        val body = response.body
+
+        if(body == null)
+            throw IllegalStateException("Did not receive a response")
+
+        val backendAddresses = Json.decodeFromString<List<aetherealtech.metroidstore.backendmodel.UserAddressDetails>>(
+            body.string()
+        )
+
+        return backendAddresses
+            .map { backendAddress ->
+                UserAddressDetails(
+                    name = backendAddress.name,
+                    address = Address(
+                        id = Address.ID(backendAddress.addressID),
+                        street1 = Address.Street1(backendAddress.street1),
+                        street2 = backendAddress.street2?.let { street2 -> Address.Street2(street2) },
+                        locality = Address.Locality(backendAddress.locality),
+                        province = Address.Province(backendAddress.province),
+                        country = Address.Country(backendAddress.country),
+                        planet = Address.Planet(backendAddress.planet),
+                        postalCode = backendAddress.postalCode?.let { postalCode -> Address.PostalCode(postalCode) }
+                    ),
+                    isPrimary = backendAddress.isPrimary
+                )
+            }
+            .toImmutableList()
     }
 
     private val client = OkHttpClient()

@@ -1,12 +1,34 @@
 package aetherealtech.metroidstore.customerclient.root
 
+import aetherealtech.metroidstore.customerclient.addresses.AddressesView
+import aetherealtech.metroidstore.customerclient.addresses.AddressesViewModel
+import aetherealtech.metroidstore.customerclient.cart.CartViewModel
+import aetherealtech.metroidstore.customerclient.checkout.CheckoutView
+import aetherealtech.metroidstore.customerclient.checkout.CheckoutViewModel
+import aetherealtech.metroidstore.customerclient.datasources.DataSource
+import aetherealtech.metroidstore.customerclient.model.OrderID
+import aetherealtech.metroidstore.customerclient.model.ProductID
+import aetherealtech.metroidstore.customerclient.orderdetails.OrderDetailsView
+import aetherealtech.metroidstore.customerclient.orderdetails.OrderDetailsViewModel
+import aetherealtech.metroidstore.customerclient.orders.OrdersViewModel
+import aetherealtech.metroidstore.customerclient.productdetail.ProductDetailView
+import aetherealtech.metroidstore.customerclient.productdetail.ProductDetailViewModel
+import aetherealtech.metroidstore.customerclient.productlist.ProductListViewModel
+import aetherealtech.metroidstore.customerclient.repositories.CartRepository
+import aetherealtech.metroidstore.customerclient.repositories.OrderRepository
+import aetherealtech.metroidstore.customerclient.repositories.ProductRepository
+import aetherealtech.metroidstore.customerclient.repositories.UserRepository
+import aetherealtech.metroidstore.customerclient.routing.AppBarState
+import aetherealtech.metroidstore.customerclient.routing.Screen
+import aetherealtech.metroidstore.customerclient.routing.rememberRouter
+import aetherealtech.metroidstore.customerclient.settings.SettingsViewModel
+import aetherealtech.metroidstore.customerclient.utilities.OrderIDType
+import aetherealtech.metroidstore.customerclient.utilities.ProductIDType
+import aetherealtech.metroidstore.customerclient.utilities.getOrderID
+import aetherealtech.metroidstore.customerclient.utilities.getProductID
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -18,167 +40,34 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.NavHostController
 import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import aetherealtech.metroidstore.customerclient.cart.CartView
-import aetherealtech.metroidstore.customerclient.cart.CartViewModel
-import aetherealtech.metroidstore.customerclient.checkout.CheckoutView
-import aetherealtech.metroidstore.customerclient.checkout.CheckoutViewModel
-import aetherealtech.metroidstore.customerclient.datasources.DataSource
-import aetherealtech.metroidstore.customerclient.model.OrderID
-import aetherealtech.metroidstore.customerclient.model.ProductID
-import aetherealtech.metroidstore.customerclient.orderdetails.OrderDetailsView
-import aetherealtech.metroidstore.customerclient.orderdetails.OrderDetailsViewModel
-import aetherealtech.metroidstore.customerclient.orders.OrdersView
-import aetherealtech.metroidstore.customerclient.orders.OrdersViewModel
-import aetherealtech.metroidstore.customerclient.productdetail.ProductDetailView
-import aetherealtech.metroidstore.customerclient.productdetail.ProductDetailViewModel
-import aetherealtech.metroidstore.customerclient.productlist.ProductListView
-import aetherealtech.metroidstore.customerclient.productlist.ProductListViewModel
-import aetherealtech.metroidstore.customerclient.repositories.CartRepository
-import aetherealtech.metroidstore.customerclient.repositories.OrderRepository
-import aetherealtech.metroidstore.customerclient.repositories.ProductRepository
-import aetherealtech.metroidstore.customerclient.repositories.UserRepository
-import aetherealtech.metroidstore.customerclient.settings.SettingsView
-import aetherealtech.metroidstore.customerclient.settings.SettingsViewModel
-import aetherealtech.metroidstore.customerclient.utilities.OrderIDType
-import aetherealtech.metroidstore.customerclient.utilities.ProductIDType
-import aetherealtech.metroidstore.customerclient.utilities.getOrderID
-import aetherealtech.metroidstore.customerclient.utilities.getProductID
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
-
-sealed class Screen(
-    val title: String,
-    val icon: ImageVector,
-    val route: String,
-    val content: @Composable (NavHostController, RootViewModel) -> Unit
-) {
-    data object ProductList : Screen(
-        title = "Browse",
-        icon = Icons.Filled.List,
-        route = "productList",
-        content = { navController, rootViewModel ->
-            val productListViewModel = viewModel<ProductListViewModel>(
-                factory = rootViewModel.productList(
-                    openProductDetails = { productID -> navController.viewProductDetails(productID) }
-                )
-            )
-
-            ProductListView(
-                viewModel = productListViewModel
-            )
-        }
-    )
-
-    data object Cart : Screen(
-        title = "Cart",
-        icon = Icons.Filled.ShoppingCart,
-        route = "cart",
-        content = { navController, rootViewModel ->
-            val cartViewModel = viewModel<CartViewModel>(
-                factory = rootViewModel.cart(
-                    openProductDetails = { productID -> navController.viewProductDetails(productID) },
-                    openCheckout = { navController.navigate("checkout") }
-                )
-            )
-
-            CartView(
-                viewModel = cartViewModel
-            )
-        }
-    )
-
-    data object Orders : Screen(
-        title = "Orders",
-        icon = Icons.Filled.ArrowForward,
-        route = "orders",
-        content = { navController, rootViewModel ->
-            val ordersViewModel = viewModel<OrdersViewModel>(
-                factory = rootViewModel.orders(
-                    viewOrder = { orderID -> navController.viewOrder(orderID) }
-                )
-            )
-
-            OrdersView(viewModel = ordersViewModel)
-        }
-    )
-
-    data object Settings : Screen(
-        title = "Settings",
-        icon = Icons.Filled.Settings,
-        route = "settings",
-        content = { _, rootViewModel ->
-            val settingsViewModel = viewModel<SettingsViewModel>(
-                factory = rootViewModel.settings
-            )
-
-            SettingsView(viewModel = settingsViewModel)
-        }
-    )
-
-    companion object {
-        val all: ImmutableList<Screen>
-            get() {
-                return persistentListOf(
-                    ProductList,
-                    Cart,
-                    Orders,
-                    Settings
-                )
-            }
-    }
-}
-
-fun NavHostController.selectTab(screen: Screen) {
-    navigate(screen.route) {
-        popUpTo(graph.findStartDestination().id) {
-            inclusive = true
-        }
-        graph.setStartDestination(screen.route)
-        launchSingleTop = true
-        restoreState = true
-    }
-}
-
-fun NavHostController.viewProductDetails(productID: ProductID) {
-    navigate("productDetails/${productID.value}")
-}
-
-fun NavHostController.viewOrder(orderID: OrderID) {
-    selectTab(Screen.Orders)
-    navigate("orders/${orderID.value}")
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RootView(
     viewModel: RootViewModel
 ) {
-    val navController = rememberNavController()
+    val router = rememberRouter()
+
+    val setAppBarState: (AppBarState) -> Unit = { newState -> router.setAppBarState(newState) }
 
     Scaffold(
         topBar = {
-            val navBackStackEntry by navController.currentBackStackEntryAsState()
-            val currentDestination = navBackStackEntry?.destination
+            val navBackStackEntry by router.currentBackStackEntryAsState()
+            @Suppress("UNUSED_VARIABLE") val currentDestination = navBackStackEntry?.destination // This is needed to trigger recomposition when the destination changes
 
             CenterAlignedTopAppBar(
-                title = { Text("Metroid Store") },
+                title = router.topBarState.title,
                 navigationIcon = {
-                    if(navController.previousBackStackEntry != null) {
-                        IconButton(onClick = { navController.popBackStack() }) {
+                    if(router.previousBackStackEntry != null) {
+                        IconButton(onClick = { router.back() }) {
                             Icon(
                                 imageVector = Icons.Filled.ArrowBack,
                                 contentDescription = "Back"
@@ -186,29 +75,32 @@ fun RootView(
                         }
                     }
                 },
+                actions = router.topBarState.actions
             )
         },
         bottomBar = {
             NavigationBar {
-                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                val navBackStackEntry by router.currentBackStackEntryAsState()
                 val currentDestination = navBackStackEntry?.destination
 
                 Screen.all.forEach { screen ->
                     NavigationBarItem(
-                        icon = { Icon(screen.icon, contentDescription = null) },
+                        icon = { Icon(screen.icon(), contentDescription = null) },
                         label = { Text(screen.title) },
                         selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
-                        onClick = {
-                            navController.selectTab(screen)
-                        }
+                        onClick = { router.selectTab(screen) }
                     )
                 }
             }
         }
     ) { innerPadding ->
-        NavHost(navController, startDestination = Screen.ProductList.route, Modifier.padding(innerPadding)) {
+        router.NavHost(startDestination = Screen.ProductList.route, Modifier.padding(innerPadding)) {
             Screen.all.forEach { screen ->
-                composable(screen.route) { screen.content(navController, viewModel) }
+                composable(screen.route) { screen.content(
+                    router,
+                    setAppBarState,
+                    viewModel
+                ) }
             }
 
             composable(
@@ -220,9 +112,7 @@ fun RootView(
                 val detailsViewModel = viewModel<ProductDetailViewModel>(
                     factory = viewModel.productDetails(
                         id = productID,
-                        viewCart = {
-                            navController.selectTab(Screen.Cart)
-                        }
+                        viewCart = { router.selectTab(Screen.Cart) }
                     )
                 )
 
@@ -236,7 +126,10 @@ fun RootView(
             ) {backstackEntry ->
                 val detailsViewModel = viewModel<CheckoutViewModel>(
                     factory = viewModel.checkout(
-                        viewOrder = { orderID -> navController.viewOrder(orderID) }
+                        viewOrder = { orderID ->
+                            router.selectTab(Screen.Orders)
+                            router.viewOrder(orderID)
+                        }
                     )
                 )
 
@@ -254,12 +147,29 @@ fun RootView(
                 val detailsViewModel = viewModel<OrderDetailsViewModel>(
                     factory = viewModel.orderDetails(
                         id = orderID,
-                        viewProductDetails = { productID -> navController.viewProductDetails(productID) }
+                        viewProductDetails = { productID -> router.viewProductDetails(productID) }
                     )
                 )
 
                 OrderDetailsView(
                     viewModel = detailsViewModel
+                )
+            }
+
+            composable(
+                "addresses"
+            ) {backstackEntry ->
+                val addressesViewModel = viewModel<AddressesViewModel>(
+                    factory = viewModel.addresses(
+                        openAddAddress = {
+                            println("TEST")
+                        }
+                    )
+                )
+
+                AddressesView(
+                    setAppBarState = setAppBarState,
+                    viewModel = addressesViewModel
                 )
             }
         }
@@ -382,13 +292,34 @@ class RootViewModel(
         }
     }
 
-    val settings: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+    fun settings(
+        openAddresses: () -> Unit,
+        openPaymentMethods: () -> Unit,
+    ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T: ViewModel> create(
             modelClass: Class<T>,
             extras: CreationExtras
         ): T {
-            return SettingsViewModel() as T
+            return SettingsViewModel(
+                openAddresses = openAddresses,
+                openPaymentMethods = openPaymentMethods
+            ) as T
+        }
+    }
+
+    fun addresses(
+        openAddAddress: () -> Unit
+    ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T: ViewModel> create(
+            modelClass: Class<T>,
+            extras: CreationExtras
+        ): T {
+            return AddressesViewModel(
+                repository = userRepository,
+                openAddAddress = openAddAddress
+            ) as T
         }
     }
 }

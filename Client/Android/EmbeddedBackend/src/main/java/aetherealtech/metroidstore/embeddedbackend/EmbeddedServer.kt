@@ -120,6 +120,17 @@ class EmbeddedServer(
                     call.respondText(Json.encodeToString(addresses))
                 }
 
+                get("/addresses/details") {
+                    val username = call.request.header("Authorization")
+                    if(username == null) {
+                        call.respond(HttpStatusCode.Unauthorized)
+                        return@get
+                    }
+
+                    val addresses = database.addressDetails(username)
+                    call.respondText(Json.encodeToString(addresses))
+                }
+
                 get("/shippingMethods") {
                     val shippingMethods = database.shippingMethods()
                     call.respondText(Json.encodeToString(shippingMethods))

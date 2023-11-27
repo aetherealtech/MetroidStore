@@ -4,6 +4,7 @@ import aetherealtech.metroidstore.customerclient.datasources.UserDataSource
 import aetherealtech.metroidstore.customerclient.model.NewOrder
 import aetherealtech.metroidstore.customerclient.model.PaymentMethodSummary
 import aetherealtech.metroidstore.customerclient.model.ShippingMethod
+import aetherealtech.metroidstore.customerclient.model.UserAddressDetails
 import aetherealtech.metroidstore.customerclient.model.UserAddressSummary
 import aetherealtech.metroidstore.customerclient.utilities.mapState
 import kotlinx.collections.immutable.ImmutableList
@@ -21,6 +22,8 @@ class UserRepository(
     private val _paymentMethods =
         MutableStateFlow<ImmutableList<PaymentMethodSummary>>(persistentListOf())
 
+    private val _addressDetails = MutableStateFlow<ImmutableList<UserAddressDetails>>(persistentListOf())
+
     private val _processes = MutableStateFlow(0)
 
     val addresses = _addresses
@@ -30,6 +33,9 @@ class UserRepository(
         .asStateFlow()
 
     val paymentMethods = _paymentMethods
+        .asStateFlow()
+
+    val addressDetails = _addressDetails
         .asStateFlow()
 
     val busy = _processes
@@ -45,6 +51,10 @@ class UserRepository(
 
     suspend fun updatePaymentMethods() {
         update { _paymentMethods.value = dataSource.getPaymentMethods() }
+    }
+
+    suspend fun updateAddressDetails() {
+        update { _addressDetails.value = dataSource.getAddressDetails() }
     }
 
     suspend fun placeOrder(order: NewOrder) = dataSource.placeOrder(order)
