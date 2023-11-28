@@ -3,7 +3,7 @@ package aetherealtech.metroidstore.customerclient.backendclient
 import android.content.res.Resources
 import aetherealtech.metroidstore.customerclient.model.Address
 import aetherealtech.metroidstore.customerclient.model.CartItem
-import aetherealtech.metroidstore.customerclient.model.NewAddress
+import aetherealtech.metroidstore.customerclient.model.EditAddress
 import aetherealtech.metroidstore.customerclient.model.NewOrder
 import aetherealtech.metroidstore.customerclient.model.OrderActivity
 import aetherealtech.metroidstore.customerclient.model.OrderDetails
@@ -422,8 +422,8 @@ class BackendClient(
             .toImmutableList()
     }
 
-    suspend fun createAddress(address: NewAddress): ImmutableList<UserAddressDetails> {
-        val backendNewAddress = aetherealtech.metroidstore.backendmodel.NewAddress(
+    suspend fun createAddress(address: EditAddress): ImmutableList<UserAddressDetails> {
+        val backendNewAddress = aetherealtech.metroidstore.backendmodel.EditAddress(
             name = address.name,
             street1 = address.street1.value,
             street2 = address.street2?.value,
@@ -440,6 +440,43 @@ class BackendClient(
         ) { urlBuilder ->
             urlBuilder
                 .addPathSegment("addresses")
+        }
+
+        val response = client.newCall(request).await()
+
+        val body = response.body
+
+        if(body == null)
+            throw IllegalStateException("Did not receive a response")
+
+        val backendAddresses = Json.decodeFromString<List<aetherealtech.metroidstore.backendmodel.UserAddressDetails>>(
+            body.string()
+        )
+
+        return backendAddresses
+            .map { backendAddress -> backendAddress.clientModel }
+            .toImmutableList()
+    }
+
+    suspend fun updateAddress(address: EditAddress, id: Address.ID): ImmutableList<UserAddressDetails> {
+        val backendNewAddress = aetherealtech.metroidstore.backendmodel.EditAddress(
+            name = address.name,
+            street1 = address.street1.value,
+            street2 = address.street2?.value,
+            locality = address.locality.value,
+            province = address.province.value,
+            country = address.country.value,
+            planet = address.planet.value,
+            postalCode = address.postalCode?.value,
+            isPrimary = address.isPrimary
+        )
+
+        val request = buildRequest(
+            modifyRequest = { builder -> builder.patch(Json.encodeToString(backendNewAddress).toRequestBody()) }
+        ) { urlBuilder ->
+            urlBuilder
+                .addPathSegment("addresses")
+                .addPathSegment("${id.value}")
         }
 
         val response = client.newCall(request).await()

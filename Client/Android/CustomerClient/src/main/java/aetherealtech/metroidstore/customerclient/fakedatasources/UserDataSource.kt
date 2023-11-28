@@ -2,7 +2,7 @@ package aetherealtech.metroidstore.customerclient.fakedatasources
 
 import aetherealtech.metroidstore.customerclient.datasources.UserDataSource
 import aetherealtech.metroidstore.customerclient.model.Address
-import aetherealtech.metroidstore.customerclient.model.NewAddress
+import aetherealtech.metroidstore.customerclient.model.EditAddress
 import aetherealtech.metroidstore.customerclient.model.NewOrder
 import aetherealtech.metroidstore.customerclient.model.OrderID
 import aetherealtech.metroidstore.customerclient.model.PaymentMethodSummary
@@ -87,7 +87,11 @@ class UserDataSourceFake: UserDataSource {
         return OrderID(0)
     }
 
-    override suspend fun createAddress(address: NewAddress): ImmutableList<UserAddressDetails> {
+    override suspend fun createAddress(address: EditAddress): ImmutableList<UserAddressDetails> {
+        return _addresses
+    }
+
+    override suspend fun updateAddress(address: EditAddress, id: Address.ID): ImmutableList<UserAddressDetails> {
         return _addresses
     }
 }

@@ -1,5 +1,6 @@
 package aetherealtech.metroidstore.customerclient.utilities
 
+import aetherealtech.metroidstore.customerclient.model.Address
 import android.os.Bundle
 import androidx.navigation.NavType
 import aetherealtech.metroidstore.customerclient.model.OrderID
@@ -57,6 +58,34 @@ val NavType.Companion.OrderIDType: NavType<OrderID>
 
             override fun put(bundle: Bundle, key: String, value: OrderID) {
                 bundle.putOrderID(key, value)
+            }
+        }
+    }
+
+fun Bundle.getAddressID(key: String): Address.ID {
+    return Address.ID(getInt(key))
+}
+
+fun Bundle.putAddressID(key: String, value: Address.ID) {
+    putInt(key, value.value)
+}
+
+val NavType.Companion.AddressIDType: NavType<Address.ID>
+    get() {
+        return object: NavType<Address.ID>(false) {
+            override val name: String
+                get() = "productID"
+
+            override fun get(bundle: Bundle, key: String): Address.ID {
+                return bundle.getAddressID(key)
+            }
+
+            override fun parseValue(value: String): Address.ID {
+                return Address.ID(value.toInt())
+            }
+
+            override fun put(bundle: Bundle, key: String, value: Address.ID) {
+                bundle.putAddressID(key, value)
             }
         }
     }

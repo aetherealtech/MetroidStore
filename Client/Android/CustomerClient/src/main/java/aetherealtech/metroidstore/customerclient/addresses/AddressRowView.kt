@@ -5,6 +5,7 @@ import aetherealtech.metroidstore.customerclient.model.UserAddressDetails
 import aetherealtech.metroidstore.customerclient.ui.theme.MetroidStoreTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,6 +34,7 @@ fun AddressRowView(
     Column(
         modifier = Modifier
             .padding(vertical = 8.dp)
+            .clickable(onClick = viewModel.select)
     ) {
         Text(
             text = viewModel.name,
@@ -86,7 +88,8 @@ fun AddressRowView(
 }
 
 class AddressRowViewModel(
-    details: UserAddressDetails
+    details: UserAddressDetails,
+    val select: () -> Unit
 ): ViewModel() {
     val name: String
 
@@ -145,7 +148,8 @@ fun AddressRowPreview() {
                         postalCode = Address.PostalCode("90210")
                     ),
                     isPrimary = true
-                )
+                ),
+                select = { }
             )
         )
     }

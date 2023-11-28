@@ -1,6 +1,6 @@
 package aetherealtech.metroidstore.customerclient.model
 
-data class NewAddress(
+data class EditAddress(
     val name: String,
     val street1: Address.Street1,
     val street2: Address.Street2?,

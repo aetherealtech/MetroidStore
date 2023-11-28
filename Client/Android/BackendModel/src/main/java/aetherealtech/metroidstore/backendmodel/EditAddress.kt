@@ -3,7 +3,7 @@ package aetherealtech.metroidstore.backendmodel
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class NewAddress(
+data class EditAddress(
     val name: String,
     val street1: String,
     val street2: String?,

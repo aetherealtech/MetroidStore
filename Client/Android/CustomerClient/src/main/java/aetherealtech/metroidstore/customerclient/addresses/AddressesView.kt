@@ -1,6 +1,7 @@
 package aetherealtech.metroidstore.customerclient.addresses
 
 import aetherealtech.metroidstore.customerclient.fakedatasources.DataSourceFake
+import aetherealtech.metroidstore.customerclient.model.Address
 import aetherealtech.metroidstore.customerclient.repositories.UserRepository
 import aetherealtech.metroidstore.customerclient.routing.AppBarState
 import aetherealtech.metroidstore.customerclient.ui.theme.MetroidStoreTheme
@@ -63,13 +64,15 @@ fun AddressesView(
 
 class AddressesViewModel(
     repository: UserRepository,
-    val openAddAddress: () -> Unit
+    val openAddAddress: () -> Unit,
+    val openEditAddress: (Address.ID) -> Unit
 ): ViewModel() {
     val items = repository.addressDetails
         .mapState { addressDetailsList ->
             addressDetailsList.map { addressDetails ->
                 AddressRowViewModel(
-                    details = addressDetails
+                    details = addressDetails,
+                    select = { openEditAddress(addressDetails.address.id) }
                 )
             }
         }
@@ -91,7 +94,8 @@ fun AddressesPreview() {
                 repository = UserRepository(
                     dataSource = DataSourceFake().user
                 ),
-                openAddAddress = { }
+                openAddAddress = { },
+                openEditAddress = { }
             )
         )
     }

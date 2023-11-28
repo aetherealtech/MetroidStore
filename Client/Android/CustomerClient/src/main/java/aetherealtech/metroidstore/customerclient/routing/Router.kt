@@ -1,5 +1,6 @@
 package aetherealtech.metroidstore.customerclient.routing
 
+import aetherealtech.metroidstore.customerclient.model.Address
 import aetherealtech.metroidstore.customerclient.model.OrderID
 import aetherealtech.metroidstore.customerclient.model.ProductID
 import androidx.compose.runtime.Composable
@@ -72,6 +73,10 @@ class Router(
 
     fun openAddAddress() {
         navController.navigate("addaddress")
+    }
+
+    fun openEditAddress(id: Address.ID) {
+        navController.navigate("editaddress/${id.value}")
     }
 
     fun openPaymentMethods() {

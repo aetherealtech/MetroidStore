@@ -1,7 +1,8 @@
 package aetherealtech.metroidstore.customerclient.repositories
 
 import aetherealtech.metroidstore.customerclient.datasources.UserDataSource
-import aetherealtech.metroidstore.customerclient.model.NewAddress
+import aetherealtech.metroidstore.customerclient.model.Address
+import aetherealtech.metroidstore.customerclient.model.EditAddress
 import aetherealtech.metroidstore.customerclient.model.NewOrder
 import aetherealtech.metroidstore.customerclient.model.PaymentMethodSummary
 import aetherealtech.metroidstore.customerclient.model.ShippingMethod
@@ -13,7 +14,6 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -81,15 +81,19 @@ class UserRepository(
 
     suspend fun placeOrder(order: NewOrder) = dataSource.placeOrder(order)
 
+    suspend fun createAddress(address: EditAddress) {
+        update {  _addressDetails.value = dataSource.createAddress(address) }
+    }
+
+    suspend fun updateAddress(address: EditAddress, id: Address.ID) {
+        update {  _addressDetails.value = dataSource.updateAddress(address, id) }
+    }
+
     private suspend fun update(
         action: suspend () -> Unit
     ) {
         _processes.update { processes -> processes + 1 }
         action()
         _processes.update { processes -> processes - 1 }
-    }
-
-    suspend fun createAddress(address: NewAddress) {
-        update {  _addressDetails.value = dataSource.createAddress(address) }
     }
 }

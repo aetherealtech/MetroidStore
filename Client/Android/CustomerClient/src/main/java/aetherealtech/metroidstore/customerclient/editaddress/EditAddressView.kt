@@ -1,8 +1,8 @@
-package aetherealtech.metroidstore.customerclient.addaddress
+package aetherealtech.metroidstore.customerclient.editaddress
 
 import aetherealtech.metroidstore.customerclient.fakedatasources.DataSourceFake
 import aetherealtech.metroidstore.customerclient.model.Address
-import aetherealtech.metroidstore.customerclient.model.NewAddress
+import aetherealtech.metroidstore.customerclient.model.EditAddress
 import aetherealtech.metroidstore.customerclient.repositories.UserRepository
 import aetherealtech.metroidstore.customerclient.routing.AppBarState
 import aetherealtech.metroidstore.customerclient.ui.theme.MetroidStoreTheme
@@ -37,9 +37,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 @Composable
-fun AddAddressView(
+fun EditAddressView(
     setAppBarState: (AppBarState) -> Unit,
-    viewModel: AddAddressViewModel
+    viewModel: EditAddressViewModel
 ) {
     LaunchedEffect(Unit) {
         setAppBarState(AppBarState(
@@ -106,38 +106,49 @@ fun AddAddressView(
                 modifier = Modifier
                     .width(128.dp),
                 onClick = create,
-                text = "Create"
+                text = "Save"
             )
         }
     }
 }
 
-class AddAddressViewModel(
-    repository: UserRepository
+class EditAddressViewModel private constructor(
+    repository: UserRepository,
+    name: String,
+    street1: Address.Street1,
+    street2: Address.Street2?,
+    locality: Address.Locality,
+    province: Address.Province,
+    country: Address.Country,
+    planet: Address.Planet,
+    postalCode: Address.PostalCode?,
+    isPrimary: Boolean,
+    save: suspend (EditAddress) -> Unit,
+    onSaveComplete: () -> Unit
 ): ViewModel() {
     val busy = repository.busy
 
-    val name = FormValue.requiredNonEmpty("")
-    val street1 = FormValue.requiredNonEmpty("")
-    val street2 = FormValue.optionalNonEmpty(null)
-    val locality = FormValue.requiredNonEmpty("")
-    val province = FormValue.requiredNonEmpty("")
-    val country = FormValue.requiredNonEmpty("")
-    val planet = FormValue.requiredNonEmpty("")
-    val postalCode = FormValue.optionalNonEmpty(null)
-    val isPrimary = MutableStateFlow(false)
+    val name = FormValue.requiredNonEmpty(name)
+    val street1 = FormValue.requiredNonEmpty(street1.value)
+    val street2 = FormValue.optionalNonEmpty(street2?.value)
+    val locality = FormValue.requiredNonEmpty(locality.value)
+    val province = FormValue.requiredNonEmpty(province.value)
+    val country = FormValue.requiredNonEmpty(country.value)
+    val planet = FormValue.requiredNonEmpty(planet.value)
+    val postalCode = FormValue.optionalNonEmpty(postalCode?.value)
+    val isPrimary = MutableStateFlow(isPrimary)
 
     val create: StateFlow<(() -> Unit)?> = StateFlows
         .combine(
-            name.value,
-            street1.value,
-            street2.value,
-            locality.value,
-            province.value,
-            country.value,
-            planet.value,
-            postalCode.value,
-            isPrimary
+            this.name.value,
+            this.street1.value,
+            this.street2.value,
+            this.locality.value,
+            this.province.value,
+            this.country.value,
+            this.planet.value,
+            this.postalCode.value,
+            this.isPrimary
         )
         .mapState { values ->
             if(
@@ -150,7 +161,7 @@ class AddAddressViewModel(
             )
                 return@mapState null
 
-            val address = NewAddress(
+            val address = EditAddress(
                 name = values.first,
                 street1 = Address.Street1(values.second),
                 street2 = values.third?.let { value -> Address.Street2(value) },
@@ -164,22 +175,71 @@ class AddAddressViewModel(
 
             return@mapState {
                 viewModelScope.launch {
-                    repository.createAddress(address)
+                    save(address)
+                    onSaveComplete()
                 }
             }
         }
+
+    companion object {
+        fun new(
+            repository: UserRepository,
+            onSaveComplete: () -> Unit
+        ): EditAddressViewModel = EditAddressViewModel(
+            repository = repository,
+            name = "",
+            street1 = Address.Street1(""),
+            street2 = null,
+            locality = Address.Locality(""),
+            province = Address.Province(""),
+            country = Address.Country(""),
+            planet = Address.Planet(""),
+            postalCode = null,
+            isPrimary = false,
+            save = { address -> repository.createAddress(address) },
+            onSaveComplete = onSaveComplete
+        )
+
+        fun edit(
+            id: Address.ID,
+            repository: UserRepository,
+            onSaveComplete: () -> Unit
+        ): EditAddressViewModel {
+            val address = repository.addressDetails.value
+                .find { address -> address.address.id == id }
+
+            if(address == null)
+                throw IllegalArgumentException("No address with that ID was found")
+
+            return EditAddressViewModel(
+                repository = repository,
+                name = address.name,
+                street1 = address.address.street1,
+                street2 = address.address.street2,
+                locality = address.address.locality,
+                province = address.address.province,
+                country = address.address.country,
+                planet = address.address.planet,
+                postalCode = address.address.postalCode,
+                isPrimary = address.isPrimary,
+                save = { editAddress -> repository.updateAddress(editAddress, address.address.id) },
+                onSaveComplete = onSaveComplete
+            )
+        }
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun AddAddressPreview() {
     MetroidStoreTheme {
-        AddAddressView(
+        EditAddressView(
             setAppBarState = { },
-            viewModel = AddAddressViewModel(
+            viewModel = EditAddressViewModel.new(
                 repository = UserRepository(
-                    dataSource = DataSourceFake().user
-                )
+                    dataSource = DataSourceFake().user,
+                ),
+                onSaveComplete = { }
             )
         )
     }

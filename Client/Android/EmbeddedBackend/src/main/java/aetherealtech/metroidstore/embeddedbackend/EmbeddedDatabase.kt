@@ -3,7 +3,7 @@ package aetherealtech.metroidstore.embeddedbackend
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import aetherealtech.metroidstore.backendmodel.CartItem
-import aetherealtech.metroidstore.backendmodel.NewAddress
+import aetherealtech.metroidstore.backendmodel.EditAddress
 import aetherealtech.metroidstore.backendmodel.OrderActivity
 import aetherealtech.metroidstore.backendmodel.OrderDetails
 import aetherealtech.metroidstore.backendmodel.OrderSummary
@@ -559,7 +559,7 @@ fun SQLiteDatabase.addressDetails(username: String): List<UserAddressDetails> {
 
 fun SQLiteDatabase.createAddress(
     username: String,
-    address: NewAddress
+    address: EditAddress
 ): List<UserAddressDetails> {
     beginTransaction()
 
@@ -587,6 +587,46 @@ fun SQLiteDatabase.createAddress(
         execSQL(
             "INSERT INTO UserAddresses (username, addressID, name, isPrimary) VALUES (?, ?, ?, ?)",
             arrayOf(username, addressID, address.name, address.isPrimary)
+        )
+
+        val addresses = addressDetails(username)
+
+        setTransactionSuccessful()
+
+        return addresses
+    } finally {
+        endTransaction()
+    }
+}
+
+fun SQLiteDatabase.updateAddress(
+    username: String,
+    address: EditAddress,
+    addressID: Int
+): List<UserAddressDetails> {
+    beginTransaction()
+
+    try {
+        execSQL(
+            "INSERT INTO Addresses (street1, street2, locality, province, country, planet, postalCode) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            arrayOf(address.street1, address.street2, address.locality, address.province, address.country, address.planet, address.postalCode)
+        )
+
+        execSQL(
+            "UPDATE Addresses SET street1 = ?, street2 = ?, locality = ?, province = ?, country = ?, planet = ?, postalCode = ? WHERE id = ?",
+            arrayOf(address.street1, address.street2, address.locality, address.province, address.country, address.planet, address.postalCode, addressID)
+        )
+
+        if(address.isPrimary) {
+            execSQL(
+                "UPDATE UserAddresses SET isPrimary = 0 WHERE username = ?",
+                arrayOf(username)
+            )
+        }
+
+        execSQL(
+            "UPDATE UserAddresses SET name = ?, isPrimary = ? WHERE username = ? AND addressID = ?",
+            arrayOf(address.name, address.isPrimary, username, addressID)
         )
 
         val addresses = addressDetails(username)

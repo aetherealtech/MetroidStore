@@ -1,13 +1,14 @@
 package aetherealtech.metroidstore.customerclient.root
 
-import aetherealtech.metroidstore.customerclient.addaddress.AddAddressView
-import aetherealtech.metroidstore.customerclient.addaddress.AddAddressViewModel
+import aetherealtech.metroidstore.customerclient.editaddress.EditAddressView
+import aetherealtech.metroidstore.customerclient.editaddress.EditAddressViewModel
 import aetherealtech.metroidstore.customerclient.addresses.AddressesView
 import aetherealtech.metroidstore.customerclient.addresses.AddressesViewModel
 import aetherealtech.metroidstore.customerclient.cart.CartViewModel
 import aetherealtech.metroidstore.customerclient.checkout.CheckoutView
 import aetherealtech.metroidstore.customerclient.checkout.CheckoutViewModel
 import aetherealtech.metroidstore.customerclient.datasources.DataSource
+import aetherealtech.metroidstore.customerclient.model.Address
 import aetherealtech.metroidstore.customerclient.model.OrderID
 import aetherealtech.metroidstore.customerclient.model.ProductID
 import aetherealtech.metroidstore.customerclient.orderdetails.OrderDetailsView
@@ -24,9 +25,11 @@ import aetherealtech.metroidstore.customerclient.routing.AppBarState
 import aetherealtech.metroidstore.customerclient.routing.Screen
 import aetherealtech.metroidstore.customerclient.routing.rememberRouter
 import aetherealtech.metroidstore.customerclient.settings.SettingsViewModel
+import aetherealtech.metroidstore.customerclient.utilities.AddressIDType
 import aetherealtech.metroidstore.customerclient.utilities.OrderIDType
 import aetherealtech.metroidstore.customerclient.utilities.ProductIDType
 import aetherealtech.metroidstore.customerclient.utilities.ViewModelFactory
+import aetherealtech.metroidstore.customerclient.utilities.getAddressID
 import aetherealtech.metroidstore.customerclient.utilities.getOrderID
 import aetherealtech.metroidstore.customerclient.utilities.getProductID
 import aetherealtech.metroidstore.customerclient.utilities.viewModel
@@ -162,7 +165,8 @@ fun RootView(
             ) {backstackEntry ->
                 val addressesViewModel = viewModel(
                     factory = viewModel.addresses(
-                        openAddAddress = { router.openAddAddress() }
+                        openAddAddress = { router.openAddAddress() },
+                        openEditAddress = { id -> router.openEditAddress(id) }
                     )
                 )
 
@@ -177,10 +181,30 @@ fun RootView(
             ) {backstackEntry ->
                 val addAddressViewModel = viewModel(
                     factory = viewModel.addAddress(
+                        onSaveComplete = { router.back() }
                     )
                 )
 
-                AddAddressView(
+                EditAddressView(
+                    setAppBarState = setAppBarState,
+                    viewModel = addAddressViewModel
+                )
+            }
+
+            composable(
+                "editaddress/{addressID}",
+                arguments = listOf(navArgument("addressID") { type = NavType.AddressIDType })
+            ) {backstackEntry ->
+                val addressID = backstackEntry.arguments!!.getAddressID("addressID")
+
+                val addAddressViewModel = viewModel(
+                    factory = viewModel.editAddress(
+                        id = addressID,
+                        onSaveComplete = { router.back() }
+                    )
+                )
+
+                EditAddressView(
                     setAppBarState = setAppBarState,
                     viewModel = addAddressViewModel
                 )
@@ -280,17 +304,33 @@ class RootViewModel(
     }
 
     fun addresses(
-        openAddAddress: () -> Unit
+        openAddAddress: () -> Unit,
+        openEditAddress: (Address.ID) -> Unit
     ) = object : ViewModelFactory<AddressesViewModel>() {
         override fun create() = AddressesViewModel(
             repository = userRepository,
-            openAddAddress = openAddAddress
+            openAddAddress = openAddAddress,
+            openEditAddress = openEditAddress
         )
     }
 
-    fun addAddress() = object : ViewModelFactory<AddAddressViewModel>() {
-        override fun create() = AddAddressViewModel(
-            repository = userRepository
+    fun addAddress(
+        onSaveComplete: () -> Unit
+    ) = object : ViewModelFactory<EditAddressViewModel>() {
+        override fun create() = EditAddressViewModel.new(
+            repository = userRepository,
+            onSaveComplete = onSaveComplete
+        )
+    }
+
+    fun editAddress(
+        id: Address.ID,
+        onSaveComplete: () -> Unit
+    ) = object : ViewModelFactory<EditAddressViewModel>() {
+        override fun create() = EditAddressViewModel.edit(
+            id = id,
+            repository = userRepository,
+            onSaveComplete = onSaveComplete
         )
     }
 }
