@@ -70,6 +70,10 @@ class Router(
         navController.navigate("addresses")
     }
 
+    fun openAddAddress() {
+        navController.navigate("addaddress")
+    }
+
     fun openPaymentMethods() {
 
     }

@@ -1,5 +1,6 @@
 package aetherealtech.metroidstore.customerclient.datasources
 
+import aetherealtech.metroidstore.customerclient.model.NewAddress
 import aetherealtech.metroidstore.customerclient.model.NewOrder
 import aetherealtech.metroidstore.customerclient.model.OrderID
 import aetherealtech.metroidstore.customerclient.model.PaymentMethodSummary
@@ -15,4 +16,5 @@ interface UserDataSource {
     suspend fun getAddressDetails(): ImmutableList<UserAddressDetails>
 
     suspend fun placeOrder(order: NewOrder): OrderID
+    suspend fun createAddress(address: NewAddress): ImmutableList<UserAddressDetails>
 }

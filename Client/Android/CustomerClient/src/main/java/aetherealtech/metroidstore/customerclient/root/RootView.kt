@@ -1,5 +1,7 @@
 package aetherealtech.metroidstore.customerclient.root
 
+import aetherealtech.metroidstore.customerclient.addaddress.AddAddressView
+import aetherealtech.metroidstore.customerclient.addaddress.AddAddressViewModel
 import aetherealtech.metroidstore.customerclient.addresses.AddressesView
 import aetherealtech.metroidstore.customerclient.addresses.AddressesViewModel
 import aetherealtech.metroidstore.customerclient.cart.CartViewModel
@@ -24,8 +26,10 @@ import aetherealtech.metroidstore.customerclient.routing.rememberRouter
 import aetherealtech.metroidstore.customerclient.settings.SettingsViewModel
 import aetherealtech.metroidstore.customerclient.utilities.OrderIDType
 import aetherealtech.metroidstore.customerclient.utilities.ProductIDType
+import aetherealtech.metroidstore.customerclient.utilities.ViewModelFactory
 import aetherealtech.metroidstore.customerclient.utilities.getOrderID
 import aetherealtech.metroidstore.customerclient.utilities.getProductID
+import aetherealtech.metroidstore.customerclient.utilities.viewModel
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -41,9 +45,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.CreationExtras
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
@@ -109,7 +110,7 @@ fun RootView(
             ) {backstackEntry ->
                 val productID = backstackEntry.arguments!!.getProductID("productID")
 
-                val detailsViewModel = viewModel<ProductDetailViewModel>(
+                val detailsViewModel = viewModel(
                     factory = viewModel.productDetails(
                         id = productID,
                         viewCart = { router.selectTab(Screen.Cart) }
@@ -124,7 +125,7 @@ fun RootView(
             composable(
                 "checkout"
             ) {backstackEntry ->
-                val detailsViewModel = viewModel<CheckoutViewModel>(
+                val detailsViewModel = viewModel(
                     factory = viewModel.checkout(
                         viewOrder = { orderID ->
                             router.selectTab(Screen.Orders)
@@ -144,7 +145,7 @@ fun RootView(
             ) {backstackEntry ->
                 val orderID = backstackEntry.arguments!!.getOrderID("orderID")
 
-                val detailsViewModel = viewModel<OrderDetailsViewModel>(
+                val detailsViewModel = viewModel(
                     factory = viewModel.orderDetails(
                         id = orderID,
                         viewProductDetails = { productID -> router.viewProductDetails(productID) }
@@ -159,17 +160,29 @@ fun RootView(
             composable(
                 "addresses"
             ) {backstackEntry ->
-                val addressesViewModel = viewModel<AddressesViewModel>(
+                val addressesViewModel = viewModel(
                     factory = viewModel.addresses(
-                        openAddAddress = {
-                            println("TEST")
-                        }
+                        openAddAddress = { router.openAddAddress() }
                     )
                 )
 
                 AddressesView(
                     setAppBarState = setAppBarState,
                     viewModel = addressesViewModel
+                )
+            }
+
+            composable(
+                "addaddress"
+            ) {backstackEntry ->
+                val addAddressViewModel = viewModel(
+                    factory = viewModel.addAddress(
+                    )
+                )
+
+                AddAddressView(
+                    setAppBarState = setAppBarState,
+                    viewModel = addAddressViewModel
                 )
             }
         }
@@ -197,129 +210,87 @@ class RootViewModel(
 
     fun productList(
         openProductDetails: (ProductID) -> Unit,
-    ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-        @Suppress("UNCHECKED_CAST")
-        override fun <T: ViewModel> create(
-            modelClass: Class<T>,
-            extras: CreationExtras
-        ): T {
-            return ProductListViewModel(
-                productRepository = productRepository,
-                selectProduct = openProductDetails
-            ) as T
-        }
+    ) = object : ViewModelFactory<ProductListViewModel>() {
+        override fun create() = ProductListViewModel(
+            productRepository = productRepository,
+            selectProduct = openProductDetails
+        )
     }
 
     fun cart(
         openProductDetails: (ProductID) -> Unit,
         openCheckout: () -> Unit,
-    ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-        @Suppress("UNCHECKED_CAST")
-        override fun <T: ViewModel> create(
-            modelClass: Class<T>,
-            extras: CreationExtras
-        ): T {
-            return CartViewModel(
-                repository = cartRepository,
-                selectItem = openProductDetails,
-                proceedToCheckout = openCheckout
-            ) as T
-        }
+    ) = object : ViewModelFactory<CartViewModel>() {
+        override fun create() = CartViewModel(
+            repository = cartRepository,
+            selectItem = openProductDetails,
+            proceedToCheckout = openCheckout
+        )
     }
 
     fun productDetails(
         id: ProductID,
         viewCart: () -> Unit
-    ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-        @Suppress("UNCHECKED_CAST")
-        override fun <T: ViewModel> create(
-            modelClass: Class<T>,
-            extras: CreationExtras
-        ): T {
-            return ProductDetailViewModel(
-                productID = id,
-                repository = productRepository,
-                viewCart = viewCart
-            ) as T
-        }
+    ) = object : ViewModelFactory<ProductDetailViewModel>() {
+        override fun create() = ProductDetailViewModel(
+            productID = id,
+            repository = productRepository,
+            viewCart = viewCart
+        )
     }
 
     fun checkout(
         viewOrder: (OrderID) -> Unit
-    ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-        @Suppress("UNCHECKED_CAST")
-        override fun <T: ViewModel> create(
-            modelClass: Class<T>,
-            extras: CreationExtras
-        ): T {
-            return CheckoutViewModel(
-                cartRepository = cartRepository,
-                userRepository = userRepository,
-                viewOrder = viewOrder
-            ) as T
-        }
+    ) = object : ViewModelFactory<CheckoutViewModel>() {
+        override fun create() = CheckoutViewModel(
+            cartRepository = cartRepository,
+            userRepository = userRepository,
+            viewOrder = viewOrder
+        )
     }
 
     fun orders(
         viewOrder: (OrderID) -> Unit
-    ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-        @Suppress("UNCHECKED_CAST")
-        override fun <T: ViewModel> create(
-            modelClass: Class<T>,
-            extras: CreationExtras
-        ): T {
-            return OrdersViewModel(
-                repository = orderRepository,
-                viewOrder = viewOrder
-            ) as T
-        }
+    ) = object : ViewModelFactory<OrdersViewModel>() {
+        override fun create() = OrdersViewModel(
+            repository = orderRepository,
+            viewOrder = viewOrder
+        )
     }
 
     fun orderDetails(
         id: OrderID,
         viewProductDetails: (ProductID) -> Unit
-    ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-        @Suppress("UNCHECKED_CAST")
-        override fun <T: ViewModel> create(
-            modelClass: Class<T>,
-            extras: CreationExtras
-        ): T {
-            return OrderDetailsViewModel(
-                orderID = id,
-                repository = orderRepository,
-                selectItem = viewProductDetails
-            ) as T
-        }
+    ) = object : ViewModelFactory<OrderDetailsViewModel>() {
+        override fun create() = OrderDetailsViewModel(
+            orderID = id,
+            repository = orderRepository,
+            selectItem = viewProductDetails
+        )
     }
 
     fun settings(
         openAddresses: () -> Unit,
         openPaymentMethods: () -> Unit,
-    ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-        @Suppress("UNCHECKED_CAST")
-        override fun <T: ViewModel> create(
-            modelClass: Class<T>,
-            extras: CreationExtras
-        ): T {
-            return SettingsViewModel(
-                openAddresses = openAddresses,
-                openPaymentMethods = openPaymentMethods
-            ) as T
-        }
+    ) = object : ViewModelFactory<SettingsViewModel>() {
+        override fun create() = SettingsViewModel(
+            openAddresses = openAddresses,
+            openPaymentMethods = openPaymentMethods
+        )
     }
 
     fun addresses(
         openAddAddress: () -> Unit
-    ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-        @Suppress("UNCHECKED_CAST")
-        override fun <T: ViewModel> create(
-            modelClass: Class<T>,
-            extras: CreationExtras
-        ): T {
-            return AddressesViewModel(
-                repository = userRepository,
-                openAddAddress = openAddAddress
-            ) as T
-        }
+    ) = object : ViewModelFactory<AddressesViewModel>() {
+        override fun create() = AddressesViewModel(
+            repository = userRepository,
+            openAddAddress = openAddAddress
+        )
+    }
+
+    fun addAddress() = object : ViewModelFactory<AddAddressViewModel>() {
+        override fun create() = AddAddressViewModel(
+            repository = userRepository
+        )
     }
 }

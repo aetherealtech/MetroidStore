@@ -3,6 +3,7 @@ package aetherealtech.metroidstore.embeddedbackend
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import aetherealtech.metroidstore.backendmodel.CartItem
+import aetherealtech.metroidstore.backendmodel.NewAddress
 import aetherealtech.metroidstore.backendmodel.OrderActivity
 import aetherealtech.metroidstore.backendmodel.OrderDetails
 import aetherealtech.metroidstore.backendmodel.OrderSummary
@@ -553,5 +554,47 @@ fun SQLiteDatabase.addressDetails(username: String): List<UserAddressDetails> {
         }
 
         return@use results.toImmutableList()
+    }
+}
+
+fun SQLiteDatabase.createAddress(
+    username: String,
+    address: NewAddress
+): List<UserAddressDetails> {
+    beginTransaction()
+
+    try {
+        execSQL(
+            "INSERT INTO Addresses (street1, street2, locality, province, country, planet, postalCode) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            arrayOf(address.street1, address.street2, address.locality, address.province, address.country, address.planet, address.postalCode)
+        )
+
+        val addressID = rawQuery(
+            "SELECT last_insert_rowid()",
+            emptyArray()
+        ).use { cursor ->
+            cursor.moveToNext()
+            return@use cursor.getInt(0)
+        }
+
+        if(address.isPrimary) {
+            execSQL(
+                "UPDATE UserAddresses SET isPrimary = 0 WHERE username = ?",
+                arrayOf(username)
+            )
+        }
+
+        execSQL(
+            "INSERT INTO UserAddresses (username, addressID, name, isPrimary) VALUES (?, ?, ?, ?)",
+            arrayOf(username, addressID, address.name, address.isPrimary)
+        )
+
+        val addresses = addressDetails(username)
+
+        setTransactionSuccessful()
+
+        return addresses
+    } finally {
+        endTransaction()
     }
 }

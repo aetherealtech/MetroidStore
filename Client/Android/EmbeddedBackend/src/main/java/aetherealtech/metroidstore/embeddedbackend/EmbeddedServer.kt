@@ -1,5 +1,6 @@
 package aetherealtech.metroidstore.embeddedbackend
 
+import aetherealtech.metroidstore.backendmodel.NewAddress
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import aetherealtech.metroidstore.backendmodel.NewOrder
@@ -128,6 +129,19 @@ class EmbeddedServer(
                     }
 
                     val addresses = database.addressDetails(username)
+                    call.respondText(Json.encodeToString(addresses))
+                }
+
+                post("/addresses") {
+                    val username = call.request.header("Authorization")
+                    if(username == null) {
+                        call.respond(HttpStatusCode.Unauthorized)
+                        return@post
+                    }
+
+                    val newAddress = Json.decodeFromString<NewAddress>(call.receiveText())
+
+                    val addresses = database.createAddress(username, newAddress)
                     call.respondText(Json.encodeToString(addresses))
                 }
 

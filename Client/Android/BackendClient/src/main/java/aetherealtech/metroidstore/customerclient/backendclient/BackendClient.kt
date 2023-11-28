@@ -3,6 +3,7 @@ package aetherealtech.metroidstore.customerclient.backendclient
 import android.content.res.Resources
 import aetherealtech.metroidstore.customerclient.model.Address
 import aetherealtech.metroidstore.customerclient.model.CartItem
+import aetherealtech.metroidstore.customerclient.model.NewAddress
 import aetherealtech.metroidstore.customerclient.model.NewOrder
 import aetherealtech.metroidstore.customerclient.model.OrderActivity
 import aetherealtech.metroidstore.customerclient.model.OrderDetails
@@ -417,22 +418,43 @@ class BackendClient(
         )
 
         return backendAddresses
-            .map { backendAddress ->
-                UserAddressDetails(
-                    name = backendAddress.name,
-                    address = Address(
-                        id = Address.ID(backendAddress.addressID),
-                        street1 = Address.Street1(backendAddress.street1),
-                        street2 = backendAddress.street2?.let { street2 -> Address.Street2(street2) },
-                        locality = Address.Locality(backendAddress.locality),
-                        province = Address.Province(backendAddress.province),
-                        country = Address.Country(backendAddress.country),
-                        planet = Address.Planet(backendAddress.planet),
-                        postalCode = backendAddress.postalCode?.let { postalCode -> Address.PostalCode(postalCode) }
-                    ),
-                    isPrimary = backendAddress.isPrimary
-                )
-            }
+            .map { backendAddress -> backendAddress.clientModel }
+            .toImmutableList()
+    }
+
+    suspend fun createAddress(address: NewAddress): ImmutableList<UserAddressDetails> {
+        val backendNewAddress = aetherealtech.metroidstore.backendmodel.NewAddress(
+            name = address.name,
+            street1 = address.street1.value,
+            street2 = address.street2?.value,
+            locality = address.locality.value,
+            province = address.province.value,
+            country = address.country.value,
+            planet = address.planet.value,
+            postalCode = address.postalCode?.value,
+            isPrimary = address.isPrimary
+        )
+
+        val request = buildRequest(
+            modifyRequest = { builder -> builder.post(Json.encodeToString(backendNewAddress).toRequestBody()) }
+        ) { urlBuilder ->
+            urlBuilder
+                .addPathSegment("addresses")
+        }
+
+        val response = client.newCall(request).await()
+
+        val body = response.body
+
+        if(body == null)
+            throw IllegalStateException("Did not receive a response")
+
+        val backendAddresses = Json.decodeFromString<List<aetherealtech.metroidstore.backendmodel.UserAddressDetails>>(
+            body.string()
+        )
+
+        return backendAddresses
+            .map { backendAddress -> backendAddress.clientModel }
             .toImmutableList()
     }
 
@@ -455,3 +477,19 @@ class BackendClient(
             .build()
     }
 }
+
+val aetherealtech.metroidstore.backendmodel.UserAddressDetails.clientModel: UserAddressDetails
+    get() = UserAddressDetails(
+        name = name,
+        address = Address(
+            id = Address.ID(addressID),
+            street1 = Address.Street1(street1),
+            street2 = street2?.let { street2 -> Address.Street2(street2) },
+            locality = Address.Locality(locality),
+            province = Address.Province(province),
+            country = Address.Country(country),
+            planet = Address.Planet(planet),
+            postalCode = postalCode?.let { postalCode -> Address.PostalCode(postalCode) }
+        ),
+        isPrimary = isPrimary
+    )

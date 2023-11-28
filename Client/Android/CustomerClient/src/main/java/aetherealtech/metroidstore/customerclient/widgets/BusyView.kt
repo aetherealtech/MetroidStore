@@ -23,12 +23,12 @@ fun BusyView(
         modifier = modifier,
         contentAlignment = Alignment.Center
     ) {
+        content()
         if (busy) {
             CircularProgressIndicator(
                 modifier = Modifier
                     .size(64.dp)
             )
         }
-        content()
     }
 }
