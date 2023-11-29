@@ -20,4 +20,5 @@ interface UserDataSource {
 
     suspend fun createAddress(address: EditAddress): ImmutableList<UserAddressDetails>
     suspend fun updateAddress(address: EditAddress, id: Address.ID): ImmutableList<UserAddressDetails>
+    suspend fun deleteAddress(id: Address.ID): ImmutableList<UserAddressDetails>
 }

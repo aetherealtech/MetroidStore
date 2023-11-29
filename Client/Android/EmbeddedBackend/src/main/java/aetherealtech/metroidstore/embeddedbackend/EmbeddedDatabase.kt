@@ -638,3 +638,30 @@ fun SQLiteDatabase.updateAddress(
         endTransaction()
     }
 }
+
+fun SQLiteDatabase.deleteAddress(
+    username: String,
+    addressID: Int
+): List<UserAddressDetails> {
+    beginTransaction()
+
+    try {
+        execSQL(
+            "DELETE FROM Addresses WHERE id = ?",
+            arrayOf(addressID)
+        )
+
+        execSQL(
+            "DELETE FROM UserAddresses WHERE addressID = ?",
+            arrayOf(addressID)
+        )
+
+        val addresses = addressDetails(username)
+
+        setTransactionSuccessful()
+
+        return addresses
+    } finally {
+        endTransaction()
+    }
+}

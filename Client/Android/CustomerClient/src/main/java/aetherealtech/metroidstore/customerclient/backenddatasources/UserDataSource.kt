@@ -5,6 +5,8 @@ import aetherealtech.metroidstore.customerclient.datasources.UserDataSource
 import aetherealtech.metroidstore.customerclient.model.Address
 import aetherealtech.metroidstore.customerclient.model.EditAddress
 import aetherealtech.metroidstore.customerclient.model.NewOrder
+import aetherealtech.metroidstore.customerclient.model.UserAddressDetails
+import kotlinx.collections.immutable.ImmutableList
 
 class UserDataSourceBackend(
     private val client: BackendClient
@@ -18,4 +20,5 @@ class UserDataSourceBackend(
 
     override suspend fun createAddress(address: EditAddress) = client.createAddress(address)
     override suspend fun updateAddress(address: EditAddress, id: Address.ID) = client.updateAddress(address, id)
+    override suspend fun deleteAddress(id: Address.ID) = client.deleteAddress(id)
 }

@@ -86,7 +86,11 @@ class UserRepository(
     }
 
     suspend fun updateAddress(address: EditAddress, id: Address.ID) {
-        update {  _addressDetails.value = dataSource.updateAddress(address, id) }
+        update { _addressDetails.value = dataSource.updateAddress(address, id) }
+    }
+
+    suspend fun deleteAddress(id: Address.ID) {
+        update { _addressDetails.value = dataSource.deleteAddress(id) }
     }
 
     private suspend fun update(

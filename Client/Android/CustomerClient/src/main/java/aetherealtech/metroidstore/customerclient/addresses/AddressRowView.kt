@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -33,7 +34,12 @@ fun AddressRowView(
 ) {
     Column(
         modifier = Modifier
-            .padding(vertical = 8.dp)
+            .background(Color(0xFFF8F8F8))
+            .padding(
+                horizontal = 16.dp,
+                vertical = 8.dp
+            )
+            .fillMaxWidth()
             .clickable(onClick = viewModel.select)
     ) {
         Text(
@@ -69,7 +75,7 @@ fun AddressRowView(
                         color = Color(0xFFCCCCCC)
                     )
             ) {
-                if(viewModel.isPrimary) {
+                if (viewModel.isPrimary) {
                     Icon(
                         imageVector = Icons.Filled.Check,
                         contentDescription = "Primary",
@@ -83,14 +89,14 @@ fun AddressRowView(
             )
         }
     }
-
-    Divider()
 }
 
 class AddressRowViewModel(
     details: UserAddressDetails,
     val select: () -> Unit
 ): ViewModel() {
+    val id = details.address.id
+
     val name: String
 
     val address: String

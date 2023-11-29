@@ -94,6 +94,10 @@ class UserDataSourceFake: UserDataSource {
     override suspend fun updateAddress(address: EditAddress, id: Address.ID): ImmutableList<UserAddressDetails> {
         return _addresses
     }
+
+    override suspend fun deleteAddress(id: Address.ID): ImmutableList<UserAddressDetails> {
+        return _addresses
+    }
 }
 
 val UserAddressDetails.summary: UserAddressSummary

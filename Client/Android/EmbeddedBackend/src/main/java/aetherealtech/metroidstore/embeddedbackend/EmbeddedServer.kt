@@ -160,6 +160,19 @@ class EmbeddedServer(
                     call.respondText(Json.encodeToString(addresses))
                 }
 
+                delete("/addresses/{addressID}") {
+                    val username = call.request.header("Authorization")
+                    if(username == null) {
+                        call.respond(HttpStatusCode.Unauthorized)
+                        return@delete
+                    }
+
+                    val addressID = call.parameters["addressID"]!!.toInt()
+
+                    val addresses = database.deleteAddress(username, addressID)
+                    call.respondText(Json.encodeToString(addresses))
+                }
+
                 get("/shippingMethods") {
                     val shippingMethods = database.shippingMethods()
                     call.respondText(Json.encodeToString(shippingMethods))

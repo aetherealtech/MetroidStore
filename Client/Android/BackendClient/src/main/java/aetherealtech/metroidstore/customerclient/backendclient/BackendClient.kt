@@ -495,6 +495,31 @@ class BackendClient(
             .toImmutableList()
     }
 
+    suspend fun deleteAddress(id: Address.ID): ImmutableList<UserAddressDetails> {
+        val request = buildRequest(
+            modifyRequest = { builder -> builder.delete() }
+        ) { urlBuilder ->
+            urlBuilder
+                .addPathSegment("addresses")
+                .addPathSegment("${id.value}")
+        }
+
+        val response = client.newCall(request).await()
+
+        val body = response.body
+
+        if(body == null)
+            throw IllegalStateException("Did not receive a response")
+
+        val backendAddresses = Json.decodeFromString<List<aetherealtech.metroidstore.backendmodel.UserAddressDetails>>(
+            body.string()
+        )
+
+        return backendAddresses
+            .map { backendAddress -> backendAddress.clientModel }
+            .toImmutableList()
+    }
+
     private val client = OkHttpClient()
     private val username = "mother_brain"
 
