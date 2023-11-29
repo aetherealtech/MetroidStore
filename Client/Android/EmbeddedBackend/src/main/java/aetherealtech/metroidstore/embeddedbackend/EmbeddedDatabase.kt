@@ -608,11 +608,6 @@ fun SQLiteDatabase.updateAddress(
 
     try {
         execSQL(
-            "INSERT INTO Addresses (street1, street2, locality, province, country, planet, postalCode) VALUES (?, ?, ?, ?, ?, ?, ?)",
-            arrayOf(address.street1, address.street2, address.locality, address.province, address.country, address.planet, address.postalCode)
-        )
-
-        execSQL(
             "UPDATE Addresses SET street1 = ?, street2 = ?, locality = ?, province = ?, country = ?, planet = ?, postalCode = ? WHERE id = ?",
             arrayOf(address.street1, address.street2, address.locality, address.province, address.country, address.planet, address.postalCode, addressID)
         )
