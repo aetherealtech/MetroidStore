@@ -1,18 +1,20 @@
-package aetherealtech.metroidstore.customerclient.addresses
+package aetherealtech.metroidstore.customerclient.paymentmethods
 
 import aetherealtech.metroidstore.customerclient.fakedatasources.DataSourceFake
-import aetherealtech.metroidstore.customerclient.model.Address
+import aetherealtech.metroidstore.customerclient.model.PaymentMethodID
 import aetherealtech.metroidstore.customerclient.repositories.UserRepository
 import aetherealtech.metroidstore.customerclient.routing.AppBarState
 import aetherealtech.metroidstore.customerclient.ui.theme.MetroidStoreTheme
 import aetherealtech.metroidstore.customerclient.utilities.mapState
 import aetherealtech.metroidstore.customerclient.widgets.AsyncLoadedShimmering
 import aetherealtech.metroidstore.customerclient.widgets.SwipeToDeleteRow
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
@@ -23,18 +25,19 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun AddressesView(
+fun PaymentMethodsView(
     modifier: Modifier = Modifier,
     setAppBarState: (AppBarState) -> Unit,
-    viewModel: AddressesViewModel
+    viewModel: PaymentMethodsViewModel
 ) {
     LaunchedEffect(Unit) {
         setAppBarState(AppBarState(
-            title = "Addresses",
+            title = "PaymentMethods",
             actions = {
                 IconButton(
-                    onClick = viewModel.openAddAddress
+                    onClick = viewModel.openAddPaymentMethod
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
@@ -59,57 +62,57 @@ fun AddressesView(
                 SwipeToDeleteRow(
                     onDelete = { viewModel.delete(rowViewModel) }
                 ) {
-                    AddressRowView(
+                    PaymentMethodRowView(
                         viewModel = rowViewModel
                     )
                 }
-
+                
                 Divider()
             }
         }
     }
 }
 
-class AddressesViewModel(
+class PaymentMethodsViewModel(
     private val repository: UserRepository,
-    val openAddAddress: () -> Unit,
-    val openEditAddress: (Address.ID) -> Unit
+    val openAddPaymentMethod: () -> Unit,
+    val openEditPaymentMethod: (PaymentMethodID) -> Unit
 ): ViewModel() {
-    val items = repository.addressDetails
-        .mapState { addressDetailsList ->
-            addressDetailsList.map { addressDetails ->
-                AddressRowViewModel(
-                    details = addressDetails,
-                    select = { openEditAddress(addressDetails.address.id) }
+    val items = repository.paymentMethodDetails
+        .mapState { paymentMethodDetailsList ->
+            paymentMethodDetailsList.map { paymentMethodDetails ->
+                PaymentMethodRowViewModel(
+                    details = paymentMethodDetails,
+                    select = { openEditPaymentMethod(paymentMethodDetails.id) }
                 )
             }
         }
 
     init {
         viewModelScope.launch {
-            repository.updateAddressDetails()
+            repository.updatePaymentMethodDetails()
         }
     }
 
-    fun delete(item: AddressRowViewModel) {
+    fun delete(item: PaymentMethodRowViewModel) {
         viewModelScope.launch {
-            repository.deleteAddress(item.id)
+            repository.deletePaymentMethod(item.id)
         }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun AddressesPreview() {
+fun PaymentMethodsPreview() {
     MetroidStoreTheme {
-        AddressesView(
+        PaymentMethodsView(
             setAppBarState = { },
-            viewModel = AddressesViewModel(
+            viewModel = PaymentMethodsViewModel(
                 repository = UserRepository(
                     dataSource = DataSourceFake().user
                 ),
-                openAddAddress = { },
-                openEditAddress = { }
+                openAddPaymentMethod = { },
+                openEditPaymentMethod = { }
             )
         )
     }

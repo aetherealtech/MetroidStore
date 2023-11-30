@@ -1,6 +1,7 @@
 package aetherealtech.metroidstore.embeddedbackend
 
 import aetherealtech.metroidstore.backendmodel.EditAddress
+import aetherealtech.metroidstore.backendmodel.EditPaymentMethod
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import aetherealtech.metroidstore.backendmodel.NewOrder
@@ -187,6 +188,58 @@ class EmbeddedServer(
                     }
 
                     val paymentMethods = database.paymentMethods(username)
+                    call.respondText(Json.encodeToString(paymentMethods))
+                }
+
+                get("/paymentMethods/details") {
+                    val username = call.request.header("Authorization")
+                    if(username == null) {
+                        call.respond(HttpStatusCode.Unauthorized)
+                        return@get
+                    }
+
+                    val paymentMethods = database.paymentMethodDetails(username)
+                    call.respondText(Json.encodeToString(paymentMethods))
+                }
+
+                post("/paymentMethods") {
+                    val username = call.request.header("Authorization")
+                    if(username == null) {
+                        call.respond(HttpStatusCode.Unauthorized)
+                        return@post
+                    }
+
+                    val newPaymentMethod = Json.decodeFromString<EditPaymentMethod>(call.receiveText())
+
+                    val paymentMethods = database.createPaymentMethod(username, newPaymentMethod)
+                    call.respondText(Json.encodeToString(paymentMethods))
+                }
+
+                patch("/paymentMethods/{paymentMethodID}") {
+                    val username = call.request.header("Authorization")
+                    if(username == null) {
+                        call.respond(HttpStatusCode.Unauthorized)
+                        return@patch
+                    }
+
+                    val paymentMethodID = call.parameters["paymentMethodID"]!!.toInt()
+
+                    val newPaymentMethod = Json.decodeFromString<EditPaymentMethod>(call.receiveText())
+
+                    val paymentMethods = database.updatePaymentMethod(username, newPaymentMethod, paymentMethodID)
+                    call.respondText(Json.encodeToString(paymentMethods))
+                }
+
+                delete("/paymentMethods/{paymentMethodID}") {
+                    val username = call.request.header("Authorization")
+                    if(username == null) {
+                        call.respond(HttpStatusCode.Unauthorized)
+                        return@delete
+                    }
+
+                    val paymentMethodID = call.parameters["paymentMethodID"]!!.toInt()
+
+                    val paymentMethods = database.deletePaymentMethod(username, paymentMethodID)
                     call.respondText(Json.encodeToString(paymentMethods))
                 }
 

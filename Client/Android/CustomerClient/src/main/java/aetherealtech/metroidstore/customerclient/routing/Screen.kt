@@ -99,7 +99,7 @@ sealed class Screen(
             val settingsViewModel = viewModel<SettingsViewModel>(
                 factory = rootViewModel.settings(
                     openAddresses = { router.openAddresses() },
-                    openPaymentMethods = { }
+                    openPaymentMethods = { router.openPaymentMethods() }
                 )
             )
 

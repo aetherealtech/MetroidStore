@@ -3,8 +3,11 @@ package aetherealtech.metroidstore.customerclient.fakedatasources
 import aetherealtech.metroidstore.customerclient.datasources.UserDataSource
 import aetherealtech.metroidstore.customerclient.model.Address
 import aetherealtech.metroidstore.customerclient.model.EditAddress
+import aetherealtech.metroidstore.customerclient.model.EditPaymentMethod
 import aetherealtech.metroidstore.customerclient.model.NewOrder
 import aetherealtech.metroidstore.customerclient.model.OrderID
+import aetherealtech.metroidstore.customerclient.model.PaymentMethodDetails
+import aetherealtech.metroidstore.customerclient.model.PaymentMethodID
 import aetherealtech.metroidstore.customerclient.model.PaymentMethodSummary
 import aetherealtech.metroidstore.customerclient.model.Price
 import aetherealtech.metroidstore.customerclient.model.ShippingMethod
@@ -59,6 +62,22 @@ class UserDataSourceFake: UserDataSource {
             isPrimary = false
         )
     )
+
+    private val _paymentMethods = persistentListOf(
+        PaymentMethodDetails(
+            id = PaymentMethodID(0),
+            name = "Credit",
+            number = PaymentMethodDetails.Number("1234123412341234"),
+            isPrimary = false
+        ),
+        PaymentMethodDetails(
+            id = PaymentMethodID(1),
+            name = "Theft",
+            number = PaymentMethodDetails.Number("9876987698769876"),
+            isPrimary = true
+        ),
+    )
+
     override suspend fun getAddresses(): ImmutableList<UserAddressSummary> {
         return _addresses
             .map { address -> address.summary }
@@ -73,10 +92,9 @@ class UserDataSourceFake: UserDataSource {
     }
 
     override suspend fun getPaymentMethods(): ImmutableList<PaymentMethodSummary> {
-        return persistentListOf(
-            PaymentMethodSummary(PaymentMethodSummary.ID(0), "Credit", isPrimary = false),
-            PaymentMethodSummary(PaymentMethodSummary.ID(1), "Theft", isPrimary = true),
-        )
+        return _paymentMethods
+            .map { paymentMethod -> paymentMethod.summary }
+            .toImmutableList()
     }
 
     override suspend fun getAddressDetails(): ImmutableList<UserAddressDetails> {
@@ -98,11 +116,34 @@ class UserDataSourceFake: UserDataSource {
     override suspend fun deleteAddress(id: Address.ID): ImmutableList<UserAddressDetails> {
         return _addresses
     }
+
+    override suspend fun getPaymentMethodDetails(): ImmutableList<PaymentMethodDetails> {
+        return _paymentMethods
+    }
+
+    override suspend fun createPaymentMethod(paymentMethod: EditPaymentMethod): ImmutableList<PaymentMethodDetails> {
+        return _paymentMethods
+    }
+
+    override suspend fun updatePaymentMethod(paymentMethod: EditPaymentMethod, id: PaymentMethodID): ImmutableList<PaymentMethodDetails> {
+        return _paymentMethods
+    }
+
+    override suspend fun deletePaymentMethod(id: PaymentMethodID): ImmutableList<PaymentMethodDetails> {
+        return _paymentMethods
+    }
 }
 
 val UserAddressDetails.summary: UserAddressSummary
     get() = UserAddressSummary(
         addressID = address.id,
+        name = name,
+        isPrimary = isPrimary
+    )
+
+val PaymentMethodDetails.summary: PaymentMethodSummary
+    get() = PaymentMethodSummary(
+        id = id,
         name = name,
         isPrimary = isPrimary
     )

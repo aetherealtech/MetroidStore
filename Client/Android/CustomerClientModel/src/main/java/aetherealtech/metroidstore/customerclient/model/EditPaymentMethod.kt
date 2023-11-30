@@ -1,9 +1,7 @@
 package aetherealtech.metroidstore.customerclient.model
 
-data class PaymentMethodSummary(
-    val id: ID,
+data class EditPaymentMethod(
     val name: String,
+    val number: PaymentMethodDetails.Number,
     val isPrimary: Boolean
-) {
-    data class ID(val value: Int)
-}
+)

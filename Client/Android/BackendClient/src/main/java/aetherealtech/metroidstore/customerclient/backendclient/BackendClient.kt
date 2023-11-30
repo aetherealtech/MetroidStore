@@ -4,12 +4,15 @@ import android.content.res.Resources
 import aetherealtech.metroidstore.customerclient.model.Address
 import aetherealtech.metroidstore.customerclient.model.CartItem
 import aetherealtech.metroidstore.customerclient.model.EditAddress
+import aetherealtech.metroidstore.customerclient.model.EditPaymentMethod
 import aetherealtech.metroidstore.customerclient.model.NewOrder
 import aetherealtech.metroidstore.customerclient.model.OrderActivity
 import aetherealtech.metroidstore.customerclient.model.OrderDetails
 import aetherealtech.metroidstore.customerclient.model.OrderID
 import aetherealtech.metroidstore.customerclient.model.OrderStatus
 import aetherealtech.metroidstore.customerclient.model.OrderSummary
+import aetherealtech.metroidstore.customerclient.model.PaymentMethodDetails
+import aetherealtech.metroidstore.customerclient.model.PaymentMethodID
 import aetherealtech.metroidstore.customerclient.model.PaymentMethodSummary
 import aetherealtech.metroidstore.customerclient.model.Price
 import aetherealtech.metroidstore.customerclient.model.ProductDetails
@@ -266,7 +269,7 @@ class BackendClient(
         return backendMethods
             .map { backendMethod ->
                 PaymentMethodSummary(
-                    id = PaymentMethodSummary.ID(backendMethod.id),
+                    id = PaymentMethodID(backendMethod.id),
                     name = backendMethod.name,
                     isPrimary = backendMethod.isPrimary
                 )
@@ -422,6 +425,29 @@ class BackendClient(
             .toImmutableList()
     }
 
+    suspend fun getPaymentMethodDetails(): ImmutableList<PaymentMethodDetails> {
+        val request = buildRequest { urlBuilder ->
+            urlBuilder
+                .addPathSegment("paymentMethods")
+                .addPathSegment("details")
+        }
+
+        val response = client.newCall(request).await()
+
+        val body = response.body
+
+        if(body == null)
+            throw IllegalStateException("Did not receive a response")
+
+        val backendPaymentMethods = Json.decodeFromString<List<aetherealtech.metroidstore.backendmodel.PaymentMethodDetails>>(
+            body.string()
+        )
+
+        return backendPaymentMethods
+            .map { paymentMethod -> paymentMethod.clientModel }
+            .toImmutableList()
+    }
+
     suspend fun createAddress(address: EditAddress): ImmutableList<UserAddressDetails> {
         val backendNewAddress = aetherealtech.metroidstore.backendmodel.EditAddress(
             name = address.name,
@@ -520,6 +546,92 @@ class BackendClient(
             .toImmutableList()
     }
 
+    suspend fun createPaymentMethod(paymentMethod: EditPaymentMethod): ImmutableList<PaymentMethodDetails> {
+        val backendNewPaymentMethod = aetherealtech.metroidstore.backendmodel.EditPaymentMethod(
+            name = paymentMethod.name,
+            number = paymentMethod.number.value,
+            isPrimary = paymentMethod.isPrimary
+        )
+
+        val request = buildRequest(
+            modifyRequest = { builder -> builder.post(Json.encodeToString(backendNewPaymentMethod).toRequestBody()) }
+        ) { urlBuilder ->
+            urlBuilder
+                .addPathSegment("paymentMethods")
+        }
+
+        val response = client.newCall(request).await()
+
+        val body = response.body
+
+        if(body == null)
+            throw IllegalStateException("Did not receive a response")
+
+        val backendPaymentMethods = Json.decodeFromString<List<aetherealtech.metroidstore.backendmodel.PaymentMethodDetails>>(
+            body.string()
+        )
+
+        return backendPaymentMethods
+            .map { backendPaymentMethod -> backendPaymentMethod.clientModel }
+            .toImmutableList()
+    }
+
+    suspend fun updatePaymentMethod(paymentMethod: EditPaymentMethod, id: PaymentMethodID): ImmutableList<PaymentMethodDetails> {
+        val backendNewPaymentMethod = aetherealtech.metroidstore.backendmodel.EditPaymentMethod(
+            name = paymentMethod.name,
+            number = paymentMethod.number.value,
+            isPrimary = paymentMethod.isPrimary
+        )
+
+        val request = buildRequest(
+            modifyRequest = { builder -> builder.patch(Json.encodeToString(backendNewPaymentMethod).toRequestBody()) }
+        ) { urlBuilder ->
+            urlBuilder
+                .addPathSegment("paymentMethods")
+                .addPathSegment("${id.value}")
+        }
+
+        val response = client.newCall(request).await()
+
+        val body = response.body
+
+        if(body == null)
+            throw IllegalStateException("Did not receive a response")
+
+        val backendPaymentMethods = Json.decodeFromString<List<aetherealtech.metroidstore.backendmodel.PaymentMethodDetails>>(
+            body.string()
+        )
+
+        return backendPaymentMethods
+            .map { backendPaymentMethod -> backendPaymentMethod.clientModel }
+            .toImmutableList()
+    }
+
+    suspend fun deletePaymentMethod(id: PaymentMethodID): ImmutableList<PaymentMethodDetails> {
+        val request = buildRequest(
+            modifyRequest = { builder -> builder.delete() }
+        ) { urlBuilder ->
+            urlBuilder
+                .addPathSegment("paymentMethods")
+                .addPathSegment("${id.value}")
+        }
+
+        val response = client.newCall(request).await()
+
+        val body = response.body
+
+        if(body == null)
+            throw IllegalStateException("Did not receive a response")
+
+        val backendPaymentMethods = Json.decodeFromString<List<aetherealtech.metroidstore.backendmodel.PaymentMethodDetails>>(
+            body.string()
+        )
+
+        return backendPaymentMethods
+            .map { backendPaymentMethod -> backendPaymentMethod.clientModel }
+            .toImmutableList()
+    }
+
     private val client = OkHttpClient()
     private val username = "mother_brain"
 
@@ -553,5 +665,13 @@ val aetherealtech.metroidstore.backendmodel.UserAddressDetails.clientModel: User
             planet = Address.Planet(planet),
             postalCode = postalCode?.let { postalCode -> Address.PostalCode(postalCode) }
         ),
+        isPrimary = isPrimary
+    )
+
+val aetherealtech.metroidstore.backendmodel.PaymentMethodDetails.clientModel: PaymentMethodDetails
+    get() = PaymentMethodDetails(
+        id = PaymentMethodID(id),
+        name = name,
+        number = PaymentMethodDetails.Number(number),
         isPrimary = isPrimary
     )

@@ -4,9 +4,11 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import aetherealtech.metroidstore.backendmodel.CartItem
 import aetherealtech.metroidstore.backendmodel.EditAddress
+import aetherealtech.metroidstore.backendmodel.EditPaymentMethod
 import aetherealtech.metroidstore.backendmodel.OrderActivity
 import aetherealtech.metroidstore.backendmodel.OrderDetails
 import aetherealtech.metroidstore.backendmodel.OrderSummary
+import aetherealtech.metroidstore.backendmodel.PaymentMethodDetails
 import aetherealtech.metroidstore.backendmodel.PaymentMethodSummary
 import aetherealtech.metroidstore.backendmodel.ProductDetails
 import aetherealtech.metroidstore.backendmodel.ProductSummary
@@ -656,6 +658,117 @@ fun SQLiteDatabase.deleteAddress(
         setTransactionSuccessful()
 
         return addresses
+    } finally {
+        endTransaction()
+    }
+}
+
+fun SQLiteDatabase.paymentMethodDetails(username: String): List<PaymentMethodDetails> {
+    return rawQuery(
+        """
+            SELECT
+                id,
+                name, 
+                number,
+                isPrimary 
+            FROM PaymentMethods
+            WHERE username = ?
+            """,
+        arrayOf(username)
+    ).use { cursor ->
+        val results = mutableListOf<PaymentMethodDetails>()
+
+        while(cursor.moveToNext()) {
+            results.add(
+                PaymentMethodDetails(
+                    id = cursor.getInt(0),
+                    name = cursor.getString(1),
+                    number = cursor.getString(2),
+                    isPrimary = cursor.getInt(3) != 0
+                )
+            )
+        }
+
+        return@use results.toImmutableList()
+    }
+}
+
+fun SQLiteDatabase.createPaymentMethod(
+    username: String,
+    paymentMethod: EditPaymentMethod
+): List<PaymentMethodDetails> {
+    beginTransaction()
+
+    try {
+        if(paymentMethod.isPrimary) {
+            execSQL(
+                "UPDATE PaymentMethods SET isPrimary = 0 WHERE username = ?",
+                arrayOf(username)
+            )
+        }
+
+        execSQL(
+            "INSERT INTO PaymentMethods (username, name, number, isPrimary) VALUES (?, ?, ?, ?)",
+            arrayOf(username, paymentMethod.name, paymentMethod.number, paymentMethod.isPrimary)
+        )
+
+        val paymentMethods = paymentMethodDetails(username)
+
+        setTransactionSuccessful()
+
+        return paymentMethods
+    } finally {
+        endTransaction()
+    }
+}
+
+fun SQLiteDatabase.updatePaymentMethod(
+    username: String,
+    paymentMethod: EditPaymentMethod,
+    paymentMethodID: Int
+): List<PaymentMethodDetails> {
+    beginTransaction()
+
+    try {
+        if(paymentMethod.isPrimary) {
+            execSQL(
+                "UPDATE PaymentMethods SET isPrimary = 0 WHERE username = ?",
+                arrayOf(username)
+            )
+        }
+
+        execSQL(
+            "UPDATE PaymentMethods SET name = ?, number = ?, isPrimary = ? WHERE username = ? AND id = ?",
+            arrayOf(paymentMethod.name, paymentMethod.number, paymentMethod.isPrimary, username, paymentMethodID)
+        )
+
+        val paymentMethods = paymentMethodDetails(username)
+
+        setTransactionSuccessful()
+
+        return paymentMethods
+    } finally {
+        endTransaction()
+    }
+}
+
+fun SQLiteDatabase.deletePaymentMethod(
+    username: String,
+    paymentMethodID: Int
+): List<PaymentMethodDetails> {
+    beginTransaction()
+
+    try {
+        execSQL(
+            "DELETE FROM PaymentMethods WHERE id = ?",
+            arrayOf(paymentMethodID)
+        )
+
+        val paymentMethods = paymentMethodDetails(username)
+
+        setTransactionSuccessful()
+
+        return paymentMethods
     } finally {
         endTransaction()
     }

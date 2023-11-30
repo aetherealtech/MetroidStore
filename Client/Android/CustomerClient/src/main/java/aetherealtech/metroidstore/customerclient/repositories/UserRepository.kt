@@ -3,7 +3,10 @@ package aetherealtech.metroidstore.customerclient.repositories
 import aetherealtech.metroidstore.customerclient.datasources.UserDataSource
 import aetherealtech.metroidstore.customerclient.model.Address
 import aetherealtech.metroidstore.customerclient.model.EditAddress
+import aetherealtech.metroidstore.customerclient.model.EditPaymentMethod
 import aetherealtech.metroidstore.customerclient.model.NewOrder
+import aetherealtech.metroidstore.customerclient.model.PaymentMethodDetails
+import aetherealtech.metroidstore.customerclient.model.PaymentMethodID
 import aetherealtech.metroidstore.customerclient.model.PaymentMethodSummary
 import aetherealtech.metroidstore.customerclient.model.ShippingMethod
 import aetherealtech.metroidstore.customerclient.model.UserAddressDetails
@@ -29,6 +32,7 @@ class UserRepository(
         MutableStateFlow<ImmutableList<PaymentMethodSummary>>(persistentListOf())
 
     private val _addressDetails = MutableStateFlow<ImmutableList<UserAddressDetails>>(persistentListOf())
+    private val _paymentMethodDetails = MutableStateFlow<ImmutableList<PaymentMethodDetails>>(persistentListOf())
 
     private val _processes = MutableStateFlow(0)
 
@@ -44,6 +48,9 @@ class UserRepository(
     val addressDetails = _addressDetails
         .asStateFlow()
 
+    val paymentMethodDetails = _paymentMethodDetails
+        .asStateFlow()
+
     val busy = _processes
         .mapState { processes -> processes > 0 }
 
@@ -56,6 +63,20 @@ class UserRepository(
                             addressID = addressDetails.address.id,
                             name = addressDetails.name,
                             isPrimary = addressDetails.isPrimary
+                        )
+                    }
+                    .toImmutableList()
+            }
+        }
+
+        CoroutineScope(Dispatchers.IO).launch {
+            _paymentMethodDetails.collect { paymentMethodDetailsList ->
+                _paymentMethods.value = paymentMethodDetailsList
+                    .map { paymentMethodDetails ->
+                        PaymentMethodSummary(
+                            id = paymentMethodDetails.id,
+                            name = paymentMethodDetails.name,
+                            isPrimary = paymentMethodDetails.isPrimary
                         )
                     }
                     .toImmutableList()
@@ -79,10 +100,14 @@ class UserRepository(
         update { _addressDetails.value = dataSource.getAddressDetails() }
     }
 
+    suspend fun updatePaymentMethodDetails() {
+        update { _paymentMethodDetails.value = dataSource.getPaymentMethodDetails() }
+    }
+
     suspend fun placeOrder(order: NewOrder) = dataSource.placeOrder(order)
 
     suspend fun createAddress(address: EditAddress) {
-        update {  _addressDetails.value = dataSource.createAddress(address) }
+        update { _addressDetails.value = dataSource.createAddress(address) }
     }
 
     suspend fun updateAddress(address: EditAddress, id: Address.ID) {
@@ -91,6 +116,18 @@ class UserRepository(
 
     suspend fun deleteAddress(id: Address.ID) {
         update { _addressDetails.value = dataSource.deleteAddress(id) }
+    }
+
+    suspend fun createPaymentMethod(paymentMethod: EditPaymentMethod) {
+        update { _paymentMethodDetails.value = dataSource.createPaymentMethod(paymentMethod) }
+    }
+
+    suspend fun updatePaymentMethod(paymentMethod: EditPaymentMethod, id: PaymentMethodID) {
+        update { _paymentMethodDetails.value = dataSource.updatePaymentMethod(paymentMethod, id) }
+    }
+
+    suspend fun deletePaymentMethod(id: PaymentMethodID) {
+        update { _paymentMethodDetails.value = dataSource.deletePaymentMethod(id) }
     }
 
     private suspend fun update(

@@ -8,12 +8,17 @@ import aetherealtech.metroidstore.customerclient.cart.CartViewModel
 import aetherealtech.metroidstore.customerclient.checkout.CheckoutView
 import aetherealtech.metroidstore.customerclient.checkout.CheckoutViewModel
 import aetherealtech.metroidstore.customerclient.datasources.DataSource
+import aetherealtech.metroidstore.customerclient.editpaymentmethod.EditPaymentMethodView
+import aetherealtech.metroidstore.customerclient.editpaymentmethod.EditPaymentMethodViewModel
 import aetherealtech.metroidstore.customerclient.model.Address
 import aetherealtech.metroidstore.customerclient.model.OrderID
+import aetherealtech.metroidstore.customerclient.model.PaymentMethodID
 import aetherealtech.metroidstore.customerclient.model.ProductID
 import aetherealtech.metroidstore.customerclient.orderdetails.OrderDetailsView
 import aetherealtech.metroidstore.customerclient.orderdetails.OrderDetailsViewModel
 import aetherealtech.metroidstore.customerclient.orders.OrdersViewModel
+import aetherealtech.metroidstore.customerclient.paymentmethods.PaymentMethodsView
+import aetherealtech.metroidstore.customerclient.paymentmethods.PaymentMethodsViewModel
 import aetherealtech.metroidstore.customerclient.productdetail.ProductDetailView
 import aetherealtech.metroidstore.customerclient.productdetail.ProductDetailViewModel
 import aetherealtech.metroidstore.customerclient.productlist.ProductListViewModel
@@ -27,10 +32,12 @@ import aetherealtech.metroidstore.customerclient.routing.rememberRouter
 import aetherealtech.metroidstore.customerclient.settings.SettingsViewModel
 import aetherealtech.metroidstore.customerclient.utilities.AddressIDType
 import aetherealtech.metroidstore.customerclient.utilities.OrderIDType
+import aetherealtech.metroidstore.customerclient.utilities.PaymentMethodIDType
 import aetherealtech.metroidstore.customerclient.utilities.ProductIDType
 import aetherealtech.metroidstore.customerclient.utilities.ViewModelFactory
 import aetherealtech.metroidstore.customerclient.utilities.getAddressID
 import aetherealtech.metroidstore.customerclient.utilities.getOrderID
+import aetherealtech.metroidstore.customerclient.utilities.getPaymentMethodID
 import aetherealtech.metroidstore.customerclient.utilities.getProductID
 import aetherealtech.metroidstore.customerclient.utilities.viewModel
 import androidx.compose.foundation.layout.padding
@@ -177,7 +184,7 @@ fun RootView(
             }
 
             composable(
-                "addaddress"
+                "addAddress"
             ) {backstackEntry ->
                 val addAddressViewModel = viewModel(
                     factory = viewModel.addAddress(
@@ -192,7 +199,7 @@ fun RootView(
             }
 
             composable(
-                "editaddress/{addressID}",
+                "editAddress/{addressID}",
                 arguments = listOf(navArgument("addressID") { type = NavType.AddressIDType })
             ) {backstackEntry ->
                 val addressID = backstackEntry.arguments!!.getAddressID("addressID")
@@ -207,6 +214,56 @@ fun RootView(
                 EditAddressView(
                     setAppBarState = setAppBarState,
                     viewModel = addAddressViewModel
+                )
+            }
+
+            composable(
+                "paymentMethods"
+            ) { backstackEntry ->
+                val paymentMethodsViewModel = viewModel(
+                    factory = viewModel.paymentMethods(
+                        openAddPaymentMethod = { router.openAddPaymentMethod() },
+                        openEditPaymentMethod = { id -> router.openEditPaymentMethod(id) }
+                    )
+                )
+
+                PaymentMethodsView(
+                    setAppBarState = setAppBarState,
+                    viewModel = paymentMethodsViewModel
+                )
+            }
+
+            composable(
+                "addPaymentMethod"
+            ) {backstackEntry ->
+                val addPaymentMethodViewModel = viewModel(
+                    factory = viewModel.addPaymentMethod(
+                        onSaveComplete = { router.back() }
+                    )
+                )
+
+                EditPaymentMethodView(
+                    setAppBarState = setAppBarState,
+                    viewModel = addPaymentMethodViewModel
+                )
+            }
+
+            composable(
+                "editPaymentMethod/{paymentMethodID}",
+                arguments = listOf(navArgument("paymentMethodID") { type = NavType.PaymentMethodIDType })
+            ) {backstackEntry ->
+                val paymentMethodID = backstackEntry.arguments!!.getPaymentMethodID("paymentMethodID")
+
+                val addPaymentMethodViewModel = viewModel(
+                    factory = viewModel.editPaymentMethod(
+                        id = paymentMethodID,
+                        onSaveComplete = { router.back() }
+                    )
+                )
+
+                EditPaymentMethodView(
+                    setAppBarState = setAppBarState,
+                    viewModel = addPaymentMethodViewModel
                 )
             }
         }
@@ -328,6 +385,37 @@ class RootViewModel(
         onSaveComplete: () -> Unit
     ) = object : ViewModelFactory<EditAddressViewModel>() {
         override fun create() = EditAddressViewModel.edit(
+            id = id,
+            repository = userRepository,
+            onSaveComplete = onSaveComplete
+        )
+    }
+
+    fun paymentMethods(
+        openAddPaymentMethod: () -> Unit,
+        openEditPaymentMethod: (PaymentMethodID) -> Unit
+    ) = object : ViewModelFactory<PaymentMethodsViewModel>() {
+        override fun create() = PaymentMethodsViewModel(
+            repository = userRepository,
+            openAddPaymentMethod = openAddPaymentMethod,
+            openEditPaymentMethod = openEditPaymentMethod
+        )
+    }
+
+    fun addPaymentMethod(
+        onSaveComplete: () -> Unit
+    ) = object : ViewModelFactory<EditPaymentMethodViewModel>() {
+        override fun create() = EditPaymentMethodViewModel.new(
+            repository = userRepository,
+            onSaveComplete = onSaveComplete
+        )
+    }
+
+    fun editPaymentMethod(
+        id: PaymentMethodID,
+        onSaveComplete: () -> Unit
+    ) = object : ViewModelFactory<EditPaymentMethodViewModel>() {
+        override fun create() = EditPaymentMethodViewModel.edit(
             id = id,
             repository = userRepository,
             onSaveComplete = onSaveComplete
