@@ -23,6 +23,7 @@ import aetherealtech.metroidstore.customerclient.model.ProductID
 import aetherealtech.metroidstore.customerclient.model.itemCount
 import aetherealtech.metroidstore.customerclient.model.subtotal
 import aetherealtech.metroidstore.customerclient.repositories.CartRepository
+import aetherealtech.metroidstore.customerclient.routing.AppBarState
 import aetherealtech.metroidstore.customerclient.ui.theme.MetroidStoreTheme
 import aetherealtech.metroidstore.customerclient.utilities.mapState
 import aetherealtech.metroidstore.customerclient.widgets.AsyncLoadedShimmering
@@ -31,6 +32,7 @@ import aetherealtech.metroidstore.customerclient.widgets.PriceView
 import aetherealtech.metroidstore.customerclient.widgets.PriceViewModel
 import aetherealtech.metroidstore.customerclient.uitoolkit.PrimaryCallToAction
 import aetherealtech.metroidstore.customerclient.uitoolkit.PrimaryCallToActionViewModel
+import androidx.compose.runtime.LaunchedEffect
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.StateFlow
@@ -39,8 +41,15 @@ import kotlinx.coroutines.launch
 @Composable
 fun CartView(
     modifier: Modifier = Modifier,
+    setAppBarState: (AppBarState) -> Unit,
     viewModel: CartViewModel
 ) {
+    LaunchedEffect(Unit) {
+        setAppBarState(AppBarState(
+            title = "Cart"
+        ))
+    }
+
     BusyView(
         busy = viewModel.busy
     ) {
@@ -152,6 +161,7 @@ class CartSummaryViewModel(
 fun CartPreview() {
     MetroidStoreTheme {
         CartView(
+            setAppBarState = { },
             viewModel = CartViewModel(
                 repository = CartRepository(
                     dataSource = DataSourceFake().cart

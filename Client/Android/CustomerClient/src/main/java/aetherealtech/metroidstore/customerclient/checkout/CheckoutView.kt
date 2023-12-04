@@ -33,6 +33,7 @@ import aetherealtech.metroidstore.customerclient.orderconfirmation.PlaceOrderBut
 import aetherealtech.metroidstore.customerclient.orderconfirmation.PlaceOrderViewModel
 import aetherealtech.metroidstore.customerclient.repositories.CartRepository
 import aetherealtech.metroidstore.customerclient.repositories.UserRepository
+import aetherealtech.metroidstore.customerclient.routing.AppBarState
 import aetherealtech.metroidstore.customerclient.ui.theme.MetroidStoreTheme
 import aetherealtech.metroidstore.customerclient.utilities.StateFlows
 import aetherealtech.metroidstore.customerclient.utilities.mapState
@@ -41,6 +42,7 @@ import aetherealtech.metroidstore.customerclient.widgets.DropDownList
 import aetherealtech.metroidstore.customerclient.widgets.DropDownViewModel
 import aetherealtech.metroidstore.customerclient.widgets.PriceView
 import aetherealtech.metroidstore.customerclient.widgets.PriceViewModel
+import androidx.compose.runtime.LaunchedEffect
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.StateFlow
@@ -49,8 +51,15 @@ import kotlinx.coroutines.launch
 @Composable
 fun CheckoutView(
     modifier: Modifier = Modifier,
+    setAppBarState: (AppBarState) -> Unit,
     viewModel: CheckoutViewModel
 ) {
+    LaunchedEffect(Unit) {
+        setAppBarState(AppBarState(
+            title = "Checkout"
+        ))
+    }
+
     BusyView(
         busy = viewModel.busy
     ) {
@@ -311,6 +320,7 @@ class CheckoutSummaryViewModel(
 fun CheckoutPreview() {
     MetroidStoreTheme {
         CheckoutView(
+            setAppBarState = { },
             viewModel = CheckoutViewModel(
                 cartRepository = CartRepository(
                     dataSource = DataSourceFake().cart

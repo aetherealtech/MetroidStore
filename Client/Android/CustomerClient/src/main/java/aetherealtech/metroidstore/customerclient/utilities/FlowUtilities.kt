@@ -1,9 +1,14 @@
 package aetherealtech.metroidstore.customerclient.utilities
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 data class Quadruple<out T1, out T2, out T3, out T4>(
@@ -85,6 +90,22 @@ fun <T, K> StateFlow<T>.mapState(
             })
         }
     }
+}
+
+fun <T> Flow<T>.cacheLatest(
+    initialValue: T
+): StateFlow<T> {
+    val result = MutableStateFlow<T>(initialValue)
+
+    CoroutineScope(Dispatchers.IO).launch {
+        collect(object : FlowCollector<T> {
+            override suspend fun emit(value: T) {
+                result.value = value
+            }
+        })
+    }
+
+    return result.asStateFlow()
 }
 
 class StateFlows private constructor() {

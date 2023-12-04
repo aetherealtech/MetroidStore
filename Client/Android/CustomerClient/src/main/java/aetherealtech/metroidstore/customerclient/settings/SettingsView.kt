@@ -1,5 +1,6 @@
 package aetherealtech.metroidstore.customerclient.settings
 
+import aetherealtech.metroidstore.customerclient.routing.AppBarState
 import aetherealtech.metroidstore.customerclient.ui.theme.MetroidStoreTheme
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -16,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,8 +32,15 @@ import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun SettingsView(
+    setAppBarState: (AppBarState) -> Unit,
     viewModel: SettingsViewModel
 ) {
+    LaunchedEffect(Unit) {
+        setAppBarState(AppBarState(
+            title = "Settings"
+        ))
+    }
+
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 128.dp),
         contentPadding = PaddingValues(16.dp),
@@ -101,6 +110,7 @@ class SettingsViewModel(
 fun SettingsPreview() {
     MetroidStoreTheme {
         SettingsView(
+            setAppBarState = { },
             viewModel = SettingsViewModel(
                 openAddresses = { },
                 openPaymentMethods = { }

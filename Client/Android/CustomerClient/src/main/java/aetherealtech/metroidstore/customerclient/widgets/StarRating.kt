@@ -62,16 +62,21 @@ fun StarRatingView(
 }
 
 class StarRatingViewModel private constructor(
-    ratings: List<Rating>
+    ratingCount: Int,
+    rating: Float
 ): ViewModel() {
     companion object {
         fun create(
-            ratings: List<Rating>
+            ratingCount: Int,
+            rating: Float?
         ): StarRatingViewModel? {
-            if(ratings.isEmpty())
+            if(ratingCount == 0 || rating == null)
                 return null
 
-            return StarRatingViewModel(ratings)
+            return StarRatingViewModel(
+                ratingCount,
+                rating
+            )
         }
     }
 
@@ -82,10 +87,8 @@ class StarRatingViewModel private constructor(
     val count: String
 
     init {
-        val rating = ratings.rating
-
         this.rating = rating.toInt()
         this.displayedRating = format.format(rating)
-        this.count = "(${ratings.size})"
+        this.count = "(${ratingCount})"
     }
 }

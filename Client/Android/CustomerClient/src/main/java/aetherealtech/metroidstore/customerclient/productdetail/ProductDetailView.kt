@@ -23,8 +23,12 @@ import aetherealtech.metroidstore.customerclient.ui.theme.MetroidStoreTheme
 import aetherealtech.metroidstore.customerclient.utilities.parallelMap
 import aetherealtech.metroidstore.customerclient.addtocart.AddToCartButton
 import aetherealtech.metroidstore.customerclient.addtocart.AddToCartViewModel
+import aetherealtech.metroidstore.customerclient.routing.AppBarState
 import aetherealtech.metroidstore.customerclient.widgets.AsyncLoadedShimmering
 import aetherealtech.metroidstore.customerclient.widgets.ImagesCarousel
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.asImageBitmap
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -34,8 +38,17 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun ProductDetailView(
+    setAppBarState: (AppBarState) -> Unit,
     viewModel: ProductDetailViewModel
 ) {
+    val name by viewModel.name.collectAsState()
+
+    LaunchedEffect(name) {
+        setAppBarState(AppBarState(
+            title = name ?: "Loading..."
+        ))
+    }
+
     Column(
         modifier = Modifier.padding(
             horizontal = 16.dp
@@ -113,6 +126,7 @@ class ProductDetailViewModel(
 fun ProductDetailPreview() {
     MetroidStoreTheme {
         ProductDetailView(
+            setAppBarState = { },
             viewModel = ProductDetailViewModel(
                 productID = ProductID(0),
                 repository = ProductRepository(

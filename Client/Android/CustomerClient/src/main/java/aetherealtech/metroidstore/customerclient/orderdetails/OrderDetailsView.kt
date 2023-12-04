@@ -7,6 +7,7 @@ import aetherealtech.metroidstore.customerclient.model.ProductID
 import aetherealtech.metroidstore.customerclient.orderactivity.OrderActivityView
 import aetherealtech.metroidstore.customerclient.orderactivity.OrderActivityViewModel
 import aetherealtech.metroidstore.customerclient.repositories.OrderRepository
+import aetherealtech.metroidstore.customerclient.routing.AppBarState
 import aetherealtech.metroidstore.customerclient.ui.theme.MetroidStoreTheme
 import aetherealtech.metroidstore.customerclient.utilities.displayString
 import aetherealtech.metroidstore.customerclient.widgets.AsyncLoadedShimmering
@@ -23,6 +24,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,8 +43,15 @@ import kotlinx.coroutines.launch
 @Composable
 fun OrderDetailsView(
     modifier: Modifier = Modifier,
+    setAppBarState: (AppBarState) -> Unit,
     viewModel: OrderDetailsViewModel
 ) {
+    LaunchedEffect(Unit) {
+        setAppBarState(AppBarState(
+            title = "Order #${viewModel.orderID.value}"
+        ))
+    }
+
     AsyncLoadedShimmering(
         modifier = modifier,
         data = viewModel.content
@@ -147,7 +156,7 @@ fun OrderDetailsSummaryView(
 }
 
 class OrderDetailsViewModel(
-    private val orderID: OrderID,
+    val orderID: OrderID,
     private val repository: OrderRepository,
     selectItem: (ProductID) -> Unit
 ): ViewModel() {
@@ -233,6 +242,7 @@ class OrderDetailsSummaryViewModel(
 fun OrderDetailsPreview() {
     MetroidStoreTheme {
         OrderDetailsView(
+            setAppBarState = { },
             viewModel = OrderDetailsViewModel(
                 orderID = OrderID(1),
                 repository = OrderRepository(

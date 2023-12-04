@@ -12,48 +12,104 @@ import androidx.lifecycle.viewModelScope
 import aetherealtech.metroidstore.customerclient.fakedatasources.DataSourceFake
 import aetherealtech.metroidstore.customerclient.model.ProductID
 import aetherealtech.metroidstore.customerclient.repositories.ProductRepository
+import aetherealtech.metroidstore.customerclient.routing.AppBarState
 import aetherealtech.metroidstore.customerclient.ui.theme.MetroidStoreTheme
+import aetherealtech.metroidstore.customerclient.utilities.cacheLatest
+import aetherealtech.metroidstore.customerclient.utilities.mapState
+import aetherealtech.metroidstore.customerclient.widgets.AsyncLoadedShimmering
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SearchBar
+import androidx.compose.material3.Text
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductListView(
     modifier: Modifier = Modifier,
+    setAppBarState: (AppBarState) -> Unit,
     viewModel: ProductListViewModel
 ) {
-    val items by viewModel.items.collectAsState()
+    var searchQuery by remember { mutableStateOf(viewModel.searchQuery.value ?: "") }
 
-    LazyColumn(modifier = modifier) {
-        this.items(items) { rowViewModel ->
-            ProductRowView(
-                viewModel = rowViewModel
-            )
+    LaunchedEffect(Unit) {
+        setAppBarState(AppBarState(
+            title = {
+                SearchBar(
+                    query = searchQuery,
+                    onQueryChange = { newQuery -> searchQuery = newQuery },
+                    onSearch = { viewModel.searchQuery.value = if (searchQuery.isEmpty()) null else searchQuery },
+                    active = false,
+                    onActiveChange = { },
+                    modifier = Modifier
+                        .padding(bottom = 8.dp),
+                    placeholder = { Text("Search Products") },
+                    shape = RoundedCornerShape(8.dp),
+                    content = { }
+                )
+            }
+        ))
+    }
+
+    AsyncLoadedShimmering(
+        modifier = modifier,
+        data = viewModel.items
+    ) { modifier, items ->
+        LazyColumn(modifier = modifier) {
+            this.items(items) { rowViewModel ->
+                ProductRowView(
+                    viewModel = rowViewModel
+                )
+            }
         }
     }
 }
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class ProductListViewModel(
     productRepository: ProductRepository,
     selectProduct: (ProductID) -> Unit
 ): ViewModel() {
+    val items: StateFlow<ImmutableList<ProductRowViewModel>?>
 
-    private val _items = MutableStateFlow<ImmutableList<ProductRowViewModel>>(persistentListOf())
-
-    val items = _items.asStateFlow()
+    val searchQuery = MutableStateFlow<String?>(null)
 
     init {
-        viewModelScope.launch {
-            _items.value = productRepository.getProducts()
-                .map { product -> ProductRowViewModel(
-                    product = product,
-                    select = { selectProduct(product.id) }
-                ) }
-                .toImmutableList()
-        }
+        items = searchQuery
+            .flatMapLatest { searchQuery ->
+                val result = MutableStateFlow<ImmutableList<ProductRowViewModel>?>(null)
+
+                viewModelScope.launch {
+                    result.value = productRepository.getProducts(searchQuery)
+                        .map { product ->
+                            ProductRowViewModel(
+                                product = product,
+                                select = { selectProduct(product.id) }
+                            )
+                        }
+                        .toImmutableList()
+                }
+
+                return@flatMapLatest result
+            }
+            .cacheLatest(initialValue = null)
     }
 }
 
@@ -62,6 +118,7 @@ class ProductListViewModel(
 fun ProductListPreview() {
     MetroidStoreTheme {
         ProductListView(
+            setAppBarState = { },
             viewModel = ProductListViewModel(
                 productRepository = ProductRepository(
                     dataSource = DataSourceFake()

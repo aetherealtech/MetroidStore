@@ -31,8 +31,6 @@ import aetherealtech.metroidstore.customerclient.widgets.PriceView
 import aetherealtech.metroidstore.customerclient.widgets.PriceViewModel
 import aetherealtech.metroidstore.customerclient.widgets.QuantityControl
 import aetherealtech.metroidstore.customerclient.widgets.ShadowButton
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 @Composable

@@ -59,47 +59,40 @@ class EmbeddedDatabase {
     }
 }
 
-fun SQLiteDatabase.products(): List<ProductSummary> {
-    data class RatingQuery(val productID: Int, val rating: Int)
-
-    val allRatings = rawQuery(
-        "SELECT productID, rating FROM ProductReviews",
-        emptyArray()
-    ).use { cursor ->
-        val results = mutableListOf<RatingQuery>()
-
-        while(cursor.moveToNext()) {
-            results.add(RatingQuery(
-                productID = cursor.getInt(0),
-                rating = cursor.getInt(1)
-            ))
-        }
-
-        return@use results
-    }
-
+fun SQLiteDatabase.products(query: String?): List<ProductSummary> {
     return rawQuery(
-        "SELECT Products.id, Images.id, Products.name, Products.type, Products.game, Products.price FROM Products LEFT JOIN ProductImages ON ProductImages.productID = Products.id JOIN Images ON Images.id = ProductImages.imageID WHERE ProductImages.isPrimary = 1",
-        emptyArray()
+        """
+        SELECT
+            Products.id,
+            Images.id,
+            Products.name,
+            Products.type,
+            Products.game,
+            Products.price,
+            COUNT(ProductReviews.rating),
+            AVG(ProductReviews.rating)
+        FROM Products
+        LEFT JOIN ProductImages ON ProductImages.productID = Products.id
+        JOIN Images ON Images.id = ProductImages.imageID
+        LEFT JOIN ProductReviews ON ProductReviews.productID = Products.id
+        WHERE ProductImages.isPrimary = 1 AND Products.name LIKE ?
+        GROUP BY Products.id    
+        """,
+        arrayOf("%${query ?: ""}%")
     ).use { cursor ->
         val results = mutableListOf<ProductSummary>()
 
         while(cursor.moveToNext()) {
-            val productID = cursor.getInt(0)
-
-            val ratings = allRatings
-                .filter { rating -> rating.productID == productID }
-                .map { rating -> rating.rating }
-
             results.add(
                 ProductSummary(
-                    id = productID,
+                    id = cursor.getInt(0),
                     image = "images/${cursor.getInt(1)}",
                     name = cursor.getString(2),
                     type = cursor.getString(3),
                     game = cursor.getString(4),
-                    ratings = ratings,
-                    priceCents = cursor.getInt(5)
+                    priceCents = cursor.getInt(5),
+                    ratingCount = cursor.getInt(6),
+                    rating = cursor.getFloat(7)
                 )
             )
         }

@@ -1,4 +1,4 @@
-package aetherealtech.metroidstore.customerclient.modifiers
+package aetherealtech.metroidstore.customerclient.widgets
 
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat

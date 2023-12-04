@@ -25,16 +25,6 @@ class Router(
     private val navController: NavHostController,
     private val _topBarState: MutableState<AppBarState>
 ) {
-    init {
-        CoroutineScope(Dispatchers.Default).launch {
-            navController.currentBackStack
-                .drop(1)
-                .collect {
-                    _topBarState.value = AppBarState.default
-                }
-        }
-    }
-
     val previousBackStackEntry: NavBackStackEntry?
         get() {
             return navController.previousBackStackEntry

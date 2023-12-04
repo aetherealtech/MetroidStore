@@ -98,7 +98,7 @@ class ProductRowViewModel(
         name = product.name
         type = product.type
         game = product.game
-        ratings = StarRatingViewModel.create(product.ratings)
+        ratings = StarRatingViewModel.create(product.ratingCount, product.rating)
         price = PriceViewModel(product.price)
     }
 }

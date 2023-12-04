@@ -9,6 +9,7 @@ data class ProductSummary(
     val name: String,
     val type: String,
     val game: String,
-    val ratings: List<Int>,
     val priceCents: Int,
+    val ratingCount: Int,
+    val rating: Float?
 )

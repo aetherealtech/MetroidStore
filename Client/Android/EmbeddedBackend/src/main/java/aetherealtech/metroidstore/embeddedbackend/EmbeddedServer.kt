@@ -30,8 +30,14 @@ class EmbeddedServer(
         embeddedServer(Netty, port = port.toInt()) {
             routing {
                 get("/products") {
-                    val products = database.products()
-                    call.respondText(Json.encodeToString(products))
+                    val query = call.request.queryParameters["query"]
+
+                    try {
+                        val products = database.products(query)
+                        call.respondText(Json.encodeToString(products))
+                    } catch(error: Exception) {
+                        println(error.localizedMessage)
+                    }
                 }
 
                 get("/products/{productID}") {

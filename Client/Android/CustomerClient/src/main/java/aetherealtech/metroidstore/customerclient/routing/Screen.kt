@@ -43,7 +43,7 @@ sealed class Screen(
         title = "Browse",
         icon = Icons.Filled.List,
         route = "productList",
-        content = { router, _, rootViewModel ->
+        content = { router, setAppBarState, rootViewModel ->
             val productListViewModel = viewModel<ProductListViewModel>(
                 factory = rootViewModel.productList(
                     openProductDetails = { productID -> router.viewProductDetails(productID) }
@@ -51,6 +51,7 @@ sealed class Screen(
             )
 
             ProductListView(
+                setAppBarState = setAppBarState,
                 viewModel = productListViewModel
             )
         }
@@ -60,7 +61,7 @@ sealed class Screen(
         title = "Cart",
         icon = Icons.Filled.ShoppingCart,
         route = "cart",
-        content = { router, _, rootViewModel ->
+        content = { router, setAppBarState, rootViewModel ->
             val cartViewModel = viewModel<CartViewModel>(
                 factory = rootViewModel.cart(
                     openProductDetails = { productID -> router.viewProductDetails(productID) },
@@ -69,6 +70,7 @@ sealed class Screen(
             )
 
             CartView(
+                setAppBarState = setAppBarState,
                 viewModel = cartViewModel
             )
         }
@@ -78,7 +80,7 @@ sealed class Screen(
         title = "Orders",
         icon = { ImageVector.vectorResource(R.drawable.baseline_receipt_long_24) },
         route = "orders",
-        content = { router, _, rootViewModel ->
+        content = { router, setAppBarState, rootViewModel ->
             val ordersViewModel = viewModel<OrdersViewModel>(
                 factory = rootViewModel.orders(
                     viewOrder = { orderID -> router.viewOrder(orderID) }
@@ -86,6 +88,7 @@ sealed class Screen(
             )
 
             OrdersView(
+                setAppBarState = setAppBarState,
                 viewModel = ordersViewModel
             )
         }
@@ -95,7 +98,7 @@ sealed class Screen(
         title = "Settings",
         icon = Icons.Filled.Settings,
         route = "settings",
-        content = { router, _, rootViewModel ->
+        content = { router, setAppBarState, rootViewModel ->
             val settingsViewModel = viewModel<SettingsViewModel>(
                 factory = rootViewModel.settings(
                     openAddresses = { router.openAddresses() },
@@ -104,6 +107,7 @@ sealed class Screen(
             )
 
             SettingsView(
+                setAppBarState = setAppBarState,
                 viewModel = settingsViewModel
             )
         }

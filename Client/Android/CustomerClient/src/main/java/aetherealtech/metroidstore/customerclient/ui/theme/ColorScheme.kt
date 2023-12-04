@@ -18,13 +18,13 @@ import androidx.core.view.WindowCompat
 private class ColorScheme private constructor() {
     companion object {
         val Dark = darkColorScheme(
-            primary = Colors.Purple80,
+            primary = Colors.BarBackground,
             secondary = Colors.PurpleGrey80,
             tertiary = Colors.Pink80
         )
 
         val Light = lightColorScheme(
-            primary = Colors.Purple40,
+            primary = Colors.BarBackground,
             secondary = Colors.PurpleGrey40,
             tertiary = Colors.Pink40
 
@@ -50,10 +50,10 @@ fun MetroidStoreTheme(
         content: @Composable () -> Unit
 ) {
     val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
+//        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+//            val context = LocalContext.current
+//            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+//        }
 
         darkTheme -> ColorScheme.Dark
         else -> ColorScheme.Light

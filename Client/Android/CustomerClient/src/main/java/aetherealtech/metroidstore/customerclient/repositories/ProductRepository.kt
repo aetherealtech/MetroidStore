@@ -9,6 +9,6 @@ class ProductRepository(
     private val productsProductDataSource = dataSource.products
 
     val cart = CartRepository(dataSource.cart)
-    suspend fun getProducts() = productsProductDataSource.getProducts()
+    suspend fun getProducts(query: String?) = productsProductDataSource.getProducts(query)
     suspend fun getProductDetails(id: ProductID) = productsProductDataSource.getProductDetails(id)
 }

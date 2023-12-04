@@ -37,10 +37,11 @@ import ru.gildor.coroutines.okhttp.await
 class BackendClient(
     private val host: HttpUrl
 ) {
-    suspend fun getProducts(): ImmutableList<ProductSummary> {
+    suspend fun getProducts(query: String?): ImmutableList<ProductSummary> {
         val request = buildRequest { urlBuilder ->
             urlBuilder
                 .addPathSegment("products")
+                .addQueryParameter(name = "query", value = query)
         }
 
         val response = client.newCall(request).await()
@@ -62,8 +63,9 @@ class BackendClient(
                     name = backendProduct.name,
                     type = backendProduct.type,
                     game = backendProduct.game,
-                    ratings = backendProduct.ratings.map { rawRating -> Rating.parse(rawRating) }.toImmutableList(),
-                    price = Price(backendProduct.priceCents)
+                    price = Price(backendProduct.priceCents),
+                    ratingCount = backendProduct.ratingCount,
+                    rating = backendProduct.rating
                 )
             }
             .toImmutableList()

@@ -10,7 +10,7 @@ import kotlinx.collections.immutable.ImmutableList
 class ProductDataSourceBackend(
     private val client: BackendClient
 ): ProductDataSource {
-    override suspend fun getProducts(): ImmutableList<ProductSummary> = client.getProducts()
+    override suspend fun getProducts(query: String?): ImmutableList<ProductSummary> = client.getProducts(query)
 
     override suspend fun getProductDetails(id: ProductID): ProductDetails = client.getProductDetails(id)
 }

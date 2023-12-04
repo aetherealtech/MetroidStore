@@ -5,14 +5,16 @@ import aetherealtech.metroidstore.customerclient.datasources.ProductDataSource
 import aetherealtech.metroidstore.customerclient.model.ProductDetails
 import aetherealtech.metroidstore.customerclient.model.ProductID
 import aetherealtech.metroidstore.customerclient.model.ProductSummary
+import aetherealtech.metroidstore.customerclient.model.rating
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
 class ProductDataSourceFake(
     private val products: List<DataSourceFake.Product>
 ): ProductDataSource {
-    override suspend fun getProducts(): ImmutableList<ProductSummary> {
+    override suspend fun getProducts(query: String?): ImmutableList<ProductSummary> {
         return products
+            .filter { product -> query?.let { query -> product.name.contains(query) } ?: true }
             .map { product -> product.summary }
             .toImmutableList()
     }
@@ -36,7 +38,8 @@ val DataSourceFake.Product.summary: ProductSummary
             name = name,
             type = type,
             game = game,
-            ratings = ratings,
+            ratingCount = ratings.size,
+            rating = ratings.rating,
             price = price
         )
     }

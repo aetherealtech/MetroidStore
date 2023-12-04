@@ -5,7 +5,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import aetherealtech.metroidstore.customerclient.modifiers.shimmeringLoader
 import kotlinx.coroutines.flow.StateFlow
 
 @Composable

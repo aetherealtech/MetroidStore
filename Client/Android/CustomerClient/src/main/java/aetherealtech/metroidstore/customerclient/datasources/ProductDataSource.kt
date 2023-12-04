@@ -6,6 +6,6 @@ import aetherealtech.metroidstore.customerclient.model.ProductSummary
 import kotlinx.collections.immutable.ImmutableList
 
 interface ProductDataSource {
-    suspend fun getProducts(): ImmutableList<ProductSummary>
+    suspend fun getProducts(query: String?): ImmutableList<ProductSummary>
     suspend fun getProductDetails(id: ProductID): ProductDetails
 }

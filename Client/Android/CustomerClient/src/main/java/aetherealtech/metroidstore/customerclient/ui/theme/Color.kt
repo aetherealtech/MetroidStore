@@ -12,6 +12,11 @@ class Colors private constructor() {
         val PurpleGrey40 = Color(0xFF625b71)
         val Pink40 = Color(0xFF7D5260)
 
+        val BarBackground = Color(0xFFAA2200)
+        val BarBackgroundSelected = Color(0xFFCC3300)
+        val BarForeground = Color.White
+        val BarForegroundSelected = Color(0xFFFFFFAA)
+
         val PrimaryCallToAction = Color(0xFFFFDD00)
     }
 }

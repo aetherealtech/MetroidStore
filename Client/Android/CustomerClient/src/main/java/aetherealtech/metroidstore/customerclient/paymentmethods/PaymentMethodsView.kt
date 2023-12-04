@@ -4,6 +4,7 @@ import aetherealtech.metroidstore.customerclient.fakedatasources.DataSourceFake
 import aetherealtech.metroidstore.customerclient.model.PaymentMethodID
 import aetherealtech.metroidstore.customerclient.repositories.UserRepository
 import aetherealtech.metroidstore.customerclient.routing.AppBarState
+import aetherealtech.metroidstore.customerclient.ui.theme.Colors
 import aetherealtech.metroidstore.customerclient.ui.theme.MetroidStoreTheme
 import aetherealtech.metroidstore.customerclient.utilities.mapState
 import aetherealtech.metroidstore.customerclient.widgets.AsyncLoadedShimmering
@@ -41,6 +42,7 @@ fun PaymentMethodsView(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
+                        tint = Colors.BarForeground,
                         contentDescription = null
                     )
                 }

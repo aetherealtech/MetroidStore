@@ -30,6 +30,7 @@ import aetherealtech.metroidstore.customerclient.routing.AppBarState
 import aetherealtech.metroidstore.customerclient.routing.Screen
 import aetherealtech.metroidstore.customerclient.routing.rememberRouter
 import aetherealtech.metroidstore.customerclient.settings.SettingsViewModel
+import aetherealtech.metroidstore.customerclient.ui.theme.Colors
 import aetherealtech.metroidstore.customerclient.utilities.AddressIDType
 import aetherealtech.metroidstore.customerclient.utilities.OrderIDType
 import aetherealtech.metroidstore.customerclient.utilities.PaymentMethodIDType
@@ -40,6 +41,10 @@ import aetherealtech.metroidstore.customerclient.utilities.getOrderID
 import aetherealtech.metroidstore.customerclient.utilities.getPaymentMethodID
 import aetherealtech.metroidstore.customerclient.utilities.getProductID
 import aetherealtech.metroidstore.customerclient.utilities.viewModel
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -49,11 +54,17 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarColors
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavType
@@ -74,23 +85,40 @@ fun RootView(
             val navBackStackEntry by router.currentBackStackEntryAsState()
             @Suppress("UNUSED_VARIABLE") val currentDestination = navBackStackEntry?.destination // This is needed to trigger recomposition when the destination changes
 
+            val barModifier = Modifier
+                .height(72.dp)
+
             CenterAlignedTopAppBar(
-                title = router.topBarState.title,
+                title = {
+                    Box(
+                        modifier = barModifier,
+                        contentAlignment = Alignment.Center
+                    ) {
+                        router.topBarState.title()
+                    }
+                },
+                modifier = barModifier,
                 navigationIcon = {
                     if(router.previousBackStackEntry != null) {
                         IconButton(onClick = { router.back() }) {
                             Icon(
                                 imageVector = Icons.Filled.ArrowBack,
+                                tint = Colors.BarForeground,
                                 contentDescription = "Back"
                             )
                         }
                     }
                 },
-                actions = router.topBarState.actions
+                actions = router.topBarState.actions,
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = Colors.BarBackground
+                )
             )
         },
         bottomBar = {
-            NavigationBar {
+            NavigationBar(
+                containerColor = Colors.BarBackground
+            ) {
                 val navBackStackEntry by router.currentBackStackEntryAsState()
                 val currentDestination = navBackStackEntry?.destination
 
@@ -99,7 +127,14 @@ fun RootView(
                         icon = { Icon(screen.icon(), contentDescription = null) },
                         label = { Text(screen.title) },
                         selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
-                        onClick = { router.selectTab(screen) }
+                        onClick = { router.selectTab(screen) },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = Colors.BarForegroundSelected,
+                            selectedTextColor = Colors.BarForegroundSelected,
+                            indicatorColor = Colors.BarBackgroundSelected,
+                            unselectedIconColor = Colors.BarForeground,
+                            unselectedTextColor = Colors.BarForeground
+                        )
                     )
                 }
             }
@@ -128,6 +163,7 @@ fun RootView(
                 )
 
                 ProductDetailView(
+                    setAppBarState = setAppBarState,
                     viewModel = detailsViewModel
                 )
             }
@@ -145,6 +181,7 @@ fun RootView(
                 )
 
                 CheckoutView(
+                    setAppBarState = setAppBarState,
                     viewModel = detailsViewModel
                 )
             }
@@ -163,6 +200,7 @@ fun RootView(
                 )
 
                 OrderDetailsView(
+                    setAppBarState = setAppBarState,
                     viewModel = detailsViewModel
                 )
             }
