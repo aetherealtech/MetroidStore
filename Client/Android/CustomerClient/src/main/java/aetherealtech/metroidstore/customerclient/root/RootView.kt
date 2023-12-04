@@ -176,7 +176,9 @@ fun RootView(
                         viewOrder = { orderID ->
                             router.selectTab(Screen.Orders)
                             router.viewOrder(orderID)
-                        }
+                        },
+                        addNewAddress = { router.openAddAddress() },
+                        addNewPaymentMethod = { router.openAddPaymentMethod() }
                     )
                 )
 
@@ -359,12 +361,16 @@ class RootViewModel(
     }
 
     fun checkout(
-        viewOrder: (OrderID) -> Unit
+        viewOrder: (OrderID) -> Unit,
+        addNewAddress: () -> Unit,
+        addNewPaymentMethod: () -> Unit
     ) = object : ViewModelFactory<CheckoutViewModel>() {
         override fun create() = CheckoutViewModel(
             cartRepository = cartRepository,
             userRepository = userRepository,
-            viewOrder = viewOrder
+            viewOrder = viewOrder,
+            addNewAddress = addNewAddress,
+            addNewPaymentMethod = addNewPaymentMethod
         )
     }
 

@@ -100,7 +100,9 @@ fun CheckoutView(
 class CheckoutViewModel(
     cartRepository: CartRepository,
     userRepository: UserRepository,
-    viewOrder: (OrderID) -> Unit
+    viewOrder: (OrderID) -> Unit,
+    addNewAddress: () -> Unit,
+    addNewPaymentMethod: () -> Unit
 ): ViewModel() {
     data class AddressViewModel(
         val address: UserAddressSummary
@@ -218,14 +220,6 @@ class CheckoutViewModel(
                 .find { paymentMethod -> paymentMethod.method.isPrimary }
         }
     }
-
-    fun addNewAddress() {
-
-    }
-
-    fun addNewPaymentMethod() {
-
-    }
 }
 
 @Composable
@@ -328,7 +322,9 @@ fun CheckoutPreview() {
                 userRepository = UserRepository(
                     dataSource = DataSourceFake().user
                 ),
-                viewOrder = { }
+                viewOrder = { },
+                addNewAddress = { },
+                addNewPaymentMethod = { }
             )
         )
     }
