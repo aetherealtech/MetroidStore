@@ -199,7 +199,7 @@ CREATE TABLE OrderActivities
     check (date IS strftime('%Y-%m-%dT%H:%M:%SZ', date))
 );
 
-INSERT INTO Users VALUES('mother_brain','$2a$10$NRDEFHbq5heYWI8LLI0rO8jUJmJMlDL0Lpmpq6ZwbJ8cnUvOIEXa','U7HvU1Uc');
+INSERT INTO Users VALUES('mother_brain','$2a$10$NRDEF/Hbq5heYWI8LLI0rO8jUJmJMlDL0Lpmpq6ZwbJ8cnUvOIEXa','U7HvU1Uc');
 
 INSERT INTO ProductTypes VALUES('Capacity Expansion');
 INSERT INTO ProductTypes VALUES('Beam');

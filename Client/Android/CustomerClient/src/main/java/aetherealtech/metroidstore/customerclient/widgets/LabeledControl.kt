@@ -65,3 +65,15 @@ fun <T> LabeledValidatedTextField(
         ValidatedTextField(value = value)
     }
 }
+
+@Composable
+fun LabeledValidatedPasswordField(
+    name: String,
+    value: FormValue<String>
+) {
+    LabeledControl(
+        name = name
+    ) {
+        ValidatedPasswordField(value = value)
+    }
+}

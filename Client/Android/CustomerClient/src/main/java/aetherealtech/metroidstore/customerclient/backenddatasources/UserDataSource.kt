@@ -1,18 +1,15 @@
 package aetherealtech.metroidstore.customerclient.backenddatasources
 
-import aetherealtech.metroidstore.customerclient.backendclient.BackendClient
+import aetherealtech.metroidstore.customerclient.backendclient.AuthenticatedBackendClient
 import aetherealtech.metroidstore.customerclient.datasources.UserDataSource
 import aetherealtech.metroidstore.customerclient.model.Address
 import aetherealtech.metroidstore.customerclient.model.EditAddress
 import aetherealtech.metroidstore.customerclient.model.EditPaymentMethod
 import aetherealtech.metroidstore.customerclient.model.NewOrder
-import aetherealtech.metroidstore.customerclient.model.PaymentMethodDetails
 import aetherealtech.metroidstore.customerclient.model.PaymentMethodID
-import aetherealtech.metroidstore.customerclient.model.UserAddressDetails
-import kotlinx.collections.immutable.ImmutableList
 
 class UserDataSourceBackend(
-    private val client: BackendClient
+    private val client: AuthenticatedBackendClient
 ): UserDataSource {
     override suspend fun getAddresses() = client.getAddresses()
     override suspend fun getShippingMethods() = client.getShippingMethods()

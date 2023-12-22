@@ -59,6 +59,31 @@ class EmbeddedDatabase {
     }
 }
 
+data class AuthDetails(
+    val passhash: String,
+    val salt: String
+)
+
+fun SQLiteDatabase.passhash(username: String): AuthDetails {
+    return rawQuery(
+        """
+        SELECT
+            passhash,
+            salt
+        FROM Users
+        WHERE username = ?
+        """,
+        arrayOf(username)
+    ).use { cursor ->
+        cursor.moveToNext()
+
+        return@use AuthDetails(
+            passhash = cursor.getString(0),
+            salt = cursor.getString(1)
+        )
+    }
+}
+
 fun SQLiteDatabase.products(query: String?): List<ProductSummary> {
     return rawQuery(
         """

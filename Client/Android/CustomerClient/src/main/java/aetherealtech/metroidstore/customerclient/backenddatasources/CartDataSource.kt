@@ -1,6 +1,6 @@
 package aetherealtech.metroidstore.customerclient.backenddatasources
 
-import aetherealtech.metroidstore.customerclient.backendclient.BackendClient
+import aetherealtech.metroidstore.customerclient.backendclient.AuthenticatedBackendClient
 import aetherealtech.metroidstore.customerclient.datasources.CartDataSource
 import aetherealtech.metroidstore.customerclient.model.CartItem
 import aetherealtech.metroidstore.customerclient.model.ProductID
@@ -8,7 +8,7 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
 class CartDataSourceBackend(
-    private val client: BackendClient
+    private val client: AuthenticatedBackendClient
 ): CartDataSource {
     override suspend fun getCart(): ImmutableList<CartItem> = client.getCart().toImmutableList()
 

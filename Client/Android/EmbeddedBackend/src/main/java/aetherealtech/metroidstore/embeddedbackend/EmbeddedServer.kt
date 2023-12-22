@@ -5,6 +5,7 @@ import aetherealtech.metroidstore.backendmodel.EditPaymentMethod
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import aetherealtech.metroidstore.backendmodel.NewOrder
+import at.favre.lib.crypto.bcrypt.BCrypt
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.defaultForFileExtension
@@ -14,6 +15,7 @@ import io.ktor.server.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.request.header
+import io.ktor.server.request.receiveParameters
 import io.ktor.server.request.receiveText
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -29,6 +31,30 @@ class EmbeddedServer(
 
         embeddedServer(Netty, port = port.toInt()) {
             routing {
+                post("/login") {
+                    val parameters = call.receiveParameters()
+
+                    val username = parameters["username"]!!
+                    val password = parameters["password"]!!
+
+                    try {
+                        val authDetails = database.passhash(username)
+
+                        val success = BCrypt.verifyer().verify(
+                            "${password}${authDetails.salt}".toCharArray(),
+                            authDetails.passhash
+                        )
+
+                        if(!success.verified) {
+                            call.respond(HttpStatusCode.BadRequest)
+                        } else {
+                            call.respondText(username)
+                        }
+                    } catch(error: Exception) {
+                        println(error.localizedMessage)
+                    }
+                }
+
                 get("/products") {
                     val query = call.request.queryParameters["query"]
 
