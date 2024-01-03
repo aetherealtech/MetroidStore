@@ -8,8 +8,8 @@ import aetherealtech.metroidstore.customerclient.cart.CartViewModel
 import aetherealtech.metroidstore.customerclient.checkout.CheckoutView
 import aetherealtech.metroidstore.customerclient.checkout.CheckoutViewModel
 import aetherealtech.metroidstore.customerclient.datasources.api.DataSource
-import aetherealtech.metroidstore.customerclient.editpaymentmethod.EditPaymentMethodView
-import aetherealtech.metroidstore.customerclient.editpaymentmethod.EditPaymentMethodViewModel
+import aetherealtech.metroidstore.customerclient.ui.editpaymentmethod.EditPaymentMethodView
+import aetherealtech.metroidstore.customerclient.ui.editpaymentmethod.EditPaymentMethodViewModel
 import aetherealtech.metroidstore.customerclient.model.Address
 import aetherealtech.metroidstore.customerclient.model.OrderID
 import aetherealtech.metroidstore.customerclient.model.PaymentMethodID

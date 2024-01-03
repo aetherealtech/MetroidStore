@@ -1,4 +1,4 @@
-package aetherealtech.metroidstore.customerclient.editpaymentmethod
+package aetherealtech.metroidstore.customerclient.ui.editpaymentmethod
 
 import aetherealtech.metroidstore.customerclient.fakedatasources.DataSourceFake
 import aetherealtech.metroidstore.customerclient.model.EditPaymentMethod
