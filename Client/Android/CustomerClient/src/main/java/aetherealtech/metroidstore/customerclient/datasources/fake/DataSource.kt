@@ -1,6 +1,6 @@
 package aetherealtech.metroidstore.customerclient.fakedatasources
 
-import aetherealtech.metroidstore.customerclient.datasources.DataSource
+import aetherealtech.metroidstore.customerclient.datasources.api.DataSource
 import aetherealtech.metroidstore.customerclient.model.ImageSource
 import aetherealtech.metroidstore.customerclient.model.ImageSourceData
 import aetherealtech.metroidstore.customerclient.model.Price

@@ -1,7 +1,7 @@
 package aetherealtech.metroidstore.customerclient.backenddatasources
 
 import aetherealtech.metroidstore.customerclient.backendclient.AuthenticatedBackendClient
-import aetherealtech.metroidstore.customerclient.datasources.CartDataSource
+import aetherealtech.metroidstore.customerclient.datasources.api.CartDataSource
 import aetherealtech.metroidstore.customerclient.model.CartItem
 import aetherealtech.metroidstore.customerclient.model.ProductID
 import kotlinx.collections.immutable.ImmutableList

@@ -1,6 +1,6 @@
 package aetherealtech.metroidstore.customerclient.fakedatasources
 
-import aetherealtech.metroidstore.customerclient.datasources.OrderDataSource
+import aetherealtech.metroidstore.customerclient.datasources.api.OrderDataSource
 import aetherealtech.metroidstore.customerclient.model.OrderActivity
 import aetherealtech.metroidstore.customerclient.model.OrderDetails
 import aetherealtech.metroidstore.customerclient.model.OrderID
@@ -10,7 +10,6 @@ import aetherealtech.metroidstore.customerclient.model.Price
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.datetime.Clock
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 
 class OrderDataSourceFake(

@@ -1,6 +1,6 @@
 package aetherealtech.metroidstore.customerclient.repositories
 
-import aetherealtech.metroidstore.customerclient.datasources.CartDataSource
+import aetherealtech.metroidstore.customerclient.datasources.api.CartDataSource
 import aetherealtech.metroidstore.customerclient.model.CartItem
 import aetherealtech.metroidstore.customerclient.model.ProductID
 import kotlinx.collections.immutable.ImmutableList

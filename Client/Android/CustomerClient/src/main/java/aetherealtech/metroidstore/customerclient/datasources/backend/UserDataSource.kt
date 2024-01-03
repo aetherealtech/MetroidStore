@@ -1,7 +1,7 @@
 package aetherealtech.metroidstore.customerclient.backenddatasources
 
 import aetherealtech.metroidstore.customerclient.backendclient.AuthenticatedBackendClient
-import aetherealtech.metroidstore.customerclient.datasources.UserDataSource
+import aetherealtech.metroidstore.customerclient.datasources.api.UserDataSource
 import aetherealtech.metroidstore.customerclient.model.Address
 import aetherealtech.metroidstore.customerclient.model.EditAddress
 import aetherealtech.metroidstore.customerclient.model.EditPaymentMethod

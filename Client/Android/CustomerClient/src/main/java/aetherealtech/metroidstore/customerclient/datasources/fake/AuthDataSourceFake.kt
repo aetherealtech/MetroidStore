@@ -1,7 +1,7 @@
 package aetherealtech.metroidstore.customerclient.fakedatasources
 
-import aetherealtech.metroidstore.customerclient.datasources.AuthDataSource
-import aetherealtech.metroidstore.customerclient.datasources.DataSource
+import aetherealtech.metroidstore.customerclient.datasources.api.AuthDataSource
+import aetherealtech.metroidstore.customerclient.datasources.api.DataSource
 
 class AuthDataSourceFake: AuthDataSource {
     override val savedLogin: DataSource = DataSourceFake()

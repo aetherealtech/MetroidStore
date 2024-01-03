@@ -1,6 +1,6 @@
 package aetherealtech.metroidstore.customerclient.repositories
 
-import aetherealtech.metroidstore.customerclient.datasources.DataSource
+import aetherealtech.metroidstore.customerclient.datasources.api.DataSource
 import aetherealtech.metroidstore.customerclient.model.ProductID
 
 class ProductRepository(

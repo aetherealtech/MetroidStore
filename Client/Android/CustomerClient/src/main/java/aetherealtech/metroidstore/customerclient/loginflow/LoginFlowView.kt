@@ -1,6 +1,6 @@
 package aetherealtech.metroidstore.customerclient.loginflow
 
-import aetherealtech.metroidstore.customerclient.datasources.DataSource
+import aetherealtech.metroidstore.customerclient.datasources.api.DataSource
 import aetherealtech.metroidstore.customerclient.fakedatasources.AuthDataSourceFake
 import aetherealtech.metroidstore.customerclient.login.LoginView
 import aetherealtech.metroidstore.customerclient.login.LoginViewModel

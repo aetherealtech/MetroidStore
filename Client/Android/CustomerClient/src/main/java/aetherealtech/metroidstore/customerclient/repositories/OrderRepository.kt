@@ -1,6 +1,6 @@
 package aetherealtech.metroidstore.customerclient.repositories
 
-import aetherealtech.metroidstore.customerclient.datasources.OrderDataSource
+import aetherealtech.metroidstore.customerclient.datasources.api.OrderDataSource
 import aetherealtech.metroidstore.customerclient.model.OrderActivity
 import aetherealtech.metroidstore.customerclient.model.OrderDetails
 import aetherealtech.metroidstore.customerclient.model.OrderID

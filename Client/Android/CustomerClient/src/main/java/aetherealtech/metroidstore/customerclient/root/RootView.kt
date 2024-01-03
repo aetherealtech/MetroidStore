@@ -1,7 +1,7 @@
 package aetherealtech.metroidstore.customerclient.root
 
 import aetherealtech.metroidstore.customerclient.backenddatasources.AuthDataSourceBackend
-import aetherealtech.metroidstore.customerclient.datasources.DataSource
+import aetherealtech.metroidstore.customerclient.datasources.api.DataSource
 import aetherealtech.metroidstore.customerclient.loginflow.LoginFlowView
 import aetherealtech.metroidstore.customerclient.loginflow.LoginFlowViewModel
 import aetherealtech.metroidstore.customerclient.main.MainView

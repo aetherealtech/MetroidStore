@@ -1,8 +1,8 @@
 package aetherealtech.metroidstore.customerclient.backenddatasources
 
 import aetherealtech.metroidstore.customerclient.backendclient.BackendClient
-import aetherealtech.metroidstore.customerclient.datasources.AuthDataSource
-import aetherealtech.metroidstore.customerclient.datasources.DataSource
+import aetherealtech.metroidstore.customerclient.datasources.api.AuthDataSource
+import aetherealtech.metroidstore.customerclient.datasources.api.DataSource
 import android.content.Context
 import okhttp3.HttpUrl
 

@@ -1,9 +1,6 @@
 package aetherealtech.metroidstore.customerclient.repositories
 
-import aetherealtech.metroidstore.customerclient.datasources.AuthDataSource
-import aetherealtech.metroidstore.customerclient.datasources.DataSource
-import aetherealtech.metroidstore.customerclient.model.OrderSummary
-import kotlinx.collections.immutable.ImmutableList
+import aetherealtech.metroidstore.customerclient.datasources.api.AuthDataSource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 

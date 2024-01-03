@@ -1,4 +1,4 @@
-package aetherealtech.metroidstore.customerclient.datasources
+package aetherealtech.metroidstore.customerclient.datasources.api
 
 import aetherealtech.metroidstore.customerclient.model.ProductDetails
 import aetherealtech.metroidstore.customerclient.model.ProductID

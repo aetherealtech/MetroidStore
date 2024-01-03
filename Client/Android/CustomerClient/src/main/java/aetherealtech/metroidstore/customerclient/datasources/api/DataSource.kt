@@ -1,4 +1,4 @@
-package aetherealtech.metroidstore.customerclient.datasources
+package aetherealtech.metroidstore.customerclient.datasources.api
 
 interface DataSource {
     val products: ProductDataSource

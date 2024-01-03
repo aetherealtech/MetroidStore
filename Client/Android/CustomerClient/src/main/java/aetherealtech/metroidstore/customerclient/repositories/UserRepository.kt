@@ -1,6 +1,6 @@
 package aetherealtech.metroidstore.customerclient.repositories
 
-import aetherealtech.metroidstore.customerclient.datasources.UserDataSource
+import aetherealtech.metroidstore.customerclient.datasources.api.UserDataSource
 import aetherealtech.metroidstore.customerclient.model.Address
 import aetherealtech.metroidstore.customerclient.model.EditAddress
 import aetherealtech.metroidstore.customerclient.model.EditPaymentMethod

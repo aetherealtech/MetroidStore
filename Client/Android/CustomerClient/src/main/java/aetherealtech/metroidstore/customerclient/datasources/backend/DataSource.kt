@@ -1,7 +1,7 @@
 package aetherealtech.metroidstore.customerclient.backenddatasources
 
 import aetherealtech.metroidstore.customerclient.backendclient.AuthenticatedBackendClient
-import aetherealtech.metroidstore.customerclient.datasources.DataSource
+import aetherealtech.metroidstore.customerclient.datasources.api.DataSource
 
 class DataSourceBackend(
     private val client: AuthenticatedBackendClient

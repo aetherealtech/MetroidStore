@@ -7,7 +7,7 @@ import aetherealtech.metroidstore.customerclient.addresses.AddressesViewModel
 import aetherealtech.metroidstore.customerclient.cart.CartViewModel
 import aetherealtech.metroidstore.customerclient.checkout.CheckoutView
 import aetherealtech.metroidstore.customerclient.checkout.CheckoutViewModel
-import aetherealtech.metroidstore.customerclient.datasources.DataSource
+import aetherealtech.metroidstore.customerclient.datasources.api.DataSource
 import aetherealtech.metroidstore.customerclient.editpaymentmethod.EditPaymentMethodView
 import aetherealtech.metroidstore.customerclient.editpaymentmethod.EditPaymentMethodViewModel
 import aetherealtech.metroidstore.customerclient.model.Address
