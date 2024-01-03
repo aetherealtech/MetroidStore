@@ -1,13 +1,13 @@
-package aetherealtech.metroidstore.customerclient.loginflow
+package aetherealtech.metroidstore.customerclient.ui.loginflow
 
 import aetherealtech.metroidstore.customerclient.datasources.api.DataSource
-import aetherealtech.metroidstore.customerclient.fakedatasources.AuthDataSourceFake
-import aetherealtech.metroidstore.customerclient.login.LoginView
-import aetherealtech.metroidstore.customerclient.login.LoginViewModel
+import aetherealtech.metroidstore.customerclient.datasources.fake.AuthDataSourceFake
+import aetherealtech.metroidstore.customerclient.ui.login.LoginView
+import aetherealtech.metroidstore.customerclient.ui.login.LoginViewModel
 import aetherealtech.metroidstore.customerclient.repositories.AuthRepository
-import aetherealtech.metroidstore.customerclient.signup.SignUpView
-import aetherealtech.metroidstore.customerclient.signup.SignUpViewModel
-import aetherealtech.metroidstore.customerclient.ui.theme.MetroidStoreTheme
+import aetherealtech.metroidstore.customerclient.ui.signup.SignUpView
+import aetherealtech.metroidstore.customerclient.ui.signup.SignUpViewModel
+import aetherealtech.metroidstore.customerclient.theme.MetroidStoreTheme
 import aetherealtech.metroidstore.customerclient.utilities.ViewModelFactory
 import aetherealtech.metroidstore.customerclient.utilities.viewModel
 import androidx.compose.runtime.Composable

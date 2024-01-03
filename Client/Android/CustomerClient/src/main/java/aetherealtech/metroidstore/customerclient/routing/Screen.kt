@@ -1,14 +1,14 @@
 package aetherealtech.metroidstore.customerclient.routing
 
-import aetherealtech.metroidstore.customerclient.cart.CartView
-import aetherealtech.metroidstore.customerclient.cart.CartViewModel
-import aetherealtech.metroidstore.customerclient.orders.OrdersView
-import aetherealtech.metroidstore.customerclient.orders.OrdersViewModel
-import aetherealtech.metroidstore.customerclient.productlist.ProductListView
-import aetherealtech.metroidstore.customerclient.productlist.ProductListViewModel
-import aetherealtech.metroidstore.customerclient.main.MainViewModel
-import aetherealtech.metroidstore.customerclient.settings.SettingsView
-import aetherealtech.metroidstore.customerclient.settings.SettingsViewModel
+import aetherealtech.metroidstore.customerclient.ui.cart.CartView
+import aetherealtech.metroidstore.customerclient.ui.cart.CartViewModel
+import aetherealtech.metroidstore.customerclient.ui.orders.OrdersView
+import aetherealtech.metroidstore.customerclient.ui.orders.OrdersViewModel
+import aetherealtech.metroidstore.customerclient.ui.productlist.ProductListView
+import aetherealtech.metroidstore.customerclient.ui.productlist.ProductListViewModel
+import aetherealtech.metroidstore.customerclient.ui.main.MainViewModel
+import aetherealtech.metroidstore.customerclient.ui.settings.SettingsView
+import aetherealtech.metroidstore.customerclient.ui.settings.SettingsViewModel
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Settings

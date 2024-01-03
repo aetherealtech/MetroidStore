@@ -1,11 +1,11 @@
-package aetherealtech.metroidstore.customerclient.root
+package aetherealtech.metroidstore.customerclient.ui.root
 
-import aetherealtech.metroidstore.customerclient.backenddatasources.AuthDataSourceBackend
+import aetherealtech.metroidstore.customerclient.datasources.backend.AuthDataSourceBackend
 import aetherealtech.metroidstore.customerclient.datasources.api.DataSource
-import aetherealtech.metroidstore.customerclient.loginflow.LoginFlowView
-import aetherealtech.metroidstore.customerclient.loginflow.LoginFlowViewModel
-import aetherealtech.metroidstore.customerclient.main.MainView
-import aetherealtech.metroidstore.customerclient.main.MainViewModel
+import aetherealtech.metroidstore.customerclient.ui.loginflow.LoginFlowView
+import aetherealtech.metroidstore.customerclient.ui.loginflow.LoginFlowViewModel
+import aetherealtech.metroidstore.customerclient.ui.main.MainView
+import aetherealtech.metroidstore.customerclient.ui.main.MainViewModel
 import aetherealtech.metroidstore.customerclient.repositories.AuthRepository
 import aetherealtech.metroidstore.customerclient.utilities.ViewModelFactory
 import aetherealtech.metroidstore.embeddedbackend.EmbeddedServer

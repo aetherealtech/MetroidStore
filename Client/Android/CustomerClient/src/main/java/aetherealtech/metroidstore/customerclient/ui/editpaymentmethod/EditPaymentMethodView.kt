@@ -1,12 +1,12 @@
 package aetherealtech.metroidstore.customerclient.ui.editpaymentmethod
 
-import aetherealtech.metroidstore.customerclient.fakedatasources.DataSourceFake
+import aetherealtech.metroidstore.customerclient.datasources.fake.DataSourceFake
 import aetherealtech.metroidstore.customerclient.model.EditPaymentMethod
 import aetherealtech.metroidstore.customerclient.model.PaymentMethodDetails
 import aetherealtech.metroidstore.customerclient.model.PaymentMethodID
 import aetherealtech.metroidstore.customerclient.repositories.UserRepository
 import aetherealtech.metroidstore.customerclient.routing.AppBarState
-import aetherealtech.metroidstore.customerclient.ui.theme.MetroidStoreTheme
+import aetherealtech.metroidstore.customerclient.theme.MetroidStoreTheme
 import aetherealtech.metroidstore.customerclient.uitoolkit.PrimaryCallToAction
 import aetherealtech.metroidstore.customerclient.utilities.StateFlows
 import aetherealtech.metroidstore.customerclient.utilities.mapState

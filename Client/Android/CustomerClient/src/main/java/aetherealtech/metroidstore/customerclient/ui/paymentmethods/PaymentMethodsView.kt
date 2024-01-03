@@ -1,11 +1,13 @@
-package aetherealtech.metroidstore.customerclient.paymentmethods
+package aetherealtech.metroidstore.customerclient.ui.paymentmethods
 
-import aetherealtech.metroidstore.customerclient.fakedatasources.DataSourceFake
+import aetherealtech.metroidstore.customerclient.datasources.fake.DataSourceFake
 import aetherealtech.metroidstore.customerclient.model.PaymentMethodID
 import aetherealtech.metroidstore.customerclient.repositories.UserRepository
 import aetherealtech.metroidstore.customerclient.routing.AppBarState
-import aetherealtech.metroidstore.customerclient.ui.theme.Colors
-import aetherealtech.metroidstore.customerclient.ui.theme.MetroidStoreTheme
+import aetherealtech.metroidstore.customerclient.theme.Colors
+import aetherealtech.metroidstore.customerclient.theme.MetroidStoreTheme
+import aetherealtech.metroidstore.customerclient.ui.paymentmethodrow.PaymentMethodRowView
+import aetherealtech.metroidstore.customerclient.ui.paymentmethodrow.PaymentMethodRowViewModel
 import aetherealtech.metroidstore.customerclient.utilities.mapState
 import aetherealtech.metroidstore.customerclient.widgets.AsyncLoadedShimmering
 import aetherealtech.metroidstore.customerclient.widgets.SwipeToDeleteRow

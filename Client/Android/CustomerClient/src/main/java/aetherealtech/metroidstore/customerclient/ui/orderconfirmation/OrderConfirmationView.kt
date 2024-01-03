@@ -1,4 +1,4 @@
-package aetherealtech.metroidstore.customerclient.orderconfirmation
+package aetherealtech.metroidstore.customerclient.ui.orderconfirmation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,7 +16,7 @@ import androidx.lifecycle.viewModelScope
 import aetherealtech.metroidstore.customerclient.model.NewOrder
 import aetherealtech.metroidstore.customerclient.model.OrderID
 import aetherealtech.metroidstore.customerclient.repositories.UserRepository
-import aetherealtech.metroidstore.customerclient.ui.theme.MetroidStoreTheme
+import aetherealtech.metroidstore.customerclient.theme.MetroidStoreTheme
 import aetherealtech.metroidstore.customerclient.uitoolkit.ConfirmationModal
 import aetherealtech.metroidstore.customerclient.uitoolkit.ConfirmationModalViewModel
 import aetherealtech.metroidstore.customerclient.widgets.CloseableView

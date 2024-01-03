@@ -1,4 +1,4 @@
-package aetherealtech.metroidstore.customerclient.addtocart
+package aetherealtech.metroidstore.customerclient.ui.addtocartconfirmation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,11 +13,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import aetherealtech.metroidstore.customerclient.fakedatasources.DataSourceFake
-import aetherealtech.metroidstore.customerclient.fakedatasources.details
+import aetherealtech.metroidstore.customerclient.datasources.fake.DataSourceFake
+import aetherealtech.metroidstore.customerclient.datasources.fake.details
 import aetherealtech.metroidstore.customerclient.model.ProductDetails
 import aetherealtech.metroidstore.customerclient.repositories.CartRepository
-import aetherealtech.metroidstore.customerclient.ui.theme.MetroidStoreTheme
+import aetherealtech.metroidstore.customerclient.theme.MetroidStoreTheme
 import aetherealtech.metroidstore.customerclient.uitoolkit.ConfirmationModal
 import aetherealtech.metroidstore.customerclient.uitoolkit.ConfirmationModalViewModel
 import aetherealtech.metroidstore.customerclient.widgets.CloseableView

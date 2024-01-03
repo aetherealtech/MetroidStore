@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
-import aetherealtech.metroidstore.customerclient.ui.theme.Colors
+import aetherealtech.metroidstore.customerclient.theme.Colors
 
 @Composable
 fun PrimaryCallToAction(

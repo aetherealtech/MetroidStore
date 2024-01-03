@@ -1,4 +1,4 @@
-package aetherealtech.metroidstore.customerclient.backenddatasources
+package aetherealtech.metroidstore.customerclient.datasources.backend
 
 import aetherealtech.metroidstore.customerclient.backendclient.AuthenticatedBackendClient
 import aetherealtech.metroidstore.customerclient.datasources.api.UserDataSource

@@ -1,4 +1,4 @@
-package aetherealtech.metroidstore.customerclient.orders
+package aetherealtech.metroidstore.customerclient.ui.orders
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,6 +9,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import aetherealtech.metroidstore.customerclient.model.OrderID
+import aetherealtech.metroidstore.customerclient.ui.ordersummaryrow.OrderSummaryRow
+import aetherealtech.metroidstore.customerclient.ui.ordersummaryrow.OrderSummaryRowViewModel
 import aetherealtech.metroidstore.customerclient.repositories.OrderRepository
 import aetherealtech.metroidstore.customerclient.routing.AppBarState
 import aetherealtech.metroidstore.customerclient.utilities.mapState

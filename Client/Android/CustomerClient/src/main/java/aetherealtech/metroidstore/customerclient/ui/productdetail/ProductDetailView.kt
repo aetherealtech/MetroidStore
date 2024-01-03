@@ -1,4 +1,4 @@
-package aetherealtech.metroidstore.customerclient.productdetail
+package aetherealtech.metroidstore.customerclient.ui.productdetail
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,13 +16,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import aetherealtech.metroidstore.customerclient.fakedatasources.DataSourceFake
+import aetherealtech.metroidstore.customerclient.datasources.fake.DataSourceFake
 import aetherealtech.metroidstore.customerclient.model.ProductID
 import aetherealtech.metroidstore.customerclient.repositories.ProductRepository
-import aetherealtech.metroidstore.customerclient.ui.theme.MetroidStoreTheme
+import aetherealtech.metroidstore.customerclient.theme.MetroidStoreTheme
 import aetherealtech.metroidstore.customerclient.utilities.parallelMap
-import aetherealtech.metroidstore.customerclient.addtocart.AddToCartButton
-import aetherealtech.metroidstore.customerclient.addtocart.AddToCartViewModel
+import aetherealtech.metroidstore.customerclient.ui.addtocartbutton.AddToCartButton
+import aetherealtech.metroidstore.customerclient.ui.addtocartbutton.AddToCartViewModel
 import aetherealtech.metroidstore.customerclient.routing.AppBarState
 import aetherealtech.metroidstore.customerclient.widgets.AsyncLoadedShimmering
 import aetherealtech.metroidstore.customerclient.widgets.ImagesCarousel

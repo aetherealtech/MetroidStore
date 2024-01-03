@@ -1,4 +1,4 @@
-package aetherealtech.metroidstore.customerclient.fakedatasources
+package aetherealtech.metroidstore.customerclient.datasources.fake
 
 import aetherealtech.metroidstore.customerclient.datasources.api.CartDataSource
 import aetherealtech.metroidstore.customerclient.model.CartItem

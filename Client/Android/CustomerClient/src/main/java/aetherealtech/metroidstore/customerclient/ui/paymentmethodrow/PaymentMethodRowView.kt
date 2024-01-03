@@ -1,8 +1,8 @@
-package aetherealtech.metroidstore.customerclient.addresses
+package aetherealtech.metroidstore.customerclient.ui.paymentmethodrow
 
-import aetherealtech.metroidstore.customerclient.model.Address
-import aetherealtech.metroidstore.customerclient.model.UserAddressDetails
-import aetherealtech.metroidstore.customerclient.ui.theme.MetroidStoreTheme
+import aetherealtech.metroidstore.customerclient.model.PaymentMethodDetails
+import aetherealtech.metroidstore.customerclient.model.PaymentMethodID
+import aetherealtech.metroidstore.customerclient.theme.MetroidStoreTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -28,8 +28,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 
 @Composable
-fun AddressRowView(
-    viewModel: AddressRowViewModel
+fun PaymentMethodRowView(
+    viewModel: PaymentMethodRowViewModel
 ) {
     Column(
         modifier = Modifier
@@ -44,15 +44,6 @@ fun AddressRowView(
         Text(
             text = viewModel.name,
             fontWeight = FontWeight.Bold
-        )
-
-        Spacer(
-            modifier = Modifier
-                .height(16.dp)
-        )
-
-        Text(
-            text = viewModel.address
         )
 
         Spacer(
@@ -84,74 +75,31 @@ fun AddressRowView(
             }
 
             Text(
-                text = "Primary Address"
+                text = "Primary Payment Method"
             )
         }
     }
 }
 
-class AddressRowViewModel(
-    details: UserAddressDetails,
+class PaymentMethodRowViewModel(
+    details: PaymentMethodDetails,
     val select: () -> Unit
 ): ViewModel() {
-    val id = details.address.id
-
-    val name: String
-
-    val address: String
-
-    val isPrimary: Boolean
-
-    init {
-        name = details.name
-
-        val addressLines = mutableListOf<String>()
-
-        addressLines.add(details.address.street1.value)
-
-        details.address.street2?.let { street2 ->
-            addressLines.add(street2.value)
-        }
-
-        val locationElements = listOf(
-            details.address.locality.value,
-            details.address.province.value,
-            details.address.postalCode?.value
-        )
-            .filterNotNull()
-
-        addressLines.add(locationElements.joinToString(", "))
-
-        addressLines.add(listOf(
-            details.address.country.value,
-            details.address.planet.value
-        ).joinToString(", "))
-
-        address = addressLines
-            .joinToString("\n")
-
-        isPrimary = details.isPrimary
-    }
+    val id = details.id
+    val name = details.name
+    val isPrimary = details.isPrimary
 }
 
 @Preview(showBackground = true)
 @Composable
-fun AddressRowPreview() {
+fun PaymentMethodRowPreview() {
     MetroidStoreTheme {
-        AddressRowView(
-            viewModel = AddressRowViewModel(
-                details = UserAddressDetails(
+        PaymentMethodRowView(
+            viewModel = PaymentMethodRowViewModel(
+                details = PaymentMethodDetails(
+                    id = PaymentMethodID(0),
                     name = "Lair",
-                    address = Address(
-                        id = Address.ID(0),
-                        street1 = Address.Street1("123 Fake St."),
-                        street2 = Address.Street2("#4"),
-                        locality = Address.Locality("Fakerton"),
-                        province = Address.Province("CA"),
-                        country = Address.Country("USA"),
-                        planet = Address.Planet("Earth"),
-                        postalCode = Address.PostalCode("90210")
-                    ),
+                    number = PaymentMethodDetails.Number("1234123412341234"),
                     isPrimary = true
                 ),
                 select = { }

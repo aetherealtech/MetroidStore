@@ -1,10 +1,10 @@
-package aetherealtech.metroidstore.customerclient.orderdetails
+package aetherealtech.metroidstore.customerclient.ui.orderitemrow
 
-import aetherealtech.metroidstore.customerclient.fakedatasources.DataSourceFake
-import aetherealtech.metroidstore.customerclient.fakedatasources.orderItem
+import aetherealtech.metroidstore.customerclient.datasources.fake.DataSourceFake
+import aetherealtech.metroidstore.customerclient.datasources.fake.orderItem
 import aetherealtech.metroidstore.customerclient.model.ImageSource
 import aetherealtech.metroidstore.customerclient.model.OrderDetails
-import aetherealtech.metroidstore.customerclient.ui.theme.MetroidStoreTheme
+import aetherealtech.metroidstore.customerclient.theme.MetroidStoreTheme
 import aetherealtech.metroidstore.customerclient.widgets.AsyncImage
 import aetherealtech.metroidstore.customerclient.widgets.PriceView
 import aetherealtech.metroidstore.customerclient.widgets.PriceViewModel

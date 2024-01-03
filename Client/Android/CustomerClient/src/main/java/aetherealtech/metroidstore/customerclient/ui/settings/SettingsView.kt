@@ -1,7 +1,7 @@
-package aetherealtech.metroidstore.customerclient.settings
+package aetherealtech.metroidstore.customerclient.ui.settings
 
 import aetherealtech.metroidstore.customerclient.routing.AppBarState
-import aetherealtech.metroidstore.customerclient.ui.theme.MetroidStoreTheme
+import aetherealtech.metroidstore.customerclient.theme.MetroidStoreTheme
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement

@@ -1,9 +1,9 @@
-package aetherealtech.metroidstore.customerclient.signup
+package aetherealtech.metroidstore.customerclient.ui.signup
 
 import aetherealtech.metroidstore.customerclient.backendclient.BackendClient
-import aetherealtech.metroidstore.customerclient.fakedatasources.AuthDataSourceFake
+import aetherealtech.metroidstore.customerclient.datasources.fake.AuthDataSourceFake
 import aetherealtech.metroidstore.customerclient.repositories.AuthRepository
-import aetherealtech.metroidstore.customerclient.ui.theme.MetroidStoreTheme
+import aetherealtech.metroidstore.customerclient.theme.MetroidStoreTheme
 import aetherealtech.metroidstore.customerclient.uitoolkit.PrimaryCallToAction
 import aetherealtech.metroidstore.customerclient.utilities.StateFlows
 import aetherealtech.metroidstore.customerclient.utilities.mapState

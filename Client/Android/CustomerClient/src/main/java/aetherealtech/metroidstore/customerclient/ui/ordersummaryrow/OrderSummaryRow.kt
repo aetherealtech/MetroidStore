@@ -1,4 +1,4 @@
-package aetherealtech.metroidstore.customerclient.orders
+package aetherealtech.metroidstore.customerclient.ui.ordersummaryrow
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,18 +18,15 @@ import aetherealtech.metroidstore.customerclient.model.OrderID
 import aetherealtech.metroidstore.customerclient.model.OrderStatus
 import aetherealtech.metroidstore.customerclient.model.OrderSummary
 import aetherealtech.metroidstore.customerclient.model.Price
-import aetherealtech.metroidstore.customerclient.ui.theme.MetroidStoreTheme
+import aetherealtech.metroidstore.customerclient.theme.MetroidStoreTheme
 import aetherealtech.metroidstore.customerclient.uitoolkit.PrimaryCallToAction
 import aetherealtech.metroidstore.customerclient.utilities.displayString
 import aetherealtech.metroidstore.customerclient.widgets.PriceView
 import aetherealtech.metroidstore.customerclient.widgets.PriceViewModel
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.ui.text.font.FontWeight
 import kotlinx.datetime.Clock
-import java.text.DateFormat
-import java.util.Date
 
 @Composable
 fun OrderSummaryRow(

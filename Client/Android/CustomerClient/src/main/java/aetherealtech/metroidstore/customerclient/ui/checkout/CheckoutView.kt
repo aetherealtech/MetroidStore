@@ -1,4 +1,4 @@
-package aetherealtech.metroidstore.customerclient.checkout
+package aetherealtech.metroidstore.customerclient.ui.checkout
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import aetherealtech.metroidstore.customerclient.fakedatasources.DataSourceFake
+import aetherealtech.metroidstore.customerclient.datasources.fake.DataSourceFake
 import aetherealtech.metroidstore.customerclient.model.CartItem
 import aetherealtech.metroidstore.customerclient.model.NewOrder
 import aetherealtech.metroidstore.customerclient.model.OrderID
@@ -29,12 +29,12 @@ import aetherealtech.metroidstore.customerclient.model.Price
 import aetherealtech.metroidstore.customerclient.model.ShippingMethod
 import aetherealtech.metroidstore.customerclient.model.UserAddressSummary
 import aetherealtech.metroidstore.customerclient.model.subtotal
-import aetherealtech.metroidstore.customerclient.orderconfirmation.PlaceOrderButton
-import aetherealtech.metroidstore.customerclient.orderconfirmation.PlaceOrderViewModel
+import aetherealtech.metroidstore.customerclient.ui.placeorderbutton.PlaceOrderButton
+import aetherealtech.metroidstore.customerclient.ui.placeorderbutton.PlaceOrderViewModel
 import aetherealtech.metroidstore.customerclient.repositories.CartRepository
 import aetherealtech.metroidstore.customerclient.repositories.UserRepository
 import aetherealtech.metroidstore.customerclient.routing.AppBarState
-import aetherealtech.metroidstore.customerclient.ui.theme.MetroidStoreTheme
+import aetherealtech.metroidstore.customerclient.theme.MetroidStoreTheme
 import aetherealtech.metroidstore.customerclient.utilities.StateFlows
 import aetherealtech.metroidstore.customerclient.utilities.mapState
 import aetherealtech.metroidstore.customerclient.widgets.BusyView

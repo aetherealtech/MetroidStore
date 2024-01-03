@@ -1,8 +1,8 @@
 package aetherealtech.metroidstore.customerclient
 
-import aetherealtech.metroidstore.customerclient.root.RootView
-import aetherealtech.metroidstore.customerclient.root.RootViewModel
-import aetherealtech.metroidstore.customerclient.ui.theme.MetroidStoreTheme
+import aetherealtech.metroidstore.customerclient.ui.root.RootView
+import aetherealtech.metroidstore.customerclient.ui.root.RootViewModel
+import aetherealtech.metroidstore.customerclient.theme.MetroidStoreTheme
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent

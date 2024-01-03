@@ -1,4 +1,4 @@
-package aetherealtech.metroidstore.customerclient.productlist
+package aetherealtech.metroidstore.customerclient.ui.productlistrow
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -18,12 +18,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
-import aetherealtech.metroidstore.customerclient.fakedatasources.DataSourceFake
-import aetherealtech.metroidstore.customerclient.fakedatasources.summary
+import aetherealtech.metroidstore.customerclient.datasources.fake.DataSourceFake
+import aetherealtech.metroidstore.customerclient.datasources.fake.summary
 import aetherealtech.metroidstore.customerclient.model.ImageSource
 import aetherealtech.metroidstore.customerclient.model.ProductID
 import aetherealtech.metroidstore.customerclient.model.ProductSummary
-import aetherealtech.metroidstore.customerclient.ui.theme.MetroidStoreTheme
+import aetherealtech.metroidstore.customerclient.theme.MetroidStoreTheme
 import aetherealtech.metroidstore.customerclient.widgets.AsyncImage
 import aetherealtech.metroidstore.customerclient.widgets.PriceView
 import aetherealtech.metroidstore.customerclient.widgets.PriceViewModel

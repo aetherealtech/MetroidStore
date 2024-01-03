@@ -1,4 +1,4 @@
-package aetherealtech.metroidstore.customerclient.ui.theme
+package aetherealtech.metroidstore.customerclient.theme
 
 import androidx.compose.ui.graphics.Color
 

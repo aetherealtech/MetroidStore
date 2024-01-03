@@ -1,4 +1,4 @@
-package aetherealtech.metroidstore.customerclient.fakedatasources
+package aetherealtech.metroidstore.customerclient.datasources.fake
 
 import android.content.res.Resources.NotFoundException
 import aetherealtech.metroidstore.customerclient.datasources.api.ProductDataSource

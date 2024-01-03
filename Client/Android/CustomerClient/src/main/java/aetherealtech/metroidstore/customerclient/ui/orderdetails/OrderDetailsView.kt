@@ -1,14 +1,16 @@
-package aetherealtech.metroidstore.customerclient.orderdetails
+package aetherealtech.metroidstore.customerclient.ui.orderdetails
 
-import aetherealtech.metroidstore.customerclient.fakedatasources.DataSourceFake
+import aetherealtech.metroidstore.customerclient.datasources.fake.DataSourceFake
 import aetherealtech.metroidstore.customerclient.model.OrderDetails
 import aetherealtech.metroidstore.customerclient.model.OrderID
 import aetherealtech.metroidstore.customerclient.model.ProductID
-import aetherealtech.metroidstore.customerclient.orderactivity.OrderActivityView
-import aetherealtech.metroidstore.customerclient.orderactivity.OrderActivityViewModel
+import aetherealtech.metroidstore.customerclient.ui.orderitemrow.OrderItemRowView
+import aetherealtech.metroidstore.customerclient.ui.orderitemrow.OrderItemRowViewModel
+import aetherealtech.metroidstore.customerclient.ui.orderactivity.OrderActivityView
+import aetherealtech.metroidstore.customerclient.ui.orderactivity.OrderActivityViewModel
 import aetherealtech.metroidstore.customerclient.repositories.OrderRepository
 import aetherealtech.metroidstore.customerclient.routing.AppBarState
-import aetherealtech.metroidstore.customerclient.ui.theme.MetroidStoreTheme
+import aetherealtech.metroidstore.customerclient.theme.MetroidStoreTheme
 import aetherealtech.metroidstore.customerclient.utilities.displayString
 import aetherealtech.metroidstore.customerclient.widgets.AsyncLoadedShimmering
 import aetherealtech.metroidstore.customerclient.widgets.CenterModal

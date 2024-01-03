@@ -1,5 +1,7 @@
-package aetherealtech.metroidstore.customerclient.addtocart
+package aetherealtech.metroidstore.customerclient.ui.addtocartbutton
 
+import aetherealtech.metroidstore.customerclient.ui.addtocartconfirmation.AddToCartConfirmation
+import aetherealtech.metroidstore.customerclient.ui.addtocartconfirmation.AddToCartConfirmationViewModel
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -12,7 +14,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import aetherealtech.metroidstore.customerclient.model.ProductDetails
 import aetherealtech.metroidstore.customerclient.repositories.CartRepository
-import aetherealtech.metroidstore.customerclient.ui.theme.Colors
+import aetherealtech.metroidstore.customerclient.theme.Colors
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
@@ -50,11 +52,13 @@ class AddToCartViewModel(
 
     fun addToCart() {
         viewModelScope.launch {
-            _confirmationViewModel.emit(AddToCartConfirmationViewModel(
+            _confirmationViewModel.emit(
+                AddToCartConfirmationViewModel(
                 product = product,
                 cartRepository = cartRepository,
                 viewCart = viewCart
-            ))
+            )
+            )
         }
     }
 }
