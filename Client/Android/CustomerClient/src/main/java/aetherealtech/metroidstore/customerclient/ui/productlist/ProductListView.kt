@@ -6,16 +6,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import aetherealtech.metroidstore.customerclient.datasources.fake.DataSourceFake
-import aetherealtech.metroidstore.customerclient.model.ProductID
 import aetherealtech.metroidstore.customerclient.repositories.ProductRepository
 import aetherealtech.metroidstore.customerclient.routing.AppBarState
 import aetherealtech.metroidstore.customerclient.ui.productlistrow.ProductRowView
-import aetherealtech.metroidstore.customerclient.ui.productlistrow.ProductRowViewModel
 import aetherealtech.metroidstore.customerclient.theme.MetroidStoreTheme
-import aetherealtech.metroidstore.customerclient.utilities.cacheLatest
 import aetherealtech.metroidstore.customerclient.widgets.AsyncLoadedShimmering
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,13 +22,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.dp
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -74,37 +62,6 @@ fun ProductListView(
                 )
             }
         }
-    }
-}
-
-@OptIn(ExperimentalCoroutinesApi::class)
-class ProductListViewModel(
-    productRepository: ProductRepository,
-    selectProduct: (ProductID) -> Unit
-): ViewModel() {
-    val items: StateFlow<ImmutableList<ProductRowViewModel>?>
-
-    val searchQuery = MutableStateFlow<String?>(null)
-
-    init {
-        items = searchQuery
-            .flatMapLatest { searchQuery ->
-                val result = MutableStateFlow<ImmutableList<ProductRowViewModel>?>(null)
-
-                viewModelScope.launch {
-                    result.value = productRepository.getProducts(searchQuery)
-                        .map { product ->
-                            ProductRowViewModel(
-                                product = product,
-                                select = { selectProduct(product.id) }
-                            )
-                        }
-                        .toImmutableList()
-                }
-
-                return@flatMapLatest result
-            }
-            .cacheLatest(initialValue = null)
     }
 }
 

@@ -12,20 +12,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import aetherealtech.metroidstore.customerclient.datasources.fake.DataSourceFake
 import aetherealtech.metroidstore.customerclient.datasources.fake.details
 import aetherealtech.metroidstore.customerclient.model.ProductDetails
-import aetherealtech.metroidstore.customerclient.repositories.CartRepository
 import aetherealtech.metroidstore.customerclient.theme.MetroidStoreTheme
 import aetherealtech.metroidstore.customerclient.uitoolkit.ConfirmationModal
-import aetherealtech.metroidstore.customerclient.uitoolkit.ConfirmationModalViewModel
 import aetherealtech.metroidstore.customerclient.widgets.CloseableView
 import aetherealtech.metroidstore.customerclient.uitoolkit.PrimaryCallToAction
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 
 @Composable
 fun AddToCartConfirmation(
@@ -38,25 +32,6 @@ fun AddToCartConfirmation(
             viewModel = contentViewModel,
             onClose = onClose
         )
-    }
-}
-
-class AddToCartConfirmationViewModel(
-    private val _addedViewModel: MutableStateFlow<AddedToCartViewModel?>
-): ConfirmationModalViewModel<AddedToCartViewModel>(_addedViewModel.asStateFlow()) {
-    constructor(
-        product: ProductDetails,
-        cartRepository: CartRepository,
-        viewCart: () -> Unit
-    ) : this(MutableStateFlow(null)) {
-        viewModelScope.launch {
-            cartRepository.addToCart(product.id)
-
-            _addedViewModel.value = AddedToCartViewModel(
-                product = product,
-                viewCart = viewCart
-            )
-        }
     }
 }
 

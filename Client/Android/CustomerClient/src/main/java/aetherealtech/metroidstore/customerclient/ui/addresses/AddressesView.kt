@@ -1,14 +1,11 @@
 package aetherealtech.metroidstore.customerclient.ui.addresses
 
 import aetherealtech.metroidstore.customerclient.datasources.fake.DataSourceFake
-import aetherealtech.metroidstore.customerclient.model.Address
 import aetherealtech.metroidstore.customerclient.repositories.UserRepository
 import aetherealtech.metroidstore.customerclient.routing.AppBarState
 import aetherealtech.metroidstore.customerclient.theme.Colors
 import aetherealtech.metroidstore.customerclient.ui.addressrow.AddressRowView
-import aetherealtech.metroidstore.customerclient.ui.addressrow.AddressRowViewModel
 import aetherealtech.metroidstore.customerclient.theme.MetroidStoreTheme
-import aetherealtech.metroidstore.customerclient.utilities.mapState
 import aetherealtech.metroidstore.customerclient.widgets.AsyncLoadedShimmering
 import aetherealtech.metroidstore.customerclient.widgets.SwipeToDeleteRow
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,9 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.launch
 
 @Composable
 fun AddressesView(
@@ -70,34 +64,6 @@ fun AddressesView(
 
                 Divider()
             }
-        }
-    }
-}
-
-class AddressesViewModel(
-    private val repository: UserRepository,
-    val openAddAddress: () -> Unit,
-    val openEditAddress: (Address.ID) -> Unit
-): ViewModel() {
-    val items = repository.addressDetails
-        .mapState { addressDetailsList ->
-            addressDetailsList.map { addressDetails ->
-                AddressRowViewModel(
-                    details = addressDetails,
-                    select = { openEditAddress(addressDetails.address.id) }
-                )
-            }
-        }
-
-    init {
-        viewModelScope.launch {
-            repository.updateAddressDetails()
-        }
-    }
-
-    fun delete(item: AddressRowViewModel) {
-        viewModelScope.launch {
-            repository.deleteAddress(item.id)
         }
     }
 }

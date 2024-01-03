@@ -1,34 +1,25 @@
 package aetherealtech.metroidstore.customerclient.ui.paymentmethods
 
 import aetherealtech.metroidstore.customerclient.datasources.fake.DataSourceFake
-import aetherealtech.metroidstore.customerclient.model.PaymentMethodID
 import aetherealtech.metroidstore.customerclient.repositories.UserRepository
 import aetherealtech.metroidstore.customerclient.routing.AppBarState
 import aetherealtech.metroidstore.customerclient.theme.Colors
 import aetherealtech.metroidstore.customerclient.theme.MetroidStoreTheme
 import aetherealtech.metroidstore.customerclient.ui.paymentmethodrow.PaymentMethodRowView
-import aetherealtech.metroidstore.customerclient.ui.paymentmethodrow.PaymentMethodRowViewModel
-import aetherealtech.metroidstore.customerclient.utilities.mapState
 import aetherealtech.metroidstore.customerclient.widgets.AsyncLoadedShimmering
 import aetherealtech.metroidstore.customerclient.widgets.SwipeToDeleteRow
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun PaymentMethodsView(
     modifier: Modifier = Modifier,
@@ -73,34 +64,6 @@ fun PaymentMethodsView(
                 
                 Divider()
             }
-        }
-    }
-}
-
-class PaymentMethodsViewModel(
-    private val repository: UserRepository,
-    val openAddPaymentMethod: () -> Unit,
-    val openEditPaymentMethod: (PaymentMethodID) -> Unit
-): ViewModel() {
-    val items = repository.paymentMethodDetails
-        .mapState { paymentMethodDetailsList ->
-            paymentMethodDetailsList.map { paymentMethodDetails ->
-                PaymentMethodRowViewModel(
-                    details = paymentMethodDetails,
-                    select = { openEditPaymentMethod(paymentMethodDetails.id) }
-                )
-            }
-        }
-
-    init {
-        viewModelScope.launch {
-            repository.updatePaymentMethodDetails()
-        }
-    }
-
-    fun delete(item: PaymentMethodRowViewModel) {
-        viewModelScope.launch {
-            repository.deletePaymentMethod(item.id)
         }
     }
 }

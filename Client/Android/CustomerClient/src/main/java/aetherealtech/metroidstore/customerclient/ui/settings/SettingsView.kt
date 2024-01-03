@@ -21,14 +21,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
-import com.aetherealtech.metroidstore.customerclient.R
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun SettingsView(
@@ -79,36 +73,6 @@ fun SettingsView(
             }
         }
     }
-}
-
-class SettingsViewModel(
-    openAddresses: () -> Unit,
-    openPaymentMethods: () -> Unit,
-    logout: () -> Unit
-): ViewModel() {
-    data class Option(
-        val icon: @Composable () -> ImageVector,
-        val title: String,
-        val select: () -> Unit
-    )
-
-    val options: ImmutableList<Option> = persistentListOf(
-        Option(
-            icon = { ImageVector.vectorResource(R.drawable.baseline_home_work_24) },
-            title = "Addresses",
-            select = openAddresses
-        ),
-        Option(
-            icon = { ImageVector.vectorResource(R.drawable.baseline_payment_24) },
-            title = "Payment Methods",
-            select = openPaymentMethods
-        ),
-        Option(
-            icon = { ImageVector.vectorResource(R.drawable.baseline_logout_24) },
-            title = "Log Out",
-            select = logout
-        ),
-    )
 }
 
 @Preview(showBackground = true)

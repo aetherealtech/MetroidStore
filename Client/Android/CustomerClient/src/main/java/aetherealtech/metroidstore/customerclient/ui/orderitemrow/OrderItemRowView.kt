@@ -2,12 +2,9 @@ package aetherealtech.metroidstore.customerclient.ui.orderitemrow
 
 import aetherealtech.metroidstore.customerclient.datasources.fake.DataSourceFake
 import aetherealtech.metroidstore.customerclient.datasources.fake.orderItem
-import aetherealtech.metroidstore.customerclient.model.ImageSource
-import aetherealtech.metroidstore.customerclient.model.OrderDetails
 import aetherealtech.metroidstore.customerclient.theme.MetroidStoreTheme
 import aetherealtech.metroidstore.customerclient.widgets.AsyncImage
 import aetherealtech.metroidstore.customerclient.widgets.PriceView
-import aetherealtech.metroidstore.customerclient.widgets.PriceViewModel
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,7 +22,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
 
 @Composable
 fun OrderItemRowView(
@@ -63,21 +59,6 @@ fun OrderItemRowView(
             }
         }
         Divider()
-    }
-}
-
-class OrderItemRowViewModel(
-    item: OrderDetails.Item,
-    val select: () -> Unit,
-): ViewModel() {
-    val image: ImageSource
-    val name: String
-    val price: PriceViewModel
-
-    init {
-        image = item.image
-        name = "${item.name}${if (item.quantity > 1) " (${item.quantity})" else ""}"
-        price = PriceViewModel(item.price)
     }
 }
 

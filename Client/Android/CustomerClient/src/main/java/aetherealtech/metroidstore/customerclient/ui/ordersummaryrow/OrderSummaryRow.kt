@@ -13,16 +13,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
 import aetherealtech.metroidstore.customerclient.model.OrderID
 import aetherealtech.metroidstore.customerclient.model.OrderStatus
 import aetherealtech.metroidstore.customerclient.model.OrderSummary
 import aetherealtech.metroidstore.customerclient.model.Price
 import aetherealtech.metroidstore.customerclient.theme.MetroidStoreTheme
 import aetherealtech.metroidstore.customerclient.uitoolkit.PrimaryCallToAction
-import aetherealtech.metroidstore.customerclient.utilities.displayString
 import aetherealtech.metroidstore.customerclient.widgets.PriceView
-import aetherealtech.metroidstore.customerclient.widgets.PriceViewModel
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
 import androidx.compose.ui.text.font.FontWeight
@@ -69,29 +66,6 @@ fun OrderSummaryRow(
             }
         }
         Divider()
-    }
-}
-
-class OrderSummaryRowViewModel(
-    private val order: OrderSummary,
-    val viewOrder: (OrderID) -> Unit
-): ViewModel() {
-    val date: String
-    val status: String
-    val items: String
-    val total: PriceViewModel
-
-    init {
-        date = order.date.displayString
-        status = order.latestStatus.value
-
-        items = "${order.items} Items"
-
-        total = PriceViewModel(order.total)
-    }
-
-    fun viewOrder() {
-        viewOrder(order.id)
     }
 }
 

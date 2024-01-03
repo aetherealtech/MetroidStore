@@ -17,18 +17,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
 import aetherealtech.metroidstore.customerclient.datasources.fake.DataSourceFake
 import aetherealtech.metroidstore.customerclient.datasources.fake.summary
-import aetherealtech.metroidstore.customerclient.model.ImageSource
-import aetherealtech.metroidstore.customerclient.model.ProductID
-import aetherealtech.metroidstore.customerclient.model.ProductSummary
 import aetherealtech.metroidstore.customerclient.theme.MetroidStoreTheme
 import aetherealtech.metroidstore.customerclient.widgets.AsyncImage
 import aetherealtech.metroidstore.customerclient.widgets.PriceView
-import aetherealtech.metroidstore.customerclient.widgets.PriceViewModel
 import aetherealtech.metroidstore.customerclient.widgets.StarRatingView
-import aetherealtech.metroidstore.customerclient.widgets.StarRatingViewModel
 
 @Composable
 fun ProductRowView(
@@ -77,29 +71,6 @@ fun ProductRowView(
             }
         }
         Divider()
-    }
-}
-
-class ProductRowViewModel(
-    product: ProductSummary,
-    val select: () -> Unit
-): ViewModel() {
-    val id: ProductID
-    val image: ImageSource
-    val name: String
-    val type: String
-    val game: String
-    val ratings: StarRatingViewModel?
-    val price: PriceViewModel
-
-    init {
-        id = product.id
-        image = product.image
-        name = product.name
-        type = product.type
-        game = product.game
-        ratings = StarRatingViewModel.create(product.ratingCount, product.rating)
-        price = PriceViewModel(product.price)
     }
 }
 

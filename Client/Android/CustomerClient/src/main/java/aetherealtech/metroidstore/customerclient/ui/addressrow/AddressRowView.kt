@@ -25,7 +25,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
 
 @Composable
 fun AddressRowView(
@@ -87,50 +86,6 @@ fun AddressRowView(
                 text = "Primary Address"
             )
         }
-    }
-}
-
-class AddressRowViewModel(
-    details: UserAddressDetails,
-    val select: () -> Unit
-): ViewModel() {
-    val id = details.address.id
-
-    val name: String
-
-    val address: String
-
-    val isPrimary: Boolean
-
-    init {
-        name = details.name
-
-        val addressLines = mutableListOf<String>()
-
-        addressLines.add(details.address.street1.value)
-
-        details.address.street2?.let { street2 ->
-            addressLines.add(street2.value)
-        }
-
-        val locationElements = listOf(
-            details.address.locality.value,
-            details.address.province.value,
-            details.address.postalCode?.value
-        )
-            .filterNotNull()
-
-        addressLines.add(locationElements.joinToString(", "))
-
-        addressLines.add(listOf(
-            details.address.country.value,
-            details.address.planet.value
-        ).joinToString(", "))
-
-        address = addressLines
-            .joinToString("\n")
-
-        isPrimary = details.isPrimary
     }
 }
 

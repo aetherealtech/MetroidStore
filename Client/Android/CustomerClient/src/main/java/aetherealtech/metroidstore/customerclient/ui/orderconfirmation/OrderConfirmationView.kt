@@ -11,20 +11,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import aetherealtech.metroidstore.customerclient.model.NewOrder
 import aetherealtech.metroidstore.customerclient.model.OrderID
-import aetherealtech.metroidstore.customerclient.repositories.UserRepository
 import aetherealtech.metroidstore.customerclient.theme.MetroidStoreTheme
 import aetherealtech.metroidstore.customerclient.uitoolkit.ConfirmationModal
-import aetherealtech.metroidstore.customerclient.uitoolkit.ConfirmationModalViewModel
 import aetherealtech.metroidstore.customerclient.widgets.CloseableView
 import aetherealtech.metroidstore.customerclient.uitoolkit.PrimaryCallToAction
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 
 @Composable
 fun OrderConfirmationView(
@@ -37,27 +29,6 @@ fun OrderConfirmationView(
             viewModel = contentViewModel,
             onClose = onClose
         )
-    }
-}
-
-class OrderConfirmationViewModel private constructor(
-    private val _addedViewModel: MutableStateFlow<OrderConfirmationContentViewModel?>
-): ConfirmationModalViewModel<OrderConfirmationContentViewModel>(
-    _addedViewModel.asStateFlow()
-) {
-    constructor(
-        order: NewOrder,
-        userRepository: UserRepository,
-        viewOrder: (OrderID) -> Unit
-    ) : this(MutableStateFlow(null)) {
-        viewModelScope.launch {
-            val orderID = userRepository.placeOrder(order)
-
-            _addedViewModel.value = OrderConfirmationContentViewModel(
-                orderID = orderID,
-                viewOrder = viewOrder
-            )
-        }
     }
 }
 
@@ -84,20 +55,6 @@ fun OrderConfirmationContentView(
                 )
             }
         }
-    }
-}
-class OrderConfirmationContentViewModel(
-    private val orderID: OrderID,
-    private val viewOrder: (OrderID) -> Unit
-): ViewModel() {
-    val text: String
-
-    init {
-        text = "Order Placed!"
-    }
-
-    fun viewOrder() {
-        viewOrder(orderID)
     }
 }
 

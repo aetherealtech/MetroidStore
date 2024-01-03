@@ -25,7 +25,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
 
 @Composable
 fun PaymentMethodRowView(
@@ -79,15 +78,6 @@ fun PaymentMethodRowView(
             )
         }
     }
-}
-
-class PaymentMethodRowViewModel(
-    details: PaymentMethodDetails,
-    val select: () -> Unit
-): ViewModel() {
-    val id = details.id
-    val name = details.name
-    val isPrimary = details.isPrimary
 }
 
 @Preview(showBackground = true)
