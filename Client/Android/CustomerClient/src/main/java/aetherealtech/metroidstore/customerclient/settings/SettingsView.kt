@@ -84,6 +84,7 @@ fun SettingsView(
 class SettingsViewModel(
     openAddresses: () -> Unit,
     openPaymentMethods: () -> Unit,
+    logout: () -> Unit
 ): ViewModel() {
     data class Option(
         val icon: @Composable () -> ImageVector,
@@ -102,6 +103,11 @@ class SettingsViewModel(
             title = "Payment Methods",
             select = openPaymentMethods
         ),
+        Option(
+            icon = { ImageVector.vectorResource(R.drawable.baseline_logout_24) },
+            title = "Log Out",
+            select = logout
+        ),
     )
 }
 
@@ -113,7 +119,8 @@ fun SettingsPreview() {
             setAppBarState = { },
             viewModel = SettingsViewModel(
                 openAddresses = { },
-                openPaymentMethods = { }
+                openPaymentMethods = { },
+                logout = { }
             ),
         )
     }

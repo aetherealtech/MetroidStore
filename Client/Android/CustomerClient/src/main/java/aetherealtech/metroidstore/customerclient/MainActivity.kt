@@ -35,6 +35,14 @@ class MainActivity : ComponentActivity() {
 
         val viewModel: MainViewModel by viewModels { MainViewModel.Factory(this) }
 
+        openLogin(viewModel)
+    }
+
+    private fun openLogin(
+        viewModel: MainViewModel
+    ) {
+        viewModelStore.clear()
+
         setThemedContent {
             val navController = rememberNavController()
 
@@ -48,7 +56,7 @@ class MainActivity : ComponentActivity() {
                     val loginViewModel = viewModel(
                         factory = viewModel.login(
                             openSignup = { navController.navigate("signUp") },
-                            onLoggedIn = { dataSource -> onLoggedIn(viewModel, dataSource) }
+                            onLoggedIn = { dataSource -> openRoot(viewModel, dataSource) }
                         )
                     )
 
@@ -74,7 +82,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun onLoggedIn(
+    private fun openRoot(
         viewModel: MainViewModel,
         dataSource: DataSource
     ) {
@@ -82,7 +90,8 @@ class MainActivity : ComponentActivity() {
             RootView(
                 viewModel = viewModel(
                     factory = viewModel.root(
-                        dataSource = dataSource
+                        dataSource = dataSource,
+                        logout = { openLogin(viewModel) }
                     )
                 )
             )
@@ -155,10 +164,12 @@ class MainViewModel private constructor(
     }
 
     fun root(
-        dataSource: DataSource
+        dataSource: DataSource,
+        logout: () -> Unit
     ) = object : ViewModelFactory<RootViewModel>() {
         override fun create() = RootViewModel(
-            dataSource = dataSource
+            dataSource = dataSource,
+            logout = logout
         )
     }
 

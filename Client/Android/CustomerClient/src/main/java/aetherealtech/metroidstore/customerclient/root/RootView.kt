@@ -311,7 +311,8 @@ fun RootView(
 }
 
 class RootViewModel(
-    val dataSource: DataSource
+    val dataSource: DataSource,
+    val logout: () -> Unit
 ): ViewModel() {
     private val productRepository = ProductRepository(
         dataSource = dataSource
@@ -397,10 +398,12 @@ class RootViewModel(
     fun settings(
         openAddresses: () -> Unit,
         openPaymentMethods: () -> Unit,
+        logout: () -> Unit
     ) = object : ViewModelFactory<SettingsViewModel>() {
         override fun create() = SettingsViewModel(
             openAddresses = openAddresses,
-            openPaymentMethods = openPaymentMethods
+            openPaymentMethods = openPaymentMethods,
+            logout = logout
         )
     }
 

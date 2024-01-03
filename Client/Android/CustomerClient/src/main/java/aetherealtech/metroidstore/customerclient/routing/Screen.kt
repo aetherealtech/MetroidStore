@@ -102,7 +102,8 @@ sealed class Screen(
             val settingsViewModel = viewModel<SettingsViewModel>(
                 factory = rootViewModel.settings(
                     openAddresses = { router.openAddresses() },
-                    openPaymentMethods = { router.openPaymentMethods() }
+                    openPaymentMethods = { router.openPaymentMethods() },
+                    logout = rootViewModel.logout
                 )
             )
 
