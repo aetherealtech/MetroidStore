@@ -6,7 +6,7 @@ import aetherealtech.metroidstore.customerclient.orders.OrdersView
 import aetherealtech.metroidstore.customerclient.orders.OrdersViewModel
 import aetherealtech.metroidstore.customerclient.productlist.ProductListView
 import aetherealtech.metroidstore.customerclient.productlist.ProductListViewModel
-import aetherealtech.metroidstore.customerclient.root.RootViewModel
+import aetherealtech.metroidstore.customerclient.main.MainViewModel
 import aetherealtech.metroidstore.customerclient.settings.SettingsView
 import aetherealtech.metroidstore.customerclient.settings.SettingsViewModel
 import androidx.compose.material.icons.Icons
@@ -25,13 +25,13 @@ sealed class Screen(
     val title: String,
     val icon: @Composable () -> ImageVector,
     val route: String,
-    val content: @Composable (Router, (AppBarState) -> Unit, RootViewModel) -> Unit
+    val content: @Composable (Router, (AppBarState) -> Unit, MainViewModel) -> Unit
 ) {
     constructor(
         title: String,
         icon: ImageVector,
         route: String,
-        content: @Composable (Router, (AppBarState) -> Unit, RootViewModel) -> Unit
+        content: @Composable (Router, (AppBarState) -> Unit, MainViewModel) -> Unit
     ) : this(
         title = title,
         icon = { icon },
