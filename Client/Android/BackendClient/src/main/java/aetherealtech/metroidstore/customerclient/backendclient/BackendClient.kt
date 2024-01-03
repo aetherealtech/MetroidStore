@@ -39,6 +39,7 @@ class BackendClient(
     private val host: HttpUrl
 ) {
     class InvalidLoginException: RuntimeException("Login Failed")
+    class InvalidSignUpException: RuntimeException("Sign Up Failed")
 
     suspend fun login(
         username: String,
@@ -74,6 +75,34 @@ class BackendClient(
             host = host,
             token = token
         )
+    }
+
+    suspend fun signUp(
+        username: String,
+        password: String
+    ) {
+        val newUser = aetherealtech.metroidstore.backendmodel.NewUser(
+            username = username,
+            password = password
+        )
+
+        val request = buildRequest(
+            modifyRequest = { builder ->
+                builder
+                    .post(Json.encodeToString(newUser).toRequestBody())
+            }
+        ) { urlBuilder ->
+            urlBuilder
+                .addPathSegment("users")
+        }
+
+        val response = client.newCall(request).await()
+
+        if(response.code == HttpURLConnection.HTTP_BAD_REQUEST)
+            throw InvalidSignUpException()
+
+        if(!response.isSuccessful)
+            throw IllegalArgumentException(response.message)
     }
 
     private val client = OkHttpClient()

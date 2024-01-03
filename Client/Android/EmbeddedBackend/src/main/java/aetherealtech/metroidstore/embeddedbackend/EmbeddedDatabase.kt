@@ -64,6 +64,31 @@ data class AuthDetails(
     val salt: String
 )
 
+fun SQLiteDatabase.createUser(
+    username: String,
+    passhash: String,
+    salt: String
+): Boolean {
+    beginTransaction()
+
+    try {
+        execSQL(
+            "INSERT INTO Users (username, passhash, salt) VALUES (?, ?, ?)",
+            arrayOf(username, passhash, salt)
+        )
+
+        setTransactionSuccessful()
+
+        return true
+    } catch (error: Exception) {
+        println(error.localizedMessage)
+
+        return false
+    } finally {
+        endTransaction()
+    }
+}
+
 fun SQLiteDatabase.passhash(username: String): AuthDetails {
     return rawQuery(
         """

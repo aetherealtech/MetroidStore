@@ -1,7 +1,6 @@
-package aetherealtech.metroidstore.customerclient.login
+package aetherealtech.metroidstore.customerclient.signup
 
 import aetherealtech.metroidstore.customerclient.backendclient.BackendClient
-import aetherealtech.metroidstore.customerclient.datasources.DataSource
 import aetherealtech.metroidstore.customerclient.fakedatasources.AuthDataSourceFake
 import aetherealtech.metroidstore.customerclient.repositories.AuthRepository
 import aetherealtech.metroidstore.customerclient.ui.theme.MetroidStoreTheme
@@ -42,10 +41,10 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
 @Composable
-fun LoginView(
-    viewModel: LoginViewModel
+fun SignUpView(
+    viewModel: SignUpViewModel
 ) {
-    val login by viewModel.login.collectAsState()
+    val create by viewModel.signUp.collectAsState()
 
     BusyView(
         busy = viewModel.busy
@@ -78,14 +77,14 @@ fun LoginView(
                 PrimaryCallToAction(
                     modifier = Modifier
                         .width(128.dp),
-                    onClick = login,
-                    text = "Login"
+                    onClick = create,
+                    text = "Sign Up"
                 )
 
                 TextButton(
-                    onClick = viewModel.openSignup
+                    onClick = { viewModel.cancel() }
                 ) {
-                    Text("Sign Up")
+                    Text("Cancel")
                 }
             }
         }
@@ -115,10 +114,9 @@ fun LoginView(
     }
 }
 
-class LoginViewModel(
+class SignUpViewModel(
     repository: AuthRepository,
-    val openSignup: () -> Unit,
-    onLoggedIn: (DataSource) -> Unit
+    private val onCompleted: () -> Unit
 ): ViewModel() {
     private val _error = MutableSharedFlow<String>()
 
@@ -128,7 +126,7 @@ class LoginViewModel(
     val username = FormValue.requiredNonEmpty("")
     val password = FormValue.requiredNonEmpty("")
 
-    val login: StateFlow<(() -> Unit)?> = StateFlows
+    val signUp: StateFlow<(() -> Unit)?> = StateFlows
         .combine(
             this.username.value,
             this.password.value
@@ -146,34 +144,37 @@ class LoginViewModel(
             return@mapState {
                 viewModelScope.launch {
                     try {
-                        val dataSource = repository.login(
+                        repository.signUp(
                             username = first,
                             password = second
                         )
 
-                        onLoggedIn(dataSource)
+                        onCompleted()
                     } catch(error: Exception) {
                         when(error) {
-                            is BackendClient.InvalidLoginException -> _error.emit("Invalid username or password")
+                            is BackendClient.InvalidSignUpException -> _error.emit("Invalid username or password")
                             else -> _error.emit("Error communicating with server.  Please try again")
                         }
                     }
                 }
             }
         }
+    
+    fun cancel() {
+        onCompleted()
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun LoginPreview() {
+fun SignUpPreview() {
     MetroidStoreTheme {
-        LoginView(
-            viewModel = LoginViewModel(
+        SignUpView(
+            viewModel = SignUpViewModel(
                 repository = AuthRepository(
                     dataSource = AuthDataSourceFake(),
                 ),
-                openSignup = { },
-                onLoggedIn = { }
+                onCompleted = { }
             )
         )
     }

@@ -14,4 +14,8 @@ class AuthDataSourceBackend(
         val authenticatedClient = client.login(username, password)
         return DataSourceBackend(client = authenticatedClient)
     }
+
+    override suspend fun signUp(username: String, password: String) {
+        client.signUp(username, password)
+    }
 }

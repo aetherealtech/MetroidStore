@@ -7,6 +7,8 @@ import aetherealtech.metroidstore.customerclient.login.LoginViewModel
 import aetherealtech.metroidstore.customerclient.repositories.AuthRepository
 import aetherealtech.metroidstore.customerclient.root.RootView
 import aetherealtech.metroidstore.customerclient.root.RootViewModel
+import aetherealtech.metroidstore.customerclient.signup.SignUpView
+import aetherealtech.metroidstore.customerclient.signup.SignUpViewModel
 import aetherealtech.metroidstore.customerclient.ui.theme.MetroidStoreTheme
 import aetherealtech.metroidstore.customerclient.utilities.ViewModelFactory
 import aetherealtech.metroidstore.customerclient.utilities.viewModel
@@ -22,6 +24,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import okhttp3.HttpUrl
 
 class MainActivity : ComponentActivity() {
@@ -31,13 +36,41 @@ class MainActivity : ComponentActivity() {
         val viewModel: MainViewModel by viewModels { MainViewModel.Factory(this) }
 
         setThemedContent {
-            LoginView(
-                viewModel = viewModel(
-                    factory = viewModel.login(
-                        onLoggedIn = { dataSource -> onLoggedIn(viewModel, dataSource )}
+            val navController = rememberNavController()
+
+            NavHost(
+                navController,
+                startDestination = "login",
+            ) {
+                composable(
+                    "login"
+                ) {backstackEntry ->
+                    val loginViewModel = viewModel(
+                        factory = viewModel.login(
+                            openSignup = { navController.navigate("signUp") },
+                            onLoggedIn = { dataSource -> onLoggedIn(viewModel, dataSource) }
+                        )
                     )
-                )
-            )
+
+                    LoginView(
+                        viewModel = loginViewModel
+                    )
+                }
+
+                composable(
+                    "signUp"
+                ) {backstackEntry ->
+                    val signupViewModel = viewModel(
+                        factory = viewModel.signUp(
+                            onCompleted = { navController.popBackStack() }
+                        )
+                    )
+
+                    SignUpView(
+                        viewModel = signupViewModel
+                    )
+                }
+            }
         }
     }
 
@@ -94,6 +127,7 @@ class MainViewModel private constructor(
     }
 
     fun login(
+        openSignup: () -> Unit,
         onLoggedIn: (DataSource) -> Unit
     ) = object : ViewModelFactory<LoginViewModel>() {
         override fun create() = LoginViewModel(
@@ -102,7 +136,21 @@ class MainViewModel private constructor(
                     host = backendHost
                 )
             ),
+            openSignup = openSignup,
             onLoggedIn = onLoggedIn
+        )
+    }
+
+    fun signUp(
+        onCompleted: () -> Unit
+    ) = object : ViewModelFactory<SignUpViewModel>() {
+        override fun create() = SignUpViewModel(
+            repository = AuthRepository(
+                dataSource = AuthDataSourceBackend(
+                    host = backendHost
+                )
+            ),
+            onCompleted = onCompleted
         )
     }
 

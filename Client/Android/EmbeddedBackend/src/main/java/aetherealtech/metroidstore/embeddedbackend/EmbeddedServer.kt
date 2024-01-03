@@ -5,6 +5,7 @@ import aetherealtech.metroidstore.backendmodel.EditPaymentMethod
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import aetherealtech.metroidstore.backendmodel.NewOrder
+import aetherealtech.metroidstore.backendmodel.NewUser
 import at.favre.lib.crypto.bcrypt.BCrypt
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
@@ -31,6 +32,33 @@ class EmbeddedServer(
 
         embeddedServer(Netty, port = port.toInt()) {
             routing {
+                post("/users") {
+                    val newUser = Json.decodeFromString<NewUser>(call.receiveText())
+
+                    try {
+                        val salt = String.random(8)
+
+                        val passhash = BCrypt.withDefaults().hashToString(
+                            10,
+                            "${newUser.password}${salt}".toCharArray()
+                        )
+
+                        val success = database.createUser(
+                            newUser.username,
+                            passhash,
+                            salt
+                        )
+
+                        if(!success) {
+                            call.respond(HttpStatusCode.BadRequest)
+                        } else {
+                            call.respondText("")
+                        }
+                    } catch(error: Exception) {
+                        println(error.localizedMessage)
+                    }
+                }
+
                 post("/login") {
                     val parameters = call.receiveParameters()
 
@@ -327,4 +355,11 @@ class EmbeddedServer(
             }
         }.start()
     }
+}
+
+fun String.Companion.random(length: Int) : String {
+    val allowedChars = ('A'..'Z') + ('a'..'z') + ('0'..'9')
+    return (0..< length)
+        .map { allowedChars.random() }
+        .joinToString("")
 }

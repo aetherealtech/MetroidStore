@@ -10,4 +10,8 @@ class AuthDataSourceFake: AuthDataSource {
     ): DataSource {
         return DataSourceFake()
     }
+
+    override suspend fun signUp(username: String, password: String) {
+
+    }
 }

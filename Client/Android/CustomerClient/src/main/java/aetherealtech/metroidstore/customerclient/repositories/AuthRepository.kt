@@ -2,6 +2,8 @@ package aetherealtech.metroidstore.customerclient.repositories
 
 import aetherealtech.metroidstore.customerclient.datasources.AuthDataSource
 import aetherealtech.metroidstore.customerclient.datasources.DataSource
+import aetherealtech.metroidstore.customerclient.model.OrderSummary
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
@@ -16,12 +18,20 @@ class AuthRepository(
     suspend fun login(
         username: String,
         password: String
-    ): DataSource {
+    ) = perform { dataSource.login(username, password) }
+
+    suspend fun signUp(
+        username: String,
+        password: String
+    ) = perform { dataSource.signUp(username, password) }
+
+    private suspend fun <T> perform(
+        action: suspend () -> T
+    ): T {
         _busy.value = true
 
         try {
-            val dataSource = dataSource.login(username, password)
-            return dataSource
+            return action()
         } finally {
             _busy.value = false
         }
