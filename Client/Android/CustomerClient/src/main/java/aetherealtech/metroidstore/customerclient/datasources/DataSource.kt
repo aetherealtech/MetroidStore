@@ -5,4 +5,6 @@ interface DataSource {
     val cart: CartDataSource
     val user: UserDataSource
     val orders: OrderDataSource
+
+    suspend fun logout()
 }

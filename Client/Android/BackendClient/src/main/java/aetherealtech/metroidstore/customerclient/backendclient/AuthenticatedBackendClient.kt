@@ -33,10 +33,12 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import ru.gildor.coroutines.okhttp.await
+import java.net.HttpURLConnection
 
 class AuthenticatedBackendClient internal constructor(
     private val host: HttpUrl,
-    private val token: String
+    private val token: String,
+    private val onLogout: () -> Unit
 ) {
     suspend fun getProducts(query: String?): ImmutableList<ProductSummary> {
         val request = buildRequest { urlBuilder ->
@@ -633,6 +635,22 @@ class AuthenticatedBackendClient internal constructor(
         return backendPaymentMethods
             .map { backendPaymentMethod -> backendPaymentMethod.clientModel }
             .toImmutableList()
+    }
+
+    suspend fun logout() {
+        val request = buildRequest(
+            modifyRequest = { builder -> builder.post(byteArrayOf().toRequestBody()) }
+        ) { urlBuilder ->
+            urlBuilder
+                .addPathSegment("logout")
+        }
+
+        val response = client.newCall(request).await()
+
+        if(!response.isSuccessful)
+            throw IllegalArgumentException("Logout Failed")
+
+        onLogout()
     }
 
     private val client = OkHttpClient()

@@ -4,10 +4,12 @@ import aetherealtech.metroidstore.customerclient.backendclient.AuthenticatedBack
 import aetherealtech.metroidstore.customerclient.datasources.DataSource
 
 class DataSourceBackend(
-    client: AuthenticatedBackendClient
+    private val client: AuthenticatedBackendClient
 ): DataSource {
     override val products = ProductDataSourceBackend(client)
     override val cart = CartDataSourceBackend(client)
     override val user = UserDataSourceBackend(client)
     override val orders = OrderDataSourceBackend(client)
+
+    override suspend fun logout() = client.logout()
 }

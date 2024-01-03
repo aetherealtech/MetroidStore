@@ -51,4 +51,6 @@ class DataSourceFake: DataSource {
     override val cart = CartDataSourceFake(fakeProducts)
     override val user = UserDataSourceFake()
     override val orders = OrderDataSourceFake(fakeProducts)
+
+    override suspend fun logout() { }
 }

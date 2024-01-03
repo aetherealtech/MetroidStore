@@ -83,6 +83,11 @@ class EmbeddedServer(
                     }
                 }
 
+                post("/logout") {
+                    // Nothing to do
+                    call.respondText("")
+                }
+
                 get("/products") {
                     val query = call.request.queryParameters["query"]
 

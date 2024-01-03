@@ -1,45 +1,33 @@
 package aetherealtech.metroidstore.customerclient.backendclient
 
-import android.content.res.Resources
-import aetherealtech.metroidstore.customerclient.model.Address
-import aetherealtech.metroidstore.customerclient.model.CartItem
-import aetherealtech.metroidstore.customerclient.model.EditAddress
-import aetherealtech.metroidstore.customerclient.model.EditPaymentMethod
-import aetherealtech.metroidstore.customerclient.model.NewOrder
-import aetherealtech.metroidstore.customerclient.model.OrderActivity
-import aetherealtech.metroidstore.customerclient.model.OrderDetails
-import aetherealtech.metroidstore.customerclient.model.OrderID
-import aetherealtech.metroidstore.customerclient.model.OrderStatus
-import aetherealtech.metroidstore.customerclient.model.OrderSummary
-import aetherealtech.metroidstore.customerclient.model.PaymentMethodDetails
-import aetherealtech.metroidstore.customerclient.model.PaymentMethodID
-import aetherealtech.metroidstore.customerclient.model.PaymentMethodSummary
-import aetherealtech.metroidstore.customerclient.model.Price
-import aetherealtech.metroidstore.customerclient.model.ProductDetails
-import aetherealtech.metroidstore.customerclient.model.ProductID
-import aetherealtech.metroidstore.customerclient.model.ProductSummary
-import aetherealtech.metroidstore.customerclient.model.Rating
-import aetherealtech.metroidstore.customerclient.model.ShippingMethod
-import aetherealtech.metroidstore.customerclient.model.UserAddressDetails
-import aetherealtech.metroidstore.customerclient.model.UserAddressSummary
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toImmutableList
-import kotlinx.datetime.Instant
+import android.content.Context
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.Response
 import ru.gildor.coroutines.okhttp.await
 import java.net.HttpURLConnection
 
 class BackendClient(
-    private val host: HttpUrl
+    private val host: HttpUrl,
+    context: Context
 ) {
+    private val credentialStore = CredentialStore(context)
+
     class InvalidLoginException: RuntimeException("Login Failed")
     class InvalidSignUpException: RuntimeException("Sign Up Failed")
+
+    val savedLogin: AuthenticatedBackendClient?
+        get() {
+            val token = credentialStore.token
+
+            if(token != null)
+                return authenticatedBackendClient(token)
+
+            return null
+        }
 
     suspend fun login(
         username: String,
@@ -71,8 +59,9 @@ class BackendClient(
 
         val token = body.string()
 
-        return AuthenticatedBackendClient(
-            host = host,
+        credentialStore.token = token
+
+        return authenticatedBackendClient(
             token = token
         )
     }
@@ -122,4 +111,12 @@ class BackendClient(
         return requestBuilder
             .build()
     }
+
+    private fun authenticatedBackendClient(
+        token: String
+    ) = AuthenticatedBackendClient(
+        host = host,
+        token = token,
+        onLogout = { credentialStore.token = null }
+    )
 }

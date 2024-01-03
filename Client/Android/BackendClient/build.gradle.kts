@@ -39,6 +39,7 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("ru.gildor.coroutines:kotlin-coroutines-okhttp:1.0")
     implementation("androidx.core:core-ktx:1.12.0")
+    implementation("androidx.security:security-crypto:1.0.0")
     implementation(project(mapOf("path" to ":BackendModel")))
     implementation(project(mapOf("path" to ":CustomerClientModel")))
     testImplementation("junit:junit:4.13.2")

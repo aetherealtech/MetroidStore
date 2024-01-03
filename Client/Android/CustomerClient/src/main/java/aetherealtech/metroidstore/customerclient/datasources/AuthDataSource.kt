@@ -1,6 +1,8 @@
 package aetherealtech.metroidstore.customerclient.datasources
 
 interface AuthDataSource {
+    val savedLogin: DataSource?
+
     suspend fun login(
         username: String,
         password: String
