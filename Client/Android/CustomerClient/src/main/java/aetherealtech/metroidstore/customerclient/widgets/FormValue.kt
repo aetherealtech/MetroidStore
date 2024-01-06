@@ -1,6 +1,6 @@
 package aetherealtech.metroidstore.customerclient.widgets
 
-import aetherealtech.metroidstore.customerclient.utilities.mapState
+import aetherealtech.kotlinflowsextensions.mapState
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class FormValue<T>(

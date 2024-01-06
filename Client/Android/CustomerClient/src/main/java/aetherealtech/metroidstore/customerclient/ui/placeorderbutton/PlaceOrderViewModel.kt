@@ -4,7 +4,7 @@ import aetherealtech.metroidstore.customerclient.model.NewOrder
 import aetherealtech.metroidstore.customerclient.model.OrderID
 import aetherealtech.metroidstore.customerclient.repositories.UserRepository
 import aetherealtech.metroidstore.customerclient.ui.orderconfirmation.OrderConfirmationViewModel
-import aetherealtech.metroidstore.customerclient.utilities.mapState
+import aetherealtech.kotlinflowsextensions.mapState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableSharedFlow

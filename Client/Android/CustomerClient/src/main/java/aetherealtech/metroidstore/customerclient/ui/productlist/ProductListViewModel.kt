@@ -3,7 +3,7 @@ package aetherealtech.metroidstore.customerclient.ui.productlist
 import aetherealtech.metroidstore.customerclient.model.ProductID
 import aetherealtech.metroidstore.customerclient.repositories.ProductRepository
 import aetherealtech.metroidstore.customerclient.ui.productlistrow.ProductRowViewModel
-import aetherealtech.metroidstore.customerclient.utilities.cacheLatest
+import aetherealtech.kotlinflowsextensions.cacheLatest
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.collections.immutable.ImmutableList

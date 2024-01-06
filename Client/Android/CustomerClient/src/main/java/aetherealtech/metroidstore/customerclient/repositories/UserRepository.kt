@@ -11,7 +11,7 @@ import aetherealtech.metroidstore.customerclient.model.PaymentMethodSummary
 import aetherealtech.metroidstore.customerclient.model.ShippingMethod
 import aetherealtech.metroidstore.customerclient.model.UserAddressDetails
 import aetherealtech.metroidstore.customerclient.model.UserAddressSummary
-import aetherealtech.metroidstore.customerclient.utilities.mapState
+import aetherealtech.kotlinflowsextensions.mapState
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList

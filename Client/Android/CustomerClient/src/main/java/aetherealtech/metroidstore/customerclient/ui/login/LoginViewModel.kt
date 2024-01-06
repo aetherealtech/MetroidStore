@@ -3,8 +3,8 @@ package aetherealtech.metroidstore.customerclient.ui.login
 import aetherealtech.metroidstore.customerclient.backendclient.BackendClient
 import aetherealtech.metroidstore.customerclient.datasources.api.DataSource
 import aetherealtech.metroidstore.customerclient.repositories.AuthRepository
-import aetherealtech.metroidstore.customerclient.utilities.StateFlows
-import aetherealtech.metroidstore.customerclient.utilities.mapState
+import aetherealtech.kotlinflowsextensions.StateFlows
+import aetherealtech.kotlinflowsextensions.mapState
 import aetherealtech.metroidstore.customerclient.widgets.FormValue
 import aetherealtech.metroidstore.customerclient.widgets.requiredNonEmpty
 import androidx.lifecycle.ViewModel

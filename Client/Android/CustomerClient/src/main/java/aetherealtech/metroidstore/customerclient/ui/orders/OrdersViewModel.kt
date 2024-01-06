@@ -3,7 +3,7 @@ package aetherealtech.metroidstore.customerclient.ui.orders
 import aetherealtech.metroidstore.customerclient.model.OrderID
 import aetherealtech.metroidstore.customerclient.repositories.OrderRepository
 import aetherealtech.metroidstore.customerclient.ui.ordersummaryrow.OrderSummaryRowViewModel
-import aetherealtech.metroidstore.customerclient.utilities.mapState
+import aetherealtech.kotlinflowsextensions.mapState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch

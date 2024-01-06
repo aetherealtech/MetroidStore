@@ -3,8 +3,8 @@ package aetherealtech.metroidstore.customerclient.ui.editaddress
 import aetherealtech.metroidstore.customerclient.model.Address
 import aetherealtech.metroidstore.customerclient.model.EditAddress
 import aetherealtech.metroidstore.customerclient.repositories.UserRepository
-import aetherealtech.metroidstore.customerclient.utilities.StateFlows
-import aetherealtech.metroidstore.customerclient.utilities.mapState
+import aetherealtech.kotlinflowsextensions.StateFlows
+import aetherealtech.kotlinflowsextensions.mapState
 import aetherealtech.metroidstore.customerclient.widgets.FormValue
 import aetherealtech.metroidstore.customerclient.widgets.optionalNonEmpty
 import aetherealtech.metroidstore.customerclient.widgets.requiredNonEmpty
@@ -52,24 +52,31 @@ class EditAddressViewModel private constructor(
         this.isPrimary
     )
         .mapState { values ->
+            val first = values.first
+            val second = values.second
+            val fourth = values.fourth
+            val fifth = values.fifth
+            val sixth = values.sixth
+            val seventh = values.seventh
+
             if(
-                values.first == null ||
-                values.second == null ||
-                values.fourth == null ||
-                values.fifth == null ||
-                values.sixth == null ||
-                values.seventh == null
+                first == null ||
+                second == null ||
+                fourth == null ||
+                fifth == null ||
+                sixth == null ||
+                seventh == null
             )
                 return@mapState null
 
             val address = EditAddress(
-                name = values.first,
-                street1 = Address.Street1(values.second),
+                name = first,
+                street1 = Address.Street1(second),
                 street2 = values.third?.let { value -> Address.Street2(value) },
-                locality = Address.Locality(values.fourth),
-                province = Address.Province(values.fifth),
-                country = Address.Country(values.sixth),
-                planet = Address.Planet(values.seventh),
+                locality = Address.Locality(fourth),
+                province = Address.Province(fifth),
+                country = Address.Country(sixth),
+                planet = Address.Planet(seventh),
                 postalCode = values.eighth?.let { value -> Address.PostalCode(value) },
                 isPrimary = values.ninth
             )

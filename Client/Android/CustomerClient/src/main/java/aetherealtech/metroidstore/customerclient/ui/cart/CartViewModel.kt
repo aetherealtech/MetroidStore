@@ -7,7 +7,7 @@ import aetherealtech.metroidstore.customerclient.model.subtotal
 import aetherealtech.metroidstore.customerclient.repositories.CartRepository
 import aetherealtech.metroidstore.customerclient.ui.cartrow.CartRowViewModel
 import aetherealtech.metroidstore.customerclient.uitoolkit.PrimaryCallToActionViewModel
-import aetherealtech.metroidstore.customerclient.utilities.mapState
+import aetherealtech.kotlinflowsextensions.mapState
 import aetherealtech.metroidstore.customerclient.widgets.PriceViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

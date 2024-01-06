@@ -4,8 +4,8 @@ import aetherealtech.metroidstore.customerclient.model.EditPaymentMethod
 import aetherealtech.metroidstore.customerclient.model.PaymentMethodDetails
 import aetherealtech.metroidstore.customerclient.model.PaymentMethodID
 import aetherealtech.metroidstore.customerclient.repositories.UserRepository
-import aetherealtech.metroidstore.customerclient.utilities.StateFlows
-import aetherealtech.metroidstore.customerclient.utilities.mapState
+import aetherealtech.kotlinflowsextensions.StateFlows
+import aetherealtech.kotlinflowsextensions.mapState
 import aetherealtech.metroidstore.customerclient.widgets.FormValue
 import aetherealtech.metroidstore.customerclient.widgets.requiredNonEmpty
 import androidx.lifecycle.ViewModel

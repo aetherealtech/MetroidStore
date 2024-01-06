@@ -29,8 +29,8 @@ import aetherealtech.metroidstore.customerclient.repositories.CartRepository
 import aetherealtech.metroidstore.customerclient.repositories.UserRepository
 import aetherealtech.metroidstore.customerclient.routing.AppBarState
 import aetherealtech.metroidstore.customerclient.theme.MetroidStoreTheme
-import aetherealtech.metroidstore.customerclient.utilities.StateFlows
-import aetherealtech.metroidstore.customerclient.utilities.mapState
+import aetherealtech.kotlinflowsextensions.StateFlows
+import aetherealtech.kotlinflowsextensions.mapState
 import aetherealtech.metroidstore.customerclient.widgets.BusyView
 import aetherealtech.metroidstore.customerclient.widgets.DropDownList
 import aetherealtech.metroidstore.customerclient.widgets.PriceView

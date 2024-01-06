@@ -62,6 +62,8 @@ dependencies {
     implementation("androidx.compose.material3:material3:1.1.2")
     implementation("androidx.navigation:navigation-compose:2.7.5")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.aetherealtech:tuples:0.0.2")
+    implementation("com.aetherealtech:kotlinflowsextensions:0.0.1")
     implementation(project(mapOf("path" to ":CustomerClientModel")))
     implementation(project(mapOf("path" to ":BackendClient")))
     implementation(project(mapOf("path" to ":EmbeddedBackend")))
