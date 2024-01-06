@@ -3,7 +3,7 @@ package aetherealtech.metroidstore.customerclient.ui.orderconfirmation
 import aetherealtech.metroidstore.customerclient.model.NewOrder
 import aetherealtech.metroidstore.customerclient.model.OrderID
 import aetherealtech.metroidstore.customerclient.repositories.UserRepository
-import aetherealtech.metroidstore.customerclient.uitoolkit.ConfirmationModalViewModel
+import aetherealtech.metroidstore.customerclient.widgets.ConfirmationModalViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -31,8 +31,8 @@ import aetherealtech.metroidstore.customerclient.routing.AppBarState
 import aetherealtech.metroidstore.customerclient.theme.MetroidStoreTheme
 import aetherealtech.kotlinflowsextensions.StateFlows
 import aetherealtech.kotlinflowsextensions.mapState
-import aetherealtech.metroidstore.customerclient.widgets.BusyView
-import aetherealtech.metroidstore.customerclient.widgets.DropDownList
+import aetherealtech.androiduitoolkit.BusyView
+import aetherealtech.androiduitoolkit.DropDownList
 import aetherealtech.metroidstore.customerclient.widgets.PriceView
 import aetherealtech.metroidstore.customerclient.widgets.PriceViewModel
 import androidx.compose.runtime.LaunchedEffect

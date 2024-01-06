@@ -11,7 +11,7 @@ import aetherealtech.metroidstore.customerclient.repositories.ProductRepository
 import aetherealtech.metroidstore.customerclient.routing.AppBarState
 import aetherealtech.metroidstore.customerclient.ui.productlistrow.ProductRowView
 import aetherealtech.metroidstore.customerclient.theme.MetroidStoreTheme
-import aetherealtech.metroidstore.customerclient.widgets.AsyncLoadedShimmering
+import aetherealtech.androiduitoolkit.AsyncLoadedShimmering
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api

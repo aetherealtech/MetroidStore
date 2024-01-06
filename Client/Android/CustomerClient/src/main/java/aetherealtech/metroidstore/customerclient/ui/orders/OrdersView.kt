@@ -8,7 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import aetherealtech.metroidstore.customerclient.ui.ordersummaryrow.OrderSummaryRow
 import aetherealtech.metroidstore.customerclient.routing.AppBarState
-import aetherealtech.metroidstore.customerclient.widgets.AsyncLoadedShimmering
+import aetherealtech.androiduitoolkit.AsyncLoadedShimmering
 import androidx.compose.runtime.LaunchedEffect
 
 @Composable

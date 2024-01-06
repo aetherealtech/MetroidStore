@@ -3,10 +3,10 @@ package aetherealtech.metroidstore.customerclient.ui.signup
 import aetherealtech.metroidstore.customerclient.datasources.fake.AuthDataSourceFake
 import aetherealtech.metroidstore.customerclient.repositories.AuthRepository
 import aetherealtech.metroidstore.customerclient.theme.MetroidStoreTheme
-import aetherealtech.metroidstore.customerclient.uitoolkit.PrimaryCallToAction
-import aetherealtech.metroidstore.customerclient.widgets.BusyView
-import aetherealtech.metroidstore.customerclient.widgets.LabeledValidatedPasswordField
-import aetherealtech.metroidstore.customerclient.widgets.LabeledValidatedTextField
+import aetherealtech.metroidstore.customerclient.widgets.PrimaryCallToAction
+import aetherealtech.androiduitoolkit.BusyView
+import aetherealtech.androiduitoolkit.LabeledValidatedPasswordField
+import aetherealtech.androiduitoolkit.LabeledValidatedTextField
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding

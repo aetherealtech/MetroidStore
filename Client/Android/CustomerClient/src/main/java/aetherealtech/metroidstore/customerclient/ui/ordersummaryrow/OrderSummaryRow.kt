@@ -18,7 +18,7 @@ import aetherealtech.metroidstore.customerclient.model.OrderStatus
 import aetherealtech.metroidstore.customerclient.model.OrderSummary
 import aetherealtech.metroidstore.customerclient.model.Price
 import aetherealtech.metroidstore.customerclient.theme.MetroidStoreTheme
-import aetherealtech.metroidstore.customerclient.uitoolkit.PrimaryCallToAction
+import aetherealtech.metroidstore.customerclient.widgets.PrimaryCallToAction
 import aetherealtech.metroidstore.customerclient.widgets.PriceView
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width

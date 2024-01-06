@@ -2,7 +2,7 @@ package aetherealtech.metroidstore.customerclient.ui.addtocartconfirmation
 
 import aetherealtech.metroidstore.customerclient.model.ProductDetails
 import aetherealtech.metroidstore.customerclient.repositories.CartRepository
-import aetherealtech.metroidstore.customerclient.uitoolkit.ConfirmationModalViewModel
+import aetherealtech.metroidstore.customerclient.widgets.ConfirmationModalViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

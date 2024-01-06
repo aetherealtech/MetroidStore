@@ -6,8 +6,8 @@ import aetherealtech.metroidstore.customerclient.model.PaymentMethodID
 import aetherealtech.metroidstore.customerclient.repositories.UserRepository
 import aetherealtech.kotlinflowsextensions.StateFlows
 import aetherealtech.kotlinflowsextensions.mapState
-import aetherealtech.metroidstore.customerclient.widgets.FormValue
-import aetherealtech.metroidstore.customerclient.widgets.requiredNonEmpty
+import aetherealtech.androiduitoolkit.FormValue
+import aetherealtech.androiduitoolkit.requiredNonEmpty
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow

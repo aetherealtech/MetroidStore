@@ -1,4 +1,4 @@
-package aetherealtech.metroidstore.customerclient.uitoolkit
+package aetherealtech.metroidstore.customerclient.widgets
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape

@@ -10,7 +10,7 @@ import aetherealtech.metroidstore.customerclient.repositories.UserRepository
 import aetherealtech.metroidstore.customerclient.ui.placeorderbutton.PlaceOrderViewModel
 import aetherealtech.kotlinflowsextensions.StateFlows
 import aetherealtech.kotlinflowsextensions.mapState
-import aetherealtech.metroidstore.customerclient.widgets.DropDownViewModel
+import aetherealtech.androiduitoolkit.DropDownViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.collections.immutable.toImmutableList

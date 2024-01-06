@@ -21,10 +21,10 @@ import aetherealtech.metroidstore.customerclient.datasources.fake.DataSourceFake
 import aetherealtech.metroidstore.customerclient.datasources.fake.cartItem
 import aetherealtech.metroidstore.customerclient.repositories.CartRepository
 import aetherealtech.metroidstore.customerclient.theme.MetroidStoreTheme
-import aetherealtech.metroidstore.customerclient.widgets.AsyncImage
+import aetherealtech.metroidstore.customerclient.uitoolkit.AsyncImage
 import aetherealtech.metroidstore.customerclient.widgets.PriceView
-import aetherealtech.metroidstore.customerclient.widgets.QuantityControl
-import aetherealtech.metroidstore.customerclient.widgets.ShadowButton
+import aetherealtech.androiduitoolkit.QuantityControl
+import aetherealtech.androiduitoolkit.ShadowButton
 
 @Composable
 fun CartRowView(

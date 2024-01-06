@@ -1,4 +1,4 @@
-package aetherealtech.metroidstore.customerclient.uitoolkit
+package aetherealtech.metroidstore.customerclient.widgets
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,7 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
-import aetherealtech.metroidstore.customerclient.widgets.BottomModal
+import aetherealtech.androiduitoolkit.BottomModal
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 

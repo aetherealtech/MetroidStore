@@ -4,8 +4,8 @@ import aetherealtech.metroidstore.customerclient.datasources.fake.DataSourceFake
 import aetherealtech.metroidstore.customerclient.model.OrderID
 import aetherealtech.metroidstore.customerclient.repositories.OrderRepository
 import aetherealtech.metroidstore.customerclient.theme.MetroidStoreTheme
-import aetherealtech.metroidstore.customerclient.widgets.AsyncLoadedShimmering
-import aetherealtech.metroidstore.customerclient.widgets.MilestoneProgressView
+import aetherealtech.androiduitoolkit.AsyncLoadedShimmering
+import aetherealtech.androiduitoolkit.MilestoneProgressView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

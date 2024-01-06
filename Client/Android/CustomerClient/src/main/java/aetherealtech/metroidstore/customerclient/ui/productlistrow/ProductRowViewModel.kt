@@ -4,7 +4,7 @@ import aetherealtech.metroidstore.customerclient.model.ImageSource
 import aetherealtech.metroidstore.customerclient.model.ProductID
 import aetherealtech.metroidstore.customerclient.model.ProductSummary
 import aetherealtech.metroidstore.customerclient.widgets.PriceViewModel
-import aetherealtech.metroidstore.customerclient.widgets.StarRatingViewModel
+import aetherealtech.androiduitoolkit.StarRatingViewModel
 import androidx.lifecycle.ViewModel
 
 class ProductRowViewModel(

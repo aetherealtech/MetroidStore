@@ -20,9 +20,9 @@ import androidx.compose.ui.unit.sp
 import aetherealtech.metroidstore.customerclient.datasources.fake.DataSourceFake
 import aetherealtech.metroidstore.customerclient.datasources.fake.summary
 import aetherealtech.metroidstore.customerclient.theme.MetroidStoreTheme
-import aetherealtech.metroidstore.customerclient.widgets.AsyncImage
+import aetherealtech.metroidstore.customerclient.uitoolkit.AsyncImage
 import aetherealtech.metroidstore.customerclient.widgets.PriceView
-import aetherealtech.metroidstore.customerclient.widgets.StarRatingView
+import aetherealtech.androiduitoolkit.StarRatingView
 
 @Composable
 fun ProductRowView(

@@ -7,7 +7,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import aetherealtech.metroidstore.customerclient.ui.orderconfirmation.OrderConfirmationView
-import aetherealtech.metroidstore.customerclient.uitoolkit.PrimaryCallToAction
+import aetherealtech.metroidstore.customerclient.widgets.PrimaryCallToAction
 
 @Composable
 fun PlaceOrderButton(

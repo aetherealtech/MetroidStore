@@ -7,8 +7,8 @@ import aetherealtech.metroidstore.customerclient.ui.orderactivity.OrderActivityV
 import aetherealtech.metroidstore.customerclient.repositories.OrderRepository
 import aetherealtech.metroidstore.customerclient.routing.AppBarState
 import aetherealtech.metroidstore.customerclient.theme.MetroidStoreTheme
-import aetherealtech.metroidstore.customerclient.widgets.AsyncLoadedShimmering
-import aetherealtech.metroidstore.customerclient.widgets.CenterModal
+import aetherealtech.androiduitoolkit.AsyncLoadedShimmering
+import aetherealtech.androiduitoolkit.CenterModal
 import aetherealtech.metroidstore.customerclient.widgets.PriceView
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement

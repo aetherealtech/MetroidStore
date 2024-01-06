@@ -20,10 +20,10 @@ import aetherealtech.metroidstore.customerclient.repositories.CartRepository
 import aetherealtech.metroidstore.customerclient.routing.AppBarState
 import aetherealtech.metroidstore.customerclient.ui.cartrow.CartRowView
 import aetherealtech.metroidstore.customerclient.theme.MetroidStoreTheme
-import aetherealtech.metroidstore.customerclient.widgets.AsyncLoadedShimmering
-import aetherealtech.metroidstore.customerclient.widgets.BusyView
+import aetherealtech.androiduitoolkit.AsyncLoadedShimmering
+import aetherealtech.androiduitoolkit.BusyView
 import aetherealtech.metroidstore.customerclient.widgets.PriceView
-import aetherealtech.metroidstore.customerclient.uitoolkit.PrimaryCallToAction
+import aetherealtech.metroidstore.customerclient.widgets.PrimaryCallToAction
 import androidx.compose.runtime.LaunchedEffect
 
 @Composable

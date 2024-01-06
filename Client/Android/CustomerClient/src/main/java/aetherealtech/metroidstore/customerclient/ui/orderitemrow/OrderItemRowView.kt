@@ -3,7 +3,7 @@ package aetherealtech.metroidstore.customerclient.ui.orderitemrow
 import aetherealtech.metroidstore.customerclient.datasources.fake.DataSourceFake
 import aetherealtech.metroidstore.customerclient.datasources.fake.orderItem
 import aetherealtech.metroidstore.customerclient.theme.MetroidStoreTheme
-import aetherealtech.metroidstore.customerclient.widgets.AsyncImage
+import aetherealtech.metroidstore.customerclient.uitoolkit.AsyncImage
 import aetherealtech.metroidstore.customerclient.widgets.PriceView
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement

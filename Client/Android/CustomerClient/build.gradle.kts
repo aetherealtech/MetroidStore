@@ -49,7 +49,7 @@ android {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.6")
+    implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.7")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
@@ -63,7 +63,8 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.7.6")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.aetherealtech:tuples:0.0.2")
-    implementation("com.aetherealtech:kotlinflowsextensions:0.0.1")
+    implementation("com.aetherealtech:kotlin-flows-extensions:0.0.2")
+    implementation("com.aetherealtech:android-ui-toolkit:0.0.1")
     implementation(project(mapOf("path" to ":CustomerClientModel")))
     implementation(project(mapOf("path" to ":BackendClient")))
     implementation(project(mapOf("path" to ":EmbeddedBackend")))

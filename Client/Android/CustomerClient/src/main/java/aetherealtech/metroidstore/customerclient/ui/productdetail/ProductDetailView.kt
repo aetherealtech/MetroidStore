@@ -19,8 +19,8 @@ import aetherealtech.metroidstore.customerclient.repositories.ProductRepository
 import aetherealtech.metroidstore.customerclient.theme.MetroidStoreTheme
 import aetherealtech.metroidstore.customerclient.ui.addtocartbutton.AddToCartButton
 import aetherealtech.metroidstore.customerclient.routing.AppBarState
-import aetherealtech.metroidstore.customerclient.widgets.AsyncLoadedShimmering
-import aetherealtech.metroidstore.customerclient.widgets.ImagesCarousel
+import aetherealtech.androiduitoolkit.AsyncLoadedShimmering
+import aetherealtech.androiduitoolkit.ImagesCarousel
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue

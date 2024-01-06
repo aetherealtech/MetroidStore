@@ -6,8 +6,8 @@ import aetherealtech.metroidstore.customerclient.routing.AppBarState
 import aetherealtech.metroidstore.customerclient.theme.Colors
 import aetherealtech.metroidstore.customerclient.theme.MetroidStoreTheme
 import aetherealtech.metroidstore.customerclient.ui.paymentmethodrow.PaymentMethodRowView
-import aetherealtech.metroidstore.customerclient.widgets.AsyncLoadedShimmering
-import aetherealtech.metroidstore.customerclient.widgets.SwipeToDeleteRow
+import aetherealtech.androiduitoolkit.AsyncLoadedShimmering
+import aetherealtech.androiduitoolkit.SwipeToDeleteRow
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons

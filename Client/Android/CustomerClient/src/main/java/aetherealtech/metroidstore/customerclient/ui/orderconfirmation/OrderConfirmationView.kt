@@ -13,9 +13,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import aetherealtech.metroidstore.customerclient.model.OrderID
 import aetherealtech.metroidstore.customerclient.theme.MetroidStoreTheme
-import aetherealtech.metroidstore.customerclient.uitoolkit.ConfirmationModal
-import aetherealtech.metroidstore.customerclient.widgets.CloseableView
-import aetherealtech.metroidstore.customerclient.uitoolkit.PrimaryCallToAction
+import aetherealtech.metroidstore.customerclient.widgets.ConfirmationModal
+import aetherealtech.androiduitoolkit.CloseableView
+import aetherealtech.metroidstore.customerclient.widgets.PrimaryCallToAction
 import kotlinx.coroutines.flow.Flow
 
 @Composable
